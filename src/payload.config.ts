@@ -13,9 +13,10 @@ import { buildConfig } from 'payload/config'
 import { Pages } from './collections/Pages'
 import { Tenants } from './collections/Tenants'
 import { Users } from './collections/Users'
+import { Media } from './collections/Media'
 
 export default buildConfig({
-  collections: [Users, Tenants, Pages],
+  collections: [Users, Tenants, Pages, Media],
   admin: {
     bundler: webpackBundler(),
     webpack: config => ({

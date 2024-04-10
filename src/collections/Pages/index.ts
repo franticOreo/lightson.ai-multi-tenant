@@ -7,6 +7,8 @@ import { tenantAdmins } from './access/tenantAdmins'
 import { tenants } from './access/tenants'
 import formatSlug from './hooks/formatSlug'
 
+import { MediaBlock } from '../../blocks/MediaBlock'
+
 export const Pages: CollectionConfig = {
   slug: 'pages',
   admin: {
@@ -37,7 +39,15 @@ export const Pages: CollectionConfig = {
         beforeValidate: [formatSlug('title')],
       },
     },
+    {
+      label: 'Media',
+      name: 'media',
+      type: 'blocks',
+      required: false,
+      blocks: [MediaBlock],
+    },
     tenant,
     richText(),
+
   ],
 }
