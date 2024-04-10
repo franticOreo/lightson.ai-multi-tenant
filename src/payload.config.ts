@@ -17,6 +17,7 @@ import { Media } from './collections/Media'
 
 export default buildConfig({
   collections: [Users, Tenants, Pages, Media],
+  cors: '*',
   admin: {
     bundler: webpackBundler(),
     webpack: config => ({

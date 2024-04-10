@@ -1,1 +1,0 @@
-# lightson.ai-multi-tenant
