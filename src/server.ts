@@ -12,16 +12,7 @@ import { seed } from './seed'
 
 const app = express()
 
-// Define the redirect rules
-app.use((req, res, next) => {
-  if (req.hostname === 'www.lightson.ai') {
-    return res.redirect(301, `https://lightson.ai${req.originalUrl}`);
-  }
-  if (req.hostname === 'lightson.ai') {
-    return res.redirect(301, `https://www.lightson.ai${req.originalUrl}`);
-  }
-  next();
-});
+
 
 
 app.get('/', (_, res) => {
