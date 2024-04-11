@@ -16,6 +16,8 @@ app.get('/', (_, res) => {
   res.redirect('/admin')
 })
 
+
+
 const start = async (): Promise<void> => {
   await payload.init({
     secret: process.env.PAYLOAD_SECRET,
@@ -29,6 +31,8 @@ const start = async (): Promise<void> => {
     payload.logger.info('---- SEEDING DATABASE ----')
     await seed(payload)
   }
+
+  app.use('/assets', express.static(path.resolve(__dirname, './assets')));
 
   app.listen(3000)
 }

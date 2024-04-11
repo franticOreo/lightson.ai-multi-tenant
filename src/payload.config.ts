@@ -4,6 +4,8 @@ import { slateEditor } from '@payloadcms/richtext-slate'
 import dotenv from 'dotenv'
 import path from 'path'
 
+import { Logo } from './graphics/logo';
+
 dotenv.config({
   path: path.resolve(__dirname, '../.env'),
 })
@@ -30,6 +32,17 @@ export default buildConfig({
         },
       },
     }),
+    meta: {
+      titleSuffix: '- lightson.ai',
+      favicon: '/assets/logo.svg',
+      ogImage: '/assets/logo.svg',
+      
+    },
+    components: {
+      graphics: {
+        Logo,
+      },
+    },
   },
   editor: slateEditor({}),
   db: mongooseAdapter({
