@@ -18,6 +18,7 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 
 export default buildConfig({
+  serverURL: 'https://lightson.ai',
   collections: [Users, Tenants, Pages, Media],
   cors: '*',
   admin: {

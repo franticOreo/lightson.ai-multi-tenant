@@ -12,14 +12,9 @@ import { seed } from './seed'
 
 const app = express()
 
-
-
-
 app.get('/', (_, res) => {
   res.redirect('/admin')
 })
-
-
 
 const start = async (): Promise<void> => {
   await payload.init({
