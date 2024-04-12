@@ -18,7 +18,7 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 
 export default buildConfig({
-  serverURL: 'https://lightson.ai',
+  serverURL: process.env.NODE_ENV === 'production' ? 'https://lightson.ai' : 'http://localhost:3000',
   collections: [Users, Tenants, Pages, Media],
   cors: '*',
   admin: {
