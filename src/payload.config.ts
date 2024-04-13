@@ -16,10 +16,11 @@ import { Posts } from './collections/Posts'
 import { Tenants } from './collections/Tenants'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Business } from './collections/Business';
 
 export default buildConfig({
-  collections: [Users, Tenants, Posts, Media],
-  serverURL: process.env.NODE_ENV === 'production' ? 'https://lightson.ai' : 'http://localhost:3000',
+  collections: [Users, Tenants, Posts, Media, Business],
+  // serverURL: process.env.NODE_ENV === 'production' ? 'https://lightson.ai' : 'http://localhost:3000',
   cors: '*',
   admin: {
     bundler: webpackBundler(),

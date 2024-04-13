@@ -12,6 +12,7 @@ export interface Config {
     tenants: Tenant;
     posts: Post;
     media: Media;
+    business: Business;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
@@ -108,6 +109,34 @@ export interface Media {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "business".
+ */
+export interface Business {
+  id: string;
+  clientName: string;
+  instagramHandle: string;
+  phoneNumber: string;
+  email: string;
+  businessName: string;
+  businessBio: string;
+  businessAddress: string;
+  operatingHours: string;
+  languageStyle: string;
+  keywords?:
+    | {
+        keyword: string;
+        id?: string | null;
+      }[]
+    | null;
+  serviceArea: string;
+  createdBy?: (string | null) | User;
+  updatedBy?: (string | null) | User;
+  tenant?: (string | null) | Tenant;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
