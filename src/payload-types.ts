@@ -8,92 +8,143 @@
 
 export interface Config {
   collections: {
-    users: User
-    tenants: Tenant
-    pages: Page
-    'payload-preferences': PayloadPreference
-    'payload-migrations': PayloadMigration
-  }
-  globals: {}
+    users: User;
+    tenants: Tenant;
+    posts: Post;
+    media: Media;
+    'payload-preferences': PayloadPreference;
+    'payload-migrations': PayloadMigration;
+  };
+  globals: {};
 }
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
 export interface User {
-  id: string
-  firstName?: string
-  lastName?: string
-  roles: ('super-admin' | 'user')[]
-  tenants?: {
-    tenant: string | Tenant
-    roles: ('admin' | 'user')[]
-    id?: string
-  }[]
-  lastLoggedInTenant?: string | Tenant
-  updatedAt: string
-  createdAt: string
-  email: string
-  resetPasswordToken?: string
-  resetPasswordExpiration?: string
-  salt?: string
-  hash?: string
-  loginAttempts?: number
-  lockUntil?: string
-  password?: string
+  id: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  roles: ('super-admin' | 'user')[];
+  tenants?:
+    | {
+        tenant: string | Tenant;
+        roles: ('admin' | 'user')[];
+        id?: string | null;
+      }[]
+    | null;
+  lastLoggedInTenant?: (string | null) | Tenant;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  password: string | null;
 }
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tenants".
+ */
 export interface Tenant {
-  id: string
-  name: string
-  domains?: {
-    domain: string
-    id?: string
-  }[]
-  updatedAt: string
-  createdAt: string
+  id: string;
+  name: string;
+  domains?:
+    | {
+        domain: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
-export interface Page {
-  id: string
-  title: string
-  slug?: string
-  tenant?: string | Tenant
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: string;
+  title: string;
+  slug?: string | null;
+  excerpt: string;
+  date: string;
+  author: string | User;
+  createdBy?: (string | null) | User;
+  updatedBy?: (string | null) | User;
+  coverImage: {
+    position?: ('default' | 'fullscreen') | null;
+    media: string | Media;
+    id?: string | null;
+    blockName?: string | null;
+    blockType: 'mediaBlock';
+  }[];
+  tenant?: (string | null) | Tenant;
   richText: {
-    [k: string]: unknown
-  }[]
-  updatedAt: string
-  createdAt: string
+    [k: string]: unknown;
+  }[];
+  updatedAt: string;
+  createdAt: string;
 }
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: string;
+  alt: string;
+  caption?:
+    | {
+        [k: string]: unknown;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-preferences".
+ */
 export interface PayloadPreference {
-  id: string
+  id: string;
   user: {
-    relationTo: 'users'
-    value: string | User
-  }
-  key?: string
+    relationTo: 'users';
+    value: string | User;
+  };
+  key?: string | null;
   value?:
     | {
-        [k: string]: unknown
+        [k: string]: unknown;
       }
     | unknown[]
     | string
     | number
     | boolean
-    | null
-  updatedAt: string
-  createdAt: string
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-migrations".
+ */
 export interface PayloadMigration {
-  id: string
-  name?: string
-  batch?: number
-  updatedAt: string
-  createdAt: string
+  id: string;
+  name?: string | null;
+  batch?: number | null;
+  updatedAt: string;
+  createdAt: string;
 }
 
+
 declare module 'payload' {
-  export interface GeneratedTypes {
-    collections: {
-      users: User
-      tenants: Tenant
-      pages: Page
-      'payload-preferences': PayloadPreference
-      'payload-migrations': PayloadMigration
-    }
-  }
+  export interface GeneratedTypes extends Config {}
 }

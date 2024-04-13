@@ -29,58 +29,58 @@ const richText: RichText = (
       required: true,
       editor: slateEditor({
         admin: {
-          upload: {
-            collections: {
-              media: {
-                fields: [
-                  {
-                    type: 'richText',
-                    name: 'caption',
-                    label: 'Caption',
-                    editor: slateEditor({
-                      admin: {
-                        elements: [...elements],
-                        leaves: [...leaves],
-                      },
-                    }),
-                  },
-                  {
-                    type: 'radio',
-                    name: 'alignment',
-                    label: 'Alignment',
-                    options: [
-                      {
-                        label: 'Left',
-                        value: 'left',
-                      },
-                      {
-                        label: 'Center',
-                        value: 'center',
-                      },
-                      {
-                        label: 'Right',
-                        value: 'right',
-                      },
-                    ],
-                  },
-                  {
-                    name: 'enableLink',
-                    type: 'checkbox',
-                    label: 'Enable Link',
-                  },
-                  link({
-                    appearances: false,
-                    disableLabel: true,
-                    overrides: {
-                      admin: {
-                        condition: (_, data) => Boolean(data?.enableLink),
-                      },
-                    },
-                  }),
-                ],
-              },
-            },
-          },
+          // upload: {
+          //   collections: {
+          //     media: {
+          //       fields: [
+          //         {
+          //           type: 'richText',
+          //           name: 'caption',
+          //           label: 'Caption',
+          //           editor: slateEditor({
+          //             admin: {
+          //               elements: [...elements],
+          //               leaves: [...leaves],
+          //             },
+          //           }),
+          //         },
+          //         {
+          //           type: 'radio',
+          //           name: 'alignment',
+          //           label: 'Alignment',
+          //           options: [
+          //             {
+          //               label: 'Left',
+          //               value: 'left',
+          //             },
+          //             {
+          //               label: 'Center',
+          //               value: 'center',
+          //             },
+          //             {
+          //               label: 'Right',
+          //               value: 'right',
+          //             },
+          //           ],
+          //         },
+          //         {
+          //           name: 'enableLink',
+          //           type: 'checkbox',
+          //           label: 'Enable Link',
+          //         },
+          //         link({
+          //           appearances: false,
+          //           disableLabel: true,
+          //           overrides: {
+          //             admin: {
+          //               condition: (_, data) => Boolean(data?.enableLink),
+          //             },
+          //           },
+          //         }),
+          //       ],
+          //     },
+          //   },
+          // },
           elements: [...elements, ...(additions.elements || [])],
           leaves: [...leaves, ...(additions.leaves || [])],
         },
