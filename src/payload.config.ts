@@ -19,7 +19,8 @@ import { Media } from './collections/Media'
 
 export default buildConfig({
   collections: [Users, Tenants, Posts, Media],
-  cors: "*",
+  serverURL: process.env.NODE_ENV === 'production' ? 'https://lightson.ai' : 'http://localhost:3000',
+  cors: '*',
   admin: {
     bundler: webpackBundler(),
     webpack: (config) => ({
