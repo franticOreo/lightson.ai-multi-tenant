@@ -18,7 +18,7 @@ That's it! Changes made in `./src` will be reflected in your app. See the [Devel
 
 A multi-tenant Payload application is a single server that hosts multiple "tenants". Examples of tenants may be your agency's clients, your business conglomerate's organizations, or your SaaS customers.
 
-Each tenant has its own set of users, pages, and other data that is scoped to that tenant. This means that your application will be shared across tenants but the data will be scoped to each tenant. Tenants also run on separate domains entirely, so users are not aware of their tenancy.
+Each tenant has its own set of users, posts, and other data that is scoped to that tenant. This means that your application will be shared across tenants but the data will be scoped to each tenant. Tenants also run on separate domains entirely, so users are not aware of their tenancy.
 
 ### Collections
 
@@ -32,13 +32,13 @@ See the [Collections](https://payloadcms.com/docs/configuration/collections) doc
 
 - #### Tenants
 
-  A `tenants` collection is used to achieve tenant-based access control. Each user is assigned an array of `tenants` which includes a relationship to a `tenant` and their `roles` within that tenant. You can then scope any document within your application to any of your tenants using a simple [relationship](https://payloadcms.com/docs/fields/relationship) field on the `users` or `pages` collections, or any other collection that your application needs. The value of this field is used to filter documents in the admin panel and API to ensure that users can only access documents that belong to their tenant and are within their role. See [Access Control](#access-control) for more details.
+  A `tenants` collection is used to achieve tenant-based access control. Each user is assigned an array of `tenants` which includes a relationship to a `tenant` and their `roles` within that tenant. You can then scope any document within your application to any of your tenants using a simple [relationship](https://payloadcms.com/docs/fields/relationship) field on the `users` or `posts` collections, or any other collection that your application needs. The value of this field is used to filter documents in the admin panel and API to ensure that users can only access documents that belong to their tenant and are within their role. See [Access Control](#access-control) for more details.
 
   For more details on how to extend this functionality, see the [Payload Access Control](https://payloadcms.com/docs/access-control/overview) docs.
 
-- #### Pages
+- #### Posts
 
-  Each page is assigned a `tenant` which is used to control access and scope API requests. Pages that are created by tenants are automatically assigned that tenant based on that user's `lastLoggedInTenant` field.
+  Each page is assigned a `tenant` which is used to control access and scope API requests. Posts that are created by tenants are automatically assigned that tenant based on that user's `lastLoggedInTenant` field.
 
 ## Access control
 
@@ -51,11 +51,11 @@ This applies to each collection in the following ways:
 
 - `users`: Only super-admins, tenant-admins, and the user themselves can access their profile. Anyone can create a user, but only these admins can delete users. See [Users](#users) for more details.
 - `tenants`: Only super-admins and tenant-admins can read, create, update, or delete tenants. See [Tenants](#tenants) for more details.
-- `pages`: Everyone can access pages, but only super-admins and tenant-admins can create, update, or delete them.
+- `posts`: Everyone can access posts, but only super-admins and tenant-admins can create, update, or delete them.
 
-When a user logs in, a `lastLoggedInTenant` field is saved to their profile. This is done by reading the value of `req.headers.host`, querying for a tenant with a matching `domain`, and verifying that the user is a member of that tenant. This field is then used to automatically assign the tenant to any documents that the user creates, such as pages. Super-admins can also use this field to browse the admin panel as a specific tenant.
+When a user logs in, a `lastLoggedInTenant` field is saved to their profile. This is done by reading the value of `req.headers.host`, querying for a tenant with a matching `domain`, and verifying that the user is a member of that tenant. This field is then used to automatically assign the tenant to any documents that the user creates, such as posts. Super-admins can also use this field to browse the admin panel as a specific tenant.
 
-> If you have versions and drafts enabled on your pages, you will need to add additional read access control condition to check the user's tenants that prevents them from accessing draft documents of other tenants.
+> If you have versions and drafts enabled on your posts, you will need to add additional read access control condition to check the user's tenants that prevents them from accessing draft documents of other tenants.
 
 For more details on how to extend this functionality, see the [Payload Access Control](https://payloadcms.com/docs/access-control/overview#access-control) docs.
 
@@ -69,7 +69,7 @@ For more details on this, see the [CORS](https://payloadcms.com/docs/production/
 
 ## Front-end
 
-If you're building a website or other front-end for your tenant, you will need specify the `tenant` in your requests. For example, if you wanted to fetch all pages for the tenant `ABC`, you would make a request to `/api/pages?where[tenant.name][equals]=ABC`.
+If you're building a website or other front-end for your tenant, you will need specify the `tenant` in your requests. For example, if you wanted to fetch all posts for the tenant `ABC`, you would make a request to `/api/posts?where[tenant.name][equals]=ABC`.
 
 For a head start on building a website for your tenant(s), check out the official [Website Template](https://github.com/payloadcms/template-website). It includes a page layout builder, preview, SEO, and much more. It is not multi-tenant, though, but you can easily take the concepts from that example and apply them here.
 
@@ -87,7 +87,7 @@ On boot, a seed script is included to scaffold a basic database for you to use a
   - Users:
     - `admin@abc.com` with role `admin` and password `test`
     - `user@abc.com` with role `user` and password `test`
-  - Pages:
+  - Posts:
     - `ABC Home` with content `Hello, ABC!`
 - `BBC`
   - Domains:
@@ -95,7 +95,7 @@ On boot, a seed script is included to scaffold a basic database for you to use a
   - Users:
     - `admin@bbc.com` with role `admin` and password `test`
     - `user@bbc.com` with role `user` and password `test`
-  - Pages:
+  - Posts:
     - `BBC Home` with content `Hello, BBC!`
 
 > NOTICE: seeding the database is destructive because it drops your current database to populate a fresh one from the seed template. Only run this command if you are starting a new project or can afford to lose your current data.

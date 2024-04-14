@@ -12,32 +12,32 @@ dotenv.config({
 
 import { buildConfig } from 'payload/config'
 
-import { Pages } from './collections/Pages'
+import { Posts } from './collections/Posts'
 import { Tenants } from './collections/Tenants'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Business } from './collections/Business';
 
 export default buildConfig({
-  serverURL: process.env.NODE_ENV === 'production' ? 'https://lightson.ai' : 'http://localhost:3000',
-  collections: [Users, Tenants, Pages, Media],
+  collections: [Users, Tenants, Posts, Media, Business],
+  // serverURL: process.env.NODE_ENV === 'production' ? 'https://lightson.ai' : 'http://localhost:3000',
   cors: '*',
   admin: {
     bundler: webpackBundler(),
-    webpack: config => ({
+    webpack: (config) => ({
       ...config,
       resolve: {
         ...config.resolve,
         alias: {
           ...config.resolve.alias,
-          dotenv: path.resolve(__dirname, './dotenv.js'),
+          dotenv: path.resolve(__dirname, "./dotenv.js"),
         },
       },
     }),
     meta: {
-      titleSuffix: '- lightson.ai',
-      favicon: '/assets/logo.svg',
-      ogImage: '/assets/logo.svg',
-      
+      titleSuffix: "- lightson.ai",
+      favicon: "/assets/logo.svg",
+      ogImage: "/assets/logo.svg",
     },
     components: {
       graphics: {
@@ -50,6 +50,9 @@ export default buildConfig({
     url: process.env.DATABASE_URI,
   }),
   typescript: {
-    outputFile: path.resolve(__dirname, 'payload-types.ts'),
+    outputFile: path.resolve(__dirname, "payload-types.ts"),
   },
-})
+  graphQL: {
+    schemaOutputFile: path.resolve(__dirname, "./graphql/schema.graphql"),
+  },
+});

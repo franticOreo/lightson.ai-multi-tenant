@@ -73,26 +73,26 @@ const link: LinkType = ({ appearances, disableLabel = false, overrides = {} } = 
 
   const linkTypes: Field[] = [
     {
-      name: 'reference',
-      label: 'Document to link to',
-      type: 'relationship',
-      relationTo: ['pages'],
+      name: "reference",
+      label: "Document to link to",
+      type: "relationship",
+      relationTo: ["posts"],
       required: true,
       maxDepth: 1,
       admin: {
-        condition: (_, siblingData) => siblingData?.type === 'reference',
+        condition: (_, siblingData) => siblingData?.type === "reference",
       },
     },
     {
-      name: 'url',
-      label: 'Custom URL',
-      type: 'text',
+      name: "url",
+      label: "Custom URL",
+      type: "text",
       required: true,
       admin: {
-        condition: (_, siblingData) => siblingData?.type === 'custom',
+        condition: (_, siblingData) => siblingData?.type === "custom",
       },
     },
-  ]
+  ];
 
   if (!disableLabel) {
     linkTypes[0].admin.width = '50%'
