@@ -1,4 +1,4 @@
-import type { User } from '../../../payload-types'
+import type { User } from '../../../../payload-types'
 
 export const checkTenantRoles = (
   allRoles: User['tenants'][0]['roles'] = [],
