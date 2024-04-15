@@ -1,14 +1,18 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "target": "es5",
     "allowJs": true,
-    "strict": true, // Note: One had false, another true. Choose based on your strictness requirement.
+    "strict": false, // Note: One had false, another true. Choose based on your strictness requirement.
     "esModuleInterop": true,
     "skipLibCheck": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "jsx": "react", // Note: If you're using Next.js, you might want to keep it as "preserve".
+    "jsx": "preserve", // Note: If you're using Next.js, you might want to keep it as "preserve".
     "sourceMap": true,
     "resolveJsonModule": true,
     "module": "CommonJS",
@@ -17,14 +21,20 @@
     "incremental": true,
     "noEmit": true, // Note: Important for Next.js, might not be desired for other setups.
     "paths": {
-      "node_modules/*": ["./node_modules/*"],
-      "@/*": ["./*"]
+      "node_modules/*": [
+        "./node_modules/*"
+      ],
+      "@/*": [
+        "./*"
+      ]
     },
     "plugins": [
       {
         "name": "next"
       }
-    ]
+    ],
+    "forceConsistentCasingInFileNames": true,
+    "strictNullChecks": true
   },
   "include": [
     "src",
