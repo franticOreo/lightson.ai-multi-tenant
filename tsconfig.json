@@ -1,31 +1,42 @@
 {
   "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
     "allowJs": true,
-    "strict": false,
+    "strict": true, // Note: One had false, another true. Choose based on your strictness requirement.
     "esModuleInterop": true,
     "skipLibCheck": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "jsx": "react",
+    "jsx": "react", // Note: If you're using Next.js, you might want to keep it as "preserve".
     "sourceMap": true,
     "resolveJsonModule": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "isolatedModules": true,
+    "incremental": true,
+    "noEmit": true, // Note: Important for Next.js, might not be desired for other setups.
     "paths": {
-      "node_modules/*": ["./node_modules/*"]
+      "node_modules/*": ["./node_modules/*"],
+      "@/*": ["./*"]
     },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
-    "src"
+    "src",
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "build",
+    "build"
   ],
   "ts-node": {
     "transpileOnly": true
