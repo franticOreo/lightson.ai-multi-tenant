@@ -1,5 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import fetch from 'node-fetch';
+import { takeUserProfileScreenshot } from '../../../utils/screenshot';
+
+async function getUserProfile(accessToken: string) {
+    const response = await fetch(`https://api.instagram.com/v1/users/self/?access_token=${accessToken}`);
+    const data = await response.json();
+    return data.data.username;
+}
+
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { code } = req.query;
@@ -10,8 +18,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const clientId = '743103918004392';
-    const clientSecret = 'eli';
-    const redirectUri = 'https://localhost:3000/api/instagram/callback';
+    const clientSecret = '2647020baecf2da6ba40f57d151d730b';
+    // const redirectUri = encodeURIComponent(process.env.REDIRECT_URI);
     const tokenUrl = 'https://api.instagram.com/oauth/access_token';
 
     const response = await fetch(tokenUrl, {
@@ -23,17 +31,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         client_id: clientId,
         client_secret: clientSecret,
         grant_type: 'authorization_code',
-        redirect_uri: redirectUri,
+        redirect_uri: 'https://3b36-122-202-8-240.ngrok-free.app/api/instagram/callback',
         code,
       }),
     });
 
     const data = await response.json();
 
+    console.log(data)
+
     if (data.access_token) {
-      // Here you can handle the access token. For example, save it to your database.
-      // Redirect the user to a new page or show a success message.
-      // Note: Adjust the redirection URL as needed.
+
+      const instagramHandle = await getUserProfile(data.access_token)
+      console.log(instagramHandle)
+
+      takeUserProfileScreenshot(`https://www.instagram.com/${instagramHandle}`, instagramHandle)
+
+              
+
       res.redirect(307, '/success-page');
     } else {
       // Handle errors, e.g., display an error message to the user.
