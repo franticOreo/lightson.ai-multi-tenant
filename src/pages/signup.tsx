@@ -10,7 +10,7 @@ export default function SignupPage( {username} ) {
     // Function to handle Instagram authorization
     const handleInstagramAuth = () => {
         const clientId = '743103918004392';
-        const redirectUri = 'http://localhost:3000/api/instagram/callback';
+        const redirectUri = 'https://localhost:3000/api/instagram/callback';
         const scope = 'user_profile';
         const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&response_type=code`;
 

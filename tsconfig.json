@@ -32,7 +32,7 @@
       }
     ],
     "forceConsistentCasingInFileNames": true,
-    "strictNullChecks": true
+    "strictNullChecks": false
   },
   "include": [
     "src",
