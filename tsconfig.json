@@ -10,8 +10,6 @@
     "strict": false, // Note: One had false, another true. Choose based on your strictness requirement.
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
     "jsx": "preserve", // Note: If you're using Next.js, you might want to keep it as "preserve".
     "sourceMap": true,
     "resolveJsonModule": true,

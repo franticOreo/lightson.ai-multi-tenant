@@ -9,11 +9,13 @@ export const tenantAdmins: FieldAccess = args => {
     doc,
   } = args
 
-  return (
+  const result = (
     checkUserRoles(['super-admin'], user) ||
     doc?.tenants?.some(({ tenant }) => {
       const id = typeof tenant === 'string' ? tenant : tenant?.id
       return checkTenantRoles(['admin'], user, id)
     })
   )
+
+  return result
 }

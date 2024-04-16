@@ -24,16 +24,22 @@ export default buildConfig({
   cors: '*',
   admin: {
     bundler: webpackBundler(),
-    webpack: (config) => ({
-      ...config,
-      resolve: {
-        ...config.resolve,
-        alias: {
-          ...config.resolve.alias,
-          dotenv: path.resolve(__dirname, "./dotenv.js"),
-        },
-      },
-    }),
+    webpack: (config) => {
+      if (config.resolve) {
+        return {
+          ...config,
+          resolve: {
+            ...config.resolve,
+            alias: {
+              ...config.resolve.alias,
+              dotenv: path.resolve(__dirname, "./dotenv.js"),
+            },
+          },
+        };
+      } else {
+        return config;
+      }
+    },
     meta: {
       titleSuffix: "- lightson.ai",
       favicon: "/payload/assets/logo.svg",
@@ -47,7 +53,7 @@ export default buildConfig({
   },
   editor: slateEditor({}),
   db: mongooseAdapter({
-    url: process.env.DATABASE_URI,
+    url: process.env.DATABASE_URI || false,
   }),
   typescript: {
     outputFile: path.resolve(__dirname, "payload-types.ts"),

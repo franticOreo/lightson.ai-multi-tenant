@@ -1,4 +1,3 @@
-import Layout from '../app/layout'
 import { getCookie } from 'cookies-next';
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -6,10 +5,22 @@ import { useRouter } from 'next/router'
 import '../app/globals.css'
 
 export default function SignupPage( {username} ) {
-    const router = useRouter()
+    const router = useRouter();
+
+    // Function to handle Instagram authorization
+    const handleInstagramAuth = () => {
+        const clientId = '743103918004392';
+        const redirectUri = 'http://localhost:3000/api/instagram/callback';
+        const scope = 'user_profile';
+        const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&response_type=code`;
+
+        // Redirecting user to the Instagram Authorization Window
+        window.location.href = authUrl;
+    };
+
+
     const { msg } = router.query
     return (
-        // <Layout title="Signup" description="Signup">
         <div>
             <Link href="/">Home</Link><br/>
             {msg ?
@@ -30,6 +41,7 @@ export default function SignupPage( {username} ) {
                 <input name="client_service_area" id="client_service_area" type="text" placeholder='Client Service Area' required></input><br/>
                 <input name="client_business_address" id="client_business_address" type="text" placeholder='Client Business Address' required></input><br/>
                 <input name="client_operating_hours" id="client_operating_hours" type="text" placeholder='Client Operating Hours' required></input><br/>
+                <button onClick={handleInstagramAuth}>Authorize Instagram</button>
                 <input type="submit" value="Signup"/>
             </form>
             </div>

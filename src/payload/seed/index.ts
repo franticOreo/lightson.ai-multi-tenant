@@ -12,7 +12,7 @@ export const seed = async (payload: Payload): Promise<void> => {
   });
 
   // create tenants, use `*.localhost.com` so that accidentally forgotten changes the hosts file are acceptable
-  const [abc, bbc] = await Promise.all([
+  const [abc, bbc, cbc] = await Promise.all([
     await payload.create({
       collection: "tenants",
       data: {
@@ -25,6 +25,13 @@ export const seed = async (payload: Payload): Promise<void> => {
       data: {
         name: "BBC",
         domains: [{ domain: "bbc.localhost.com:3000" }],
+      },
+    }),
+    await payload.create({
+      collection: "tenants",
+      data: {
+        name: "CBC",
+        domains: [{ domain: "cbc.localhost.com:3000" }],
       },
     }),
   ]);
@@ -83,6 +90,20 @@ export const seed = async (payload: Payload): Promise<void> => {
           {
             tenant: bbc.id,
             roles: ["user"],
+          },
+        ],
+      },
+    }),
+    await payload.create({
+      collection: "users",
+      data: {
+        email: "admin@cbc.com",
+        password: "test",
+        roles: ["user"],
+        tenants: [
+          {
+            tenant: cbc.id,
+            roles: ["admin"],
           },
         ],
       },

@@ -30,7 +30,7 @@ app.post('/api/signup', async (req, res) => {
     const createdTenant = await payload.create({
       collection: "tenants",
       data: {
-        name: `${client_instagram_handle}`,
+        name: client_instagram_handle,
         domains: [{ domain: `${client_instagram_handle}.localhost.com:3000` }],
       },
     })
