@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import fetch from 'node-fetch';
-import { takeUserProfileScreenshot, getInstagramPosts } from '../../../utils/instagramFunctions';
+import { takeUserProfileScreenshot, getInstagramPosts, downloadImageToMemory, uploadImageFromMemoryToCollection } from '../../../utils/instagramFunctions';
 
 async function getUserProfile(accessToken: string) {
     try {
@@ -51,7 +51,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       takeUserProfileScreenshot(`https://www.instagram.com/${instagramHandle}`, instagramHandle)
 
-      const posts = getInstagramPosts(data.access_token)
+      const posts = await getInstagramPosts(data.access_token)
+
+      for (const postData of posts) {
+        // If the media type is 'IMAGE', download the image to memory and upload it to the collection
+        if (postData.media_type === 'IMAGE') {
+            // Download the image to memory
+            const image = await downloadImageToMemory(postData.media_url);
+    
+            // Upload the image to the collection
+            await uploadImageFromMemoryToCollection(image, postData, instagramHandle, tenantId);
+    
+            // Stop iterating over the array
+            break;
+        }
+    }
 
               
 

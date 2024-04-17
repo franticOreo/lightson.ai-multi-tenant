@@ -1,5 +1,7 @@
 import puppeteer from 'puppeteer';
 import axios from 'axios';
+import FormData from 'form-data';
+import fs from 'fs';
 
 export async function takeUserProfileScreenshot(instagramUrl: string, instagramHandle: string): Promise<string> {
     try {
@@ -51,40 +53,46 @@ export async function getInstagramPosts(INSTAGRAM_TOKEN: string) {
     }
 }
 
-import FormData from 'form-data';
-import fs from 'fs';
+export async function downloadImageToMemory(url: string) {
+    const response = await axios({
+        url,
+        method: 'GET',
+        responseType: 'arraybuffer', // Set the response type to 'arraybuffer' to get the response data as a Buffer
+    });
 
-export async function uploadFileToCollection(collectionId: string, file: string, data: any, instagramHandle: string, tenantId: string) {
-    try {
-        // Create a new FormData instance
-        const formData = new FormData();
+    return Buffer.from(response.data, 'binary'); // Convert the response data to a Buffer
+}
 
-        // Append the file to the form data
-        formData.append('file', fs.createReadStream(file));
 
-        // Append the data to the form data
-        Object.keys(data).forEach(key => {
-            formData.append(key, data[key]);
-        });
+export async function uploadImageFromMemoryToCollection(image: Buffer, data: any, instagramHandle: string) {
+    const formData = new FormData();
 
-        // Append the instagram handle to the form data
-        formData.append('instagramHandle', instagramHandle);
+    // Append the image to the form data
+    formData.append('file', image, {
+        filename: 'image.jpg', // Set the filename to 'image.jpg'
+        contentType: 'image/jpeg', // Set the content type to 'image/jpeg'
+    });
 
-        // Make a POST request to the collection's create endpoint
-        const response = await axios.post(`https://localhost:3000/api/collections/${collectionId}/create`, formData, {
-            headers: {
-                'Content-Type': `multipart/form-data; boundary=${formData._boundary}`,
-                'Authorization': `Bearer your_access_token`
-            }
-        });
+    // Append the data to the form data
+    Object.keys(data).forEach(key => {
+        formData.append(key, data[key]);
+    });
 
-        // Check if the request was successful
-        if (response.status === 200) {
-            console.log('File uploaded successfully.');
-        } else {
-            console.log('Failed to upload file.');
+    // Append the instagram handle to the form data
+    formData.append('instagramHandle', instagramHandle);
+
+    const headers = formData.getHeaders();
+    const response = await axios.post(`https://localhost:3000/api/media/create`, formData, {
+        headers: {
+            ...headers,
+            'Authorization': `Bearer your_access_token`
         }
-    } catch (error) {
-        console.error('Error uploading file:', error);
+    });
+
+    // Check if the request was successful
+    if (response.status === 200) {
+        console.log('File uploaded successfully.');
+    } else {
+        console.log('Failed to upload file.');
     }
 }
