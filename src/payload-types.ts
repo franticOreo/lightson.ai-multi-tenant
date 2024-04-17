@@ -75,13 +75,7 @@ export interface Post {
   author: string | User;
   createdBy?: (string | null) | User;
   updatedBy?: (string | null) | User;
-  coverImage: {
-    position?: ('default' | 'fullscreen') | null;
-    media: string | Media;
-    id?: string | null;
-    blockName?: string | null;
-    blockType: 'mediaBlock';
-  }[];
+  coverImage: string | Media;
   tenant?: (string | null) | Tenant;
   richText: {
     [k: string]: unknown;
