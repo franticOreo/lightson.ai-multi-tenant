@@ -40,7 +40,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "instagram"  ],
   "exclude": [
     "node_modules",
     "dist",

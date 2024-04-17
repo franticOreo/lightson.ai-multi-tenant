@@ -2,6 +2,9 @@ import dotenv from 'dotenv'
 import next from 'next'
 import path from 'path'
 
+import { handleInstagramCallback } from './utils/instagramAuth'; // Adjust the import path as necessary
+
+
 dotenv.config({
   path: path.resolve(__dirname, '../.env'),
 })
@@ -59,6 +62,8 @@ app.post('/api/signup', async (req, res) => {
     res.status(500).send({ error: 'Signup failed' });
   }
 });
+
+app.get('/api/instagram/callback', handleInstagramCallback);
 
 const start = async (): Promise<void> => {
   await payload.init({

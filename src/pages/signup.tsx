@@ -4,15 +4,15 @@ import { useRouter } from 'next/router'
 
 import '../app/globals.css'
 
+
 export default function SignupPage( {username} ) {
     const router = useRouter();
-
+    console.log(process.env.NEXT_PUBLIC_REDIRECT_URI);
     // Function to handle Instagram authorization
     const handleInstagramAuth = () => {
         const clientId = '743103918004392';
-        // const redirectUri = process.env.REDIRECT_URI
         const scope = 'user_profile,user_media';
-        const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=https://3b36-122-202-8-240.ngrok-free.app/api/instagram/callback&scope=${scope}&response_type=code`;
+        const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=${scope}&response_type=code`;
 
         // Redirecting user to the Instagram Authorization Window
         console.log(authUrl)
