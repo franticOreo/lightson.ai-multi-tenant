@@ -34,7 +34,7 @@ app.post('/api/signup', async (req, res) => {
       collection: "tenants",
       data: {
         name: client_instagram_handle,
-        domains: [{ domain: `${client_instagram_handle}.localhost.com:3000` }],
+        domains: [{ domain: `${client_instagram_handle}.${process.env.PAYLOAD_PUBLIC_SERVER_BASE}` }],
       },
     })
 
