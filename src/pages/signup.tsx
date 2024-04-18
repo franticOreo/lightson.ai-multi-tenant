@@ -4,7 +4,9 @@ import { useRouter } from 'next/router'
 
 import '../app/globals.css'
 
-
+//
+// NEEDS SERVER SIDE CHECK FOR USER!!!
+//
 export default function SignupPage( {username} ) {
     const router = useRouter();
     console.log(process.env.NEXT_PUBLIC_REDIRECT_URI);

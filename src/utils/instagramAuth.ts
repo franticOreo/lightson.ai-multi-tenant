@@ -2,6 +2,7 @@ import fetch from 'node-fetch'; // If needed
 import { URLSearchParams } from 'url';
 import { Request, Response } from 'express';
 import { getUserProfile, takeUserProfileScreenshot, getInstagramPosts, getAuthToken, uploadImageToCollection, downloadImageToMemory} from './instagramFunctions'; // Adjust the import path as necessary
+import { tenant } from '../payload/fields/tenant';
 
 export async function handleInstagramCallback(req: Request, res: Response) {
   const { code } = req.query;
@@ -47,9 +48,11 @@ export async function handleInstagramCallback(req: Request, res: Response) {
           
           const image = await downloadImageToMemory(postData.media_url);
 
+          const tenant = 'abc'
+
           console.log(image)
           console.log('--------')
-          const response = await uploadImageToCollection(image, postData, instagramHandle, token)
+          const response = await uploadImageToCollection(image, postData, instagramHandle, token, tenant)
           console.log(response)
           break; // Stop iterating over the array
         }
