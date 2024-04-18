@@ -70,9 +70,10 @@ export async function getInstagramPosts(INSTAGRAM_TOKEN: string) {
 
 
 
-export async function getAuthToken(apiUrl) {
+export async function getPayloadAuthToken() {
+    const payloadUrl = process.env.NEXT_PUBLIC_DOMAIN
     try {
-      const req = await fetch(`${apiUrl}/api/users/login`, {
+      const req = await fetch(`${payloadUrl}/api/users/login`, {
         method: "POST", 
         credentials: "include",
         headers: {
@@ -118,7 +119,7 @@ export async function getAuthToken(apiUrl) {
 }
 
 
-  export async function uploadImageToCollection(imageBuffer: Buffer, data: any, instagramHandle: string, accessToken: string) {
+  export async function uploadImageToCollection(imageBuffer: Buffer, instagramHandle: string, accessToken: string) {
     try {
       // Save the image buffer to a temporary file because Payload expects a file path for uploads
       const tempImagePath = `./temp_${instagramHandle}.jpg`; // Use a unique name to avoid conflicts
@@ -127,7 +128,7 @@ export async function getAuthToken(apiUrl) {
       // Prepare the form data for upload
       const formData = new FormData();
       formData.append('file', fs.createReadStream(tempImagePath));
-      formData.append('alt', data.alt || 'Default alt text');
+      formData.append('alt', instagramHandle);
   
       // Perform the upload
       const response = await axios({

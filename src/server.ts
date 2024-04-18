@@ -2,7 +2,9 @@ import dotenv from 'dotenv'
 import next from 'next'
 import path from 'path'
 
-import { handleInstagramCallback } from './utils/instagramAuth'; // Adjust the import path as necessary
+import { handleInstagramCallback } from './utils/uploadPostsToPayload'; // Adjust the import path as necessary
+
+import jwt from 'jsonwebtoken';
 
 
 dotenv.config({
@@ -38,7 +40,7 @@ app.post('/api/signup', async (req, res) => {
       },
     })
 
-    await payload.create({
+    const createdUser = await payload.create({
       collection: "users",
       data: {
         email: client_email,
@@ -53,7 +55,8 @@ app.post('/api/signup', async (req, res) => {
       },
     })
     
-    res.status(200).send({ message: 'Tenant created'});
+    const userToken = jwt.sign({ user_id: createdUser.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.status(200).send({ message: 'Tenant created', userToken});
 
 
 
@@ -91,8 +94,6 @@ const start = async (): Promise<void> => {
 
     return
   }
-
-  
 
   const nextApp = next({
     dev: process.env.NODE_ENV !== 'production',
