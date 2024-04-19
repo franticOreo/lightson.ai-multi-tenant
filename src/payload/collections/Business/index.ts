@@ -3,7 +3,7 @@ import type { CollectionConfig } from "payload/types";
 import { tenant } from "../../fields/tenant";
 import { loggedIn } from "./access/loggedIn";
 import { tenantAdmins } from "./access/tenantAdmins";
-import { isSuperOrPublic } from "../Users/utilities/isSuperOrPublic";
+import { tenants } from "./access/tenants";
 
 export const Business: CollectionConfig = {
   slug: "business",
@@ -12,7 +12,7 @@ export const Business: CollectionConfig = {
     defaultColumns: ["businessName", "updatedAt"],
   },
   access: {
-    read: isSuperOrPublic,
+    read: tenants,
     create: loggedIn,
     update: tenantAdmins,
     delete: tenantAdmins,

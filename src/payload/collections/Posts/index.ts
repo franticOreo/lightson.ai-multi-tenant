@@ -7,9 +7,7 @@ import { tenantAdmins } from "./access/tenantAdmins";
 import { tenants } from "./access/tenants";
 import formatSlug from "./hooks/formatSlug";
 
-import { MediaBlock } from "../../blocks/MediaBlock";
 import { tenantAdminFieldAccess } from "../../fields/tenant/access/tenantAdmins";
-import { isSuperOrPublic } from "../Users/utilities/isSuperOrPublic";
 
 export const Posts: CollectionConfig = {
   slug: "posts",
@@ -18,7 +16,7 @@ export const Posts: CollectionConfig = {
     defaultColumns: ["title", "slug", "updatedAt"],
   },
   access: {
-    read: isSuperOrPublic,
+    read: tenants,
     create: loggedIn,
     update: tenantAdmins,
     delete: tenantAdmins,
