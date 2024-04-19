@@ -3,25 +3,39 @@ import { URLSearchParams } from 'url';
 import { Request, Response } from 'express';
 import { getUserProfile, takeUserProfileScreenshot, getInstagramPosts, getPayloadAuthToken, uploadImageToCollection, downloadImageToMemory} from './instagramFunctions'; 
 import jwt from 'jsonwebtoken';
+import axios from 'axios';
 
-export async function handleInstagramCallback(req: Request, res: Response) {
-  const userToken = req.headers.authorization?.split(' ')[1]; // Assuming Bearer token
-  if (!userToken) return res.status(401).send({ error: 'No token provided' });
+export function extractUserTokenFromState(state: string | undefined): string | null {
+  if (!state) return null;
 
   try {
-    const decoded = jwt.verify(userToken, process.env.JWT_SECRET);
-    const userId = decoded.id;
-    // Proceed with the userId
+    const decodedState = decodeURIComponent(state);
+    const parsedState = JSON.parse(decodedState);
+    const userToken = parsedState.userToken;
+    return userToken; // Return the JWT string directly
   } catch (error) {
-    return res.status(401).send({ error: 'Invalid or expired token' });
+    console.error('Error extracting userToken from state:', error);
+    return null;
   }
+}
 
-
+export async function handleInstagramCallback(req: Request, res: Response) {
   const { code } = req.query;
+  const userToken = extractUserTokenFromState(req.query.state as string | undefined);
 
-  if (!code || typeof code !== 'string') {
-    return res.status(400).json({ error: 'Code not provided or is invalid' });
+  if (!userToken) {
+    return res.status(400).json({ error: 'userToken is undefined or invalid' });
   }
+
+  const decodedUserToken = jwt.decode(userToken);
+  if (!decodedUserToken) {
+    return res.status(400).json({ error: 'Failed to decode userToken' });
+  }
+
+  // Assuming the JWT payload contains user_id and tenant_id
+  const userId = decodedUserToken.user_id;
+  const tenantId = decodedUserToken.tenant_id;
+
 
   try {
     const clientId = '743103918004392';
@@ -48,7 +62,7 @@ export async function handleInstagramCallback(req: Request, res: Response) {
 
     if (instagramAuthData.access_token) {
 
-      await uploadInstagramPost(instagramAuthData.access_token, userId)
+      await uploadInstagramPost(instagramAuthData.access_token, userId, tenantId)
       
     } else {
       return res.status(400).json({ error: 'Failed to obtain access token' });
@@ -58,10 +72,32 @@ export async function handleInstagramCallback(req: Request, res: Response) {
   }
 }
 
-export async function uploadInstagramPost(instagramToken: string, userId: string) {
+async function sendPostEntryDataToCollection(postEntryData: any, accessToken: string, client_instagram_handle: string) {
+  try {
+    const response = await axios({
+      method: 'post',
+      url: `http://${client_instagram_handle}.${process.env.PAYLOAD_PUBLIC_SERVER_BASE}/api/posts`, // Adjust this URL to your post creation endpoint
+      data: postEntryData,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`, // Ensure accessToken is passed correctly
+      },
+    });
+
+    console.log('Post created successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to create post:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+
+export async function uploadInstagramPost(instagramToken: string, userId: string, tenantId: string) {
   const instagramHandle = await getUserProfile(instagramToken);
   takeUserProfileScreenshot(`https://www.instagram.com/${instagramHandle}`, instagramHandle);
   const posts = await getInstagramPosts(instagramToken);
+
+  
 
   for (const post of posts) {
     if (post.media_type === 'IMAGE') {
@@ -70,7 +106,9 @@ export async function uploadInstagramPost(instagramToken: string, userId: string
       const payloadToken = await getPayloadAuthToken()
       const image = await downloadImageToMemory(post.media_url);
       const imageUploadResponse = await uploadImageToCollection(image, instagramHandle, payloadToken)
+      console.log('image response: ', imageUploadResponse)
  
+      const mediaId = imageUploadResponse.doc.id;
       const postTitle = 'Hardcoded Title'
       const postExcerpt = 'Hardcoded Excerpt'
 
@@ -78,16 +116,24 @@ export async function uploadInstagramPost(instagramToken: string, userId: string
       title: postTitle || 'Default Title',
       excerpt: postExcerpt,
       date: new Date().toISOString(),
-      coverImage: [
+      coverImage: mediaId,
+      author: userId,
+      tenant: tenantId,
+      richText: [
         {
-          blockType: 'MediaBlock', // Assuming this is the correct block type name
-          blockName: 'Cover Image', // Optional, depending on your Payload configuration
-          media: imageUploadResponse.id // or whatever the correct reference is
+          children: [{ text: 'having fun' }],
+          type: 'h1'
+        },
+        {
+          children: [{ text: 'hello' }]
         }
       ],
-      author: userId
     };
-      
+
+    console.log(postEntryData)
+
+    const response = await sendPostEntryDataToCollection(postEntryData, payloadToken, instagramHandle)
+
 
       break; // Stop iterating over the array
     }

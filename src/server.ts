@@ -54,11 +54,19 @@ app.post('/api/signup', async (req, res) => {
         ],
       },
     })
-    
-    const userToken = jwt.sign({ user_id: createdUser.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(200).send({ message: 'Tenant created', userToken});
 
+    const userToken = jwt.sign(
+      { 
+        user_id: createdUser.id, 
+        tenant_id: createdTenant.id 
+      }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '1h' }
+    );
 
+    const state = encodeURIComponent(JSON.stringify({ userToken }));
+    const instagramAuthUrl = `https://api.instagram.com/oauth/authorize?client_id=${process.env.INSTAGRAM_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_REDIRECT_URI)}&scope=user_profile,user_media&response_type=code&state=${state}`;
+    res.redirect(instagramAuthUrl);
 
   } catch (error) {
     console.error('Signup error:', error);
