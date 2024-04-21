@@ -19,17 +19,25 @@ import { seed } from './payload/seed'
 const app = express()
 const PORT = process.env.PORT || 3000
 
-// app.get('/', (_, res) => {
-//   res.redirect('/admin')
-// })
-
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.post('/api/signup', async (req, res) => {
   try {
-    const { client_instagram_handle, client_email, password } = req.body;
-
+    
+    const {
+      username,
+      password,
+      passwordagain,
+      client_name,
+      client_instagram_handle,
+      client_business_name,
+      client_phone_number,
+      client_email,
+      client_service_area,
+      client_business_address,
+      client_operating_hours,
+    } = req.body;
     console.log(req.body)
 
     const createdTenant = await payload.create({
@@ -58,7 +66,15 @@ app.post('/api/signup', async (req, res) => {
     const userToken = jwt.sign(
       { 
         user_id: createdUser.id, 
-        tenant_id: createdTenant.id 
+        tenant_id: createdTenant.id,
+        client_name: client_name,
+        client_instagram_handle: client_instagram_handle,
+        client_business_name: client_business_name,
+        client_phone_number: client_phone_number,
+        client_email: client_email,
+        client_service_area: client_service_area,
+        client_business_address: client_business_address,
+        client_operating_hours: client_operating_hours,
       }, 
       process.env.JWT_SECRET, 
       { expiresIn: '1h' }

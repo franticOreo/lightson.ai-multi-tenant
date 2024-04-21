@@ -1,9 +1,10 @@
 import fetch from 'node-fetch'; // If needed
 import { URLSearchParams } from 'url';
 import { Request, Response } from 'express';
-import { getUserProfile, takeUserProfileScreenshot, getInstagramPosts, getPayloadAuthToken, uploadImageToCollection, downloadImageToMemory} from './instagramFunctions'; 
+import {getInstagramPosts, getPayloadAuthToken, uploadImageToCollection, downloadImageToMemory} from './instagramFunctions'; 
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
+import { generateRemainingBusinessDetails, createBusinessEntry } from './createBusinessDetails';
 
 export function extractUserTokenFromState(state: string | undefined): string | null {
   if (!state) return null;
@@ -18,6 +19,8 @@ export function extractUserTokenFromState(state: string | undefined): string | n
     return null;
   }
 }
+
+
 
 export async function handleInstagramCallback(req: Request, res: Response) {
   const { code } = req.query;
@@ -53,7 +56,7 @@ export async function handleInstagramCallback(req: Request, res: Response) {
         client_secret: clientSecret,
         grant_type: 'authorization_code',
         redirect_uri: redirectUri,
-        code,
+        code: code as string,
       }),
     });
 
@@ -61,8 +64,35 @@ export async function handleInstagramCallback(req: Request, res: Response) {
     console.log(instagramAuthData)
 
     if (instagramAuthData.access_token) {
+      const payloadToken = await getPayloadAuthToken()
 
-      await uploadInstagramPost(instagramAuthData.access_token, userId, tenantId)
+      const bioLanguageKw = await generateRemainingBusinessDetails(payloadToken, decodedUserToken.client_instagram_handle, decodedUserToken.clientServiceArea)
+
+      const keywords = bioLanguageKw.SEO_keywords;
+
+      const businessDetails = {
+          clientName: decodedUserToken.client_name,
+          instagramHandle: decodedUserToken.client_instagram_handle,
+          phoneNumber: decodedUserToken.client_phone_number,
+          email: decodedUserToken.client_email,
+          businessName: decodedUserToken.client_business_name,
+          businessBio: bioLanguageKw.business_bio,
+          businessAddress: decodedUserToken.client_business_address,
+          operatingHours: decodedUserToken.client_operating_hours,
+          languageStyle: bioLanguageKw.language_style,
+          keywords: Array.isArray(keywords) ? keywords.map(keyword => ({ keyword })) : typeof keywords === 'string' ? keywords.split(', ').map(keyword => ({ keyword })) : [],
+          serviceArea: decodedUserToken.client_service_area,
+        };
+      
+      console.log(businessDetails)
+
+
+      const response = await createBusinessEntry(businessDetails, payloadToken)
+
+      // generate
+
+      res.redirect('/')
+      // await uploadInstagramPost(instagramAuthData.access_token, userId, tenantId, businessDetails, payloadToken)
       
     } else {
       return res.status(400).json({ error: 'Failed to obtain access token' });
@@ -92,29 +122,25 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
   }
 }
 
-export async function uploadInstagramPost(instagramToken: string, userId: string, tenantId: string) {
-  const instagramHandle = await getUserProfile(instagramToken);
-  takeUserProfileScreenshot(`https://www.instagram.com/${instagramHandle}`, instagramHandle);
+export async function uploadInstagramPost(instagramToken: string, userId: string, tenantId: string, businessDetails: any, payloadToken) {
   const posts = await getInstagramPosts(instagramToken);
-
-  
 
   for (const post of posts) {
     if (post.media_type === 'IMAGE') {
       
-      
-      const payloadToken = await getPayloadAuthToken()
       const image = await downloadImageToMemory(post.media_url);
+
       const imageUploadResponse = await uploadImageToCollection(image, instagramHandle, payloadToken)
-      console.log('image response: ', imageUploadResponse)
- 
       const mediaId = imageUploadResponse.doc.id;
+
       const postTitle = 'Hardcoded Title'
       const postExcerpt = 'Hardcoded Excerpt'
+      const postSlug = 'hardcoded-slug'
 
       const postEntryData = {
       title: postTitle || 'Default Title',
       excerpt: postExcerpt,
+      slug: postSlug,
       date: new Date().toISOString(),
       coverImage: mediaId,
       author: userId,
@@ -130,12 +156,9 @@ export async function uploadInstagramPost(instagramToken: string, userId: string
       ],
     };
 
-    console.log(postEntryData)
-
     const response = await sendPostEntryDataToCollection(postEntryData, payloadToken, instagramHandle)
 
-
-      break; // Stop iterating over the array
+    break; // Stop iterating over the array
     }
   }
 

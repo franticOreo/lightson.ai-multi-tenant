@@ -44,7 +44,6 @@ export default function SignupPage( {username} ) {
                 <input name="client_service_area" id="client_service_area" type="text" placeholder='Client Service Area' required></input><br/>
                 <input name="client_business_address" id="client_business_address" type="text" placeholder='Client Business Address' required></input><br/>
                 <input name="client_operating_hours" id="client_operating_hours" type="text" placeholder='Client Operating Hours' required></input><br/>
-                {/* <button onClick={handleInstagramAuth}>Authorize Instagram</button> */}
                 <input type="submit" value="Signup and Authorize Instagram"/>
             </form>
             </div>
