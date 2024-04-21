@@ -1,4 +1,4 @@
-import { OpenAIStream } from "ai";
+import json from "json5";
 
 export async function understandImage(imageUrl: string, aiClient: any, prompt: string = "What's in this image?"): Promise<string> {
     console.log('GPT is analysing image...')
@@ -68,10 +68,10 @@ export function createBioLanguageKwPrompt(profileUnderstanding: string, clientSe
   - \`SEO_keywords\`: using local area ${clientServiceArea}`;
   }
 
-export function makeBlogPrompt(postCaption: string, imageUnderstanding: string, bioLanguageKwObj: any, clientServiceArea: string): string {
-    const clientBusinessBio: string = bioLanguageKwObj['business_bio'];
-    const clientLanguageStyle: string = bioLanguageKwObj['language_style'];
-    const clientKeywords: string = bioLanguageKwObj['SEO_keywords'];
+export function makePostPrompt(postCaption: string, imageUnderstanding: string, bioLanguageKwObj: any, clientServiceArea: string): string {
+    const clientBusinessBio: string = bioLanguageKwObj.clientBusinessBio;
+    const clientLanguageStyle: string = bioLanguageKwObj.clientLanguageStyle;
+    const clientKeywords: string = bioLanguageKwObj.clientKeywords;
 
     return `Business Bio: ${clientBusinessBio}
   
@@ -101,6 +101,51 @@ export function makeBlogPrompt(postCaption: string, imageUnderstanding: string, 
       \`slug\`: A slug for the post.
       `;
   }
+
+
+
+export async function createPostFields(blogPrompt: string, aiClient: any): Promise<any> {
+  let maxRetries = 3;
+  let retryCount = 0;
+  let blogFields;
+
+  while (retryCount < maxRetries) {
+    const response = await aiClient.chat.completions.create({
+      model: "gpt-3.5-turbo-0125",
+      messages: [
+        {
+          role: "system", 
+          content: "You are a helpful assistant designed to output JSON."
+        },
+        {
+          role: "user",
+          content: blogPrompt
+        },
+      ],
+      response_format: {"type": "json_object"},
+      max_tokens: 1024,
+      temperature: 0.9,
+    });
+
   
+    console.log(response.choices[0].message.content)
+
+    blogFields = JSON.parse(response.choices[0].message.content);
+
+    if (['title', 'content', 'excerpt', 'slug'].every(key => key in blogFields)) {
+      break; // Exit the loop if all required keys are present
+    }
+
+    retryCount += 1;
+  }
+
+  if (retryCount === maxRetries) {
+    console.log("Failed to obtain all required keys after 3 retries.");
+  } else {
+    console.log("Blog object contains all required keys.");
+  }
+
+  return blogFields;
+}  
 
 

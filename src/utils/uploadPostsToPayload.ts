@@ -5,6 +5,7 @@ import {getInstagramPosts, getPayloadAuthToken, uploadImageToCollection, downloa
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import { generateRemainingBusinessDetails, createBusinessEntry } from './createBusinessDetails';
+import { uploadInstagramPost } from './blogCreation';
 
 export function extractUserTokenFromState(state: string | undefined): string | null {
   if (!state) return null;
@@ -89,10 +90,11 @@ export async function handleInstagramCallback(req: Request, res: Response) {
 
       const response = await createBusinessEntry(businessDetails, payloadToken)
 
+      await uploadInstagramPost(instagramAuthData.access_token, decodedUserToken.client_instagram_handle, userId, tenantId, payloadToken)
       // generate
 
       res.redirect('/')
-      // await uploadInstagramPost(instagramAuthData.access_token, userId, tenantId, businessDetails, payloadToken)
+      
       
     } else {
       return res.status(400).json({ error: 'Failed to obtain access token' });
@@ -102,67 +104,6 @@ export async function handleInstagramCallback(req: Request, res: Response) {
   }
 }
 
-async function sendPostEntryDataToCollection(postEntryData: any, accessToken: string, client_instagram_handle: string) {
-  try {
-    const response = await axios({
-      method: 'post',
-      url: `http://${client_instagram_handle}.${process.env.PAYLOAD_PUBLIC_SERVER_BASE}/api/posts`, // Adjust this URL to your post creation endpoint
-      data: postEntryData,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`, // Ensure accessToken is passed correctly
-      },
-    });
 
-    console.log('Post created successfully:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Failed to create post:', error.response ? error.response.data : error.message);
-    throw error;
-  }
-}
-
-export async function uploadInstagramPost(instagramToken: string, userId: string, tenantId: string, businessDetails: any, payloadToken) {
-  const posts = await getInstagramPosts(instagramToken);
-
-  for (const post of posts) {
-    if (post.media_type === 'IMAGE') {
-      
-      const image = await downloadImageToMemory(post.media_url);
-
-      const imageUploadResponse = await uploadImageToCollection(image, instagramHandle, payloadToken)
-      const mediaId = imageUploadResponse.doc.id;
-
-      const postTitle = 'Hardcoded Title'
-      const postExcerpt = 'Hardcoded Excerpt'
-      const postSlug = 'hardcoded-slug'
-
-      const postEntryData = {
-      title: postTitle || 'Default Title',
-      excerpt: postExcerpt,
-      slug: postSlug,
-      date: new Date().toISOString(),
-      coverImage: mediaId,
-      author: userId,
-      tenant: tenantId,
-      richText: [
-        {
-          children: [{ text: 'having fun' }],
-          type: 'h1'
-        },
-        {
-          children: [{ text: 'hello' }]
-        }
-      ],
-    };
-
-    const response = await sendPostEntryDataToCollection(postEntryData, payloadToken, instagramHandle)
-
-    break; // Stop iterating over the array
-    }
-  }
-
-
-}
 
 

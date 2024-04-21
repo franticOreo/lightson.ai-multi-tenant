@@ -17,29 +17,6 @@ export async function getUserProfile(accessToken: string) {
     }
 }
 
-
-// export async function takeUserProfileScreenshot(instagramUrl: string, instagramHandle: string): Promise<string> {
-//     try {
-//         const browser = await puppeteer.launch();
-//         const page = await browser.newPage();
-//         await page.goto(instagramUrl);
-//         await page.setViewport({ width: 1920, height: 1080 });
-//         await new Promise(resolve => setTimeout(resolve, 10000));
-//         await page.screenshot({ path: `./img/screenshot_${instagramHandle}.png` });
-//         const screenshotPath = `./img/screenshot_${instagramHandle}.png`;
-//         await page.screenshot({ 
-//             path: screenshotPath,
-//             clip: { x: 1920 * 0.2, y: 1080 * 0.05, width: 1920 * 0.6, height: 1080 * 0.85 } 
-//         });
-//         await browser.close();
-//         console.log(`Screenshot for ${instagramHandle} saved successfully.`);
-//         return `./img/screenshot_${instagramHandle}.png`;
-//     } catch (error) {
-//         console.error(`Failed to take screenshot for ${instagramHandle}: ${error}`);
-//         throw error;
-//     }
-// }
-
 export async function takeUserProfileScreenshot(instagramUrl: string, instagramHandle: string): Promise<Buffer> {
   try {
       const browser = await puppeteer.launch();
