@@ -3,6 +3,7 @@ import next from 'next'
 import path from 'path'
 
 import { handleInstagramCallback } from './utils/uploadPostsToPayload'; // Adjust the import path as necessary
+import { createUser } from './utils/tenantUserManagement';
 
 import jwt from 'jsonwebtoken';
 
@@ -26,11 +27,8 @@ app.post('/api/signup', async (req, res) => {
   try {
     
     const {
-      username,
-      password,
-      passwordagain,
+      client_password,
       client_name,
-      client_instagram_handle,
       client_business_name,
       client_phone_number,
       client_email,
@@ -40,35 +38,12 @@ app.post('/api/signup', async (req, res) => {
     } = req.body;
     console.log(req.body)
 
-    const createdTenant = await payload.create({
-      collection: "tenants",
-      data: {
-        name: client_instagram_handle,
-        domains: [{ domain: `${client_instagram_handle}.${process.env.PAYLOAD_PUBLIC_SERVER_BASE}` }],
-      },
-    })
-
-    const createdUser = await payload.create({
-      collection: "users",
-      data: {
-        email: client_email,
-        password: password,
-        roles: ["user"],
-        tenants: [
-          {
-            tenant: createdTenant.id,
-            roles: ["admin"],
-          },
-        ],
-      },
-    })
+    const createdUser = await createUser(client_email, client_password)
 
     const userToken = jwt.sign(
       { 
-        user_id: createdUser.id, 
-        tenant_id: createdTenant.id,
         client_name: client_name,
-        client_instagram_handle: client_instagram_handle,
+        client_user_id: createdUser.id,
         client_business_name: client_business_name,
         client_phone_number: client_phone_number,
         client_email: client_email,

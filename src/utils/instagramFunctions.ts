@@ -7,7 +7,7 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid'; // Ensure you have 'uuid' installed (`npm install uuid`)
 
 
-export async function getUserProfile(accessToken: string) {
+export async function getInstagramHandle(accessToken: string) {
     try {
         const response = await fetch(`https://graph.instagram.com/me?fields=id,username&access_token=${accessToken}`);
         const data = await response.json();

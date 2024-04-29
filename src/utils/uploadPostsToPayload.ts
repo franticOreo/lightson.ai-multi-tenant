@@ -1,11 +1,11 @@
 import fetch from 'node-fetch'; // If needed
 import { URLSearchParams } from 'url';
 import { Request, Response } from 'express';
-import {getInstagramPosts, getPayloadAuthToken, uploadImageToCollection, downloadImageToMemory} from './instagramFunctions'; 
+import {getInstagramPosts, getPayloadAuthToken, getInstagramHandle} from './instagramFunctions'; 
 import jwt from 'jsonwebtoken';
-import axios from 'axios';
 import { generateRemainingBusinessDetails, createBusinessEntry } from './createBusinessDetails';
 import { postsCreationPipeline } from './postCreation';
+import { createTenant, assignTenantToUser } from './tenantUserManagement';
 
 export function extractUserTokenFromState(state: string | undefined): string | null {
   if (!state) return null;
@@ -22,10 +22,11 @@ export function extractUserTokenFromState(state: string | undefined): string | n
 }
 
 
-
 export async function handleInstagramCallback(req: Request, res: Response) {
   const { code } = req.query;
   const userToken = extractUserTokenFromState(req.query.state as string | undefined);
+
+  console.log(userToken)
 
   if (!userToken) {
     return res.status(400).json({ error: 'userToken is undefined or invalid' });
@@ -36,10 +37,7 @@ export async function handleInstagramCallback(req: Request, res: Response) {
     return res.status(400).json({ error: 'Failed to decode userToken' });
   }
 
-  // Assuming the JWT payload contains user_id and tenant_id
-  const userId = decodedUserToken.user_id;
-  const tenantId = decodedUserToken.tenant_id;
-
+  const userId = decodedUserToken.client_user_id
 
   try {
     const clientId = '743103918004392';
@@ -64,16 +62,30 @@ export async function handleInstagramCallback(req: Request, res: Response) {
     const instagramAuthData = await response.json();
     console.log(instagramAuthData)
 
+    const instagramHandle = await getInstagramHandle(instagramAuthData.access_token)
+
+    let createdTenant;
+    let createdUser;
+
+    try {
+      createdTenant = await createTenant(instagramHandle);
+      createdUser = await assignTenantToUser(userId, createdTenant.id);
+    } catch (error) {
+      return res.status(500).json({ error: 'Error creating User or Tenant' });
+    }
+
+
+
     if (instagramAuthData.access_token) {
       const payloadToken = await getPayloadAuthToken()
 
-      const bioLanguageKw = await generateRemainingBusinessDetails(payloadToken, decodedUserToken.client_instagram_handle, decodedUserToken.clientServiceArea)
+      const bioLanguageKw = await generateRemainingBusinessDetails(payloadToken, instagramHandle, decodedUserToken.clientServiceArea)
 
       const keywords = bioLanguageKw.SEO_keywords;
 
       const businessDetails = {
           clientName: decodedUserToken.client_name,
-          instagramHandle: decodedUserToken.client_instagram_handle,
+          instagramHandle: instagramHandle,
           phoneNumber: decodedUserToken.client_phone_number,
           email: decodedUserToken.client_email,
           businessName: decodedUserToken.client_business_name,
@@ -101,8 +113,8 @@ export async function handleInstagramCallback(req: Request, res: Response) {
                                               clientServiceArea: businessDetails.serviceArea,
                                               clientKeywords: keywords,
                                               instagramHandle: businessDetails.instagramHandle,
-                                              userId: userId,
-                                              tenantId: tenantId,
+                                              userId: createdUser.id,
+                                              tenantId: createdTenant.id,
                                                     });
       
 
