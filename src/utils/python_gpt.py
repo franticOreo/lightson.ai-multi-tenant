@@ -149,3 +149,15 @@ def make_blog_prompt(post_caption, image_understanding):
 
     `slug`: A slug for the post.
     """
+
+CLIENT_BUSINESS_BIO = bio_language_kw_obj['business_bio']
+CLIENT_LANGUAGE_STYLE = bio_language_kw_obj['language_style']
+CLIENT_KEYWORDS = bio_language_kw_obj['SEO_keywords']
+
+instagram_profile_understanding = understand_image(screenshot_cdn_url, ai_client)
+bio_language_kw_obj = profile_to_bio_language_kw(bio_language_kw_prompt, ai_client)
+
+CLIENT_BUSINESS_BIO = bio_language_kw_obj['business_bio']
+CLIENT_LANGUAGE_STYLE = bio_language_kw_obj['language_style']
+CLIENT_KEYWORDS = bio_language_kw_obj['SEO_keywords']
+## Upload businessDetails

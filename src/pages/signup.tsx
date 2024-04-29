@@ -2,6 +2,9 @@ import { getCookie } from 'cookies-next';
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
+import { Unbounded } from "next/font/google";
+const unbounded = Unbounded({ subsets: ["latin"] }); // Adjust subsets as needed
+
 import '../app/globals.css'
 
 //
@@ -24,30 +27,64 @@ export default function SignupPage( {username} ) {
 
     const { msg } = router.query
     return (
-        <div>
-            <Link href="/">Home</Link><br/>
+    <div className="min-h-screen flex items-center justify-center bg-secondary">
+        <div className="form-container card px-8 py-9 rounded-md shadow-lg w-full max-w-4xl">
+            <Link href="/"><h1 className={`text-xl font-bold mb-4 ${unbounded.className}`}>lightson.ai</h1></Link><br/>
             {msg ?
-                <h3 className="red">{msg}</h3>
+                <h3 className="text-red-500">{msg}</h3>
             :
                 <></>
             }
-            <h2>Sign up</h2>
-            <form action='/api/signup' method='POST'>
-                <input minLength={3} name="username" id="username" type="text" placeholder='Username' required></input><br/>
-                <input minLength={5} name="password" id="password" type="password" placeholder='Password' required></input><br/>
-                <input minLength={5} name="passwordagain" id="passwordagain" type="password" placeholder='Password again' required></input><br/>
-                <input name="client_name" id="client_name" type="text" placeholder='Client Name' required></input><br/>
-                <input name="client_instagram_handle" id="client_instagram_handle" type="text" placeholder='Client Instagram Handle'></input><br/>
-                <input name="client_business_name" id="client_business_name" type="text" placeholder='Client Business Name' required></input><br/>
-                <input name="client_phone_number" id="client_phone_number" type="tel" placeholder='Client Phone Number' required></input><br/>
-                <input name="client_email" id="client_email" type="email" placeholder='Client Email' required></input><br/>
-                <input name="client_service_area" id="client_service_area" type="text" placeholder='Client Service Area' required></input><br/>
-                <input name="client_business_address" id="client_business_address" type="text" placeholder='Client Business Address' required></input><br/>
-                <input name="client_operating_hours" id="client_operating_hours" type="text" placeholder='Client Operating Hours' required></input><br/>
-                <input type="submit" value="Signup and Authorize Instagram"/>
-            </form>
+            <h2 className={`text-xl font-bold mb-4 ${unbounded.className}`}>Generate A Website with Your Instagram Content</h2>
+    <form action='/api/signup' method='POST' className="space-y-4">
+    <div className="flex flex-col">
+        <label htmlFor="username" className="font-medium">Username:</label>
+        <input minLength={3} name="username" id="username" type="text" placeholder='Username' className='input-neu ' required></input>
+    </div>
+    <div className="flex flex-col">
+        <label htmlFor="password" className="font-medium">Password:</label>
+        <input minLength={5} name="password" id="password" type="password" placeholder='Password' className='input-neu ' required></input>
+    </div>
+    <div className="flex flex-col">
+        <label htmlFor="passwordagain" className="font-medium">Confirm Password:</label>
+        <input minLength={5} name="passwordagain" id="passwordagain" type="password" placeholder='Password again' className='input-neu' required></input>
+    </div>
+    <div className="flex flex-col">
+    <label htmlFor="client_name">Name:</label>
+    <input name="client_name" id="client_name" type="text" placeholder='Client Name' className='input-neu' required></input><br/>
+    </div>
+    <div className='flex flex-col'>
+    <label htmlFor="client_instagram_handle"> Instagram Handle:</label>
+    <input name="client_instagram_handle" id="client_instagram_handle" type="text" placeholder='Client Instagram Handle' className='input-neu'></input><br/>
+    </div>
+    <div className='flex flex-col'>
+    <label htmlFor="client_business_name"> Business Name:</label>
+    <input name="client_business_name" id="client_business_name" type="text" placeholder='Client Business Name' className='input-neu' required></input><br/>
+    </div>
+    <div className='flex flex-col'>
+    <label htmlFor="client_phone_number">Phone Number:</label>
+    <input name="client_phone_number" id="client_phone_number" type="tel" placeholder='Client Phone Number' className='input-neu' required></input><br/>
+    </div>
+    <div className='flex flex-col'>
+    <label htmlFor="client_email">Email:</label>
+    <input name="client_email" id="client_email" type="email" placeholder='Client Email' className='input-neu' required></input><br/>
+    </div>
+    <div className='flex flex-col'>
+    <label htmlFor="client_service_area">Service Area:</label>
+    <input name="client_service_area" id="client_service_area" type="text" placeholder='Client Service Area' className='input-neu' required></input><br/>
+    </div>
+    <div className='flex flex-col'>
+    <label htmlFor="client_business_address">Business Address:</label>
+    <input name="client_business_address" id="client_business_address" type="text" placeholder='Client Business Address' className='input-neu' required></input><br/>
+    </div>
+    <div className='flex flex-col'>
+    <label htmlFor="client_operating_hours">Operating Hours:</label>
+    <input name="client_operating_hours" id="client_operating_hours" type="text" placeholder='Client Operating Hours' className='input-neu' required></input><br/>
+    </div>
+    <input type="submit" value="Generate Website with Instagram" className='mt-20 border-black border-2 bg-accent hover:bg-[#79F7FF] hover:shadow-[2px_2px_0px_rgba(0,0,0,1)] active:bg-[#00E1EF] rounded-full sm:mt-0 sm:p-4 text-lg leading-none'/>
+</form>
             </div>
-        // </Layout>
+        </div>
     );
 }
 

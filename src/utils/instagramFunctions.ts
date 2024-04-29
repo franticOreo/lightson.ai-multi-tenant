@@ -4,6 +4,8 @@ import FormData from 'form-data';
 import payload from 'payload';
 import fs from 'fs';
 
+import { v4 as uuidv4 } from 'uuid'; // Ensure you have 'uuid' installed (`npm install uuid`)
+
 
 export async function getUserProfile(accessToken: string) {
     try {
@@ -61,7 +63,9 @@ export async function getInstagramPosts(INSTAGRAM_TOKEN: string) {
             // Access the retrieved data
             const data = response.data;
             const posts = data.data;
-            return posts;
+
+            const imagePosts = posts.filter(post => post.media_type === "IMAGE");
+            return imagePosts;
         } else {
             console.log("Failed to retrieve data from the Instagram Display API.");
         }
@@ -123,8 +127,9 @@ export async function getPayloadAuthToken() {
 
   export async function uploadImageToCollection(imageBuffer: Buffer, instagramHandle: string, accessToken: string) {
     try {
-      // Save the image buffer to a temporary file because Payload expects a file path for uploads
-      const tempImagePath = `./temp_${instagramHandle}.jpg`; // Use a unique name to avoid conflicts
+      const uniqueId = uuidv4();
+      const tempImagePath = `./temp_${instagramHandle}_${uniqueId}.jpg`; // Now includes a UUID
+
       fs.writeFileSync(tempImagePath, imageBuffer);
   
       // Prepare the form data for upload

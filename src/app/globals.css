@@ -31,3 +31,21 @@ body {
     text-wrap: balance;
   }
 }
+
+@layer components {
+  .card {
+    @apply border-black border-2 rounded-md bg-white;
+  }
+  .card:hover {
+    @apply shadow-[8px_8px_0px_rgba(0,0,0,1)];
+  }
+}
+
+.form-container {
+  width: 90%; /* Takes up most of the screen on small devices */
+  margin: auto; /* Centers the form */
+}
+
+.input-neu {
+  @apply border-black border-2 p-2.5 focus:outline-none focus:shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:bg-[#FFA6F6] active:shadow-[2px_2px_0px_rgba(0,0,0,1)] rounded-lg;
+}

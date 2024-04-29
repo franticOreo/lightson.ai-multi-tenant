@@ -5,7 +5,7 @@ import {getInstagramPosts, getPayloadAuthToken, uploadImageToCollection, downloa
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import { generateRemainingBusinessDetails, createBusinessEntry } from './createBusinessDetails';
-import { uploadInstagramPost } from './blogCreation';
+import { postsCreationPipeline } from './postCreation';
 
 export function extractUserTokenFromState(state: string | undefined): string | null {
   if (!state) return null;
@@ -90,8 +90,21 @@ export async function handleInstagramCallback(req: Request, res: Response) {
 
       const response = await createBusinessEntry(businessDetails, payloadToken)
 
-      await uploadInstagramPost(instagramAuthData.access_token, decodedUserToken.client_instagram_handle, userId, tenantId, payloadToken)
-      // generate
+      const posts = await getInstagramPosts(instagramAuthData.access_token)
+      const lastFourPosts = posts.slice(-4); 
+
+      const postsResponse = postsCreationPipeline({
+                                              posts: lastFourPosts,
+                                              instagramToken: instagramAuthData.access_token,
+                                              clientBusinessBio: businessDetails.businessBio,
+                                              clientLanguageStyle: businessDetails.languageStyle,
+                                              clientServiceArea: businessDetails.serviceArea,
+                                              clientKeywords: keywords,
+                                              instagramHandle: businessDetails.instagramHandle,
+                                              userId: userId,
+                                              tenantId: tenantId,
+                                                    });
+      
 
       res.redirect('/')
       
