@@ -1,5 +1,4 @@
 import fetch from 'node-fetch'; // If needed
-import { URLSearchParams } from 'url';
 import { Request, Response } from 'express';
 import {getInstagramPosts, getPayloadAuthToken, getInstagramHandle} from './instagramFunctions'; 
 import jwt from 'jsonwebtoken';
@@ -59,7 +58,11 @@ export async function handleInstagramCallback(req: Request, res: Response) {
       }),
     });
 
-    const instagramAuthData = await response.json();
+    interface InstagramAuthResponse {
+      access_token: string;
+    }
+
+    const instagramAuthData = await response.json() as InstagramAuthResponse;
     console.log(instagramAuthData)
 
     const instagramHandle = await getInstagramHandle(instagramAuthData.access_token)
