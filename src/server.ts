@@ -84,15 +84,44 @@ const start = async (): Promise<void> => {
   app.use('/assets/', express.static(path.resolve(__dirname, './payload/assets')));
 
   if (process.env.NEXT_BUILD) {
-    app.listen(PORT, async () => {
+    const server = app.listen(PORT, async () => {
       payload.logger.info(`Next.js is now building...`)
       // @ts-expect-error
       await nextBuild(path.join(__dirname, '../'))
       process.exit()
-    })
+    });
+
+  // Graceful shutdown
+  process.on('SIGINT', () => {
+    console.log('SIGINT signal received: closing HTTP server');
+    server.close(() => {
+      console.log('HTTP server closed');
+      process.exit(0);
+    });
+  });
+
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received: closing HTTP server');
+    server.close(() => {
+      console.log('HTTP server closed');
+      process.exit(0);
+    });
+  });
 
     return
   }
+
+  app.use((req, res, next) => {
+    console.log(`Incoming request: ${req.method} ${req.url}`);
+    next();
+  });
+  
+  app.use((req, res, next) => {
+    res.on('finish', () => {
+      console.log(`Request to ${req.method} ${req.url} sent response ${res.statusCode}`);
+    });
+    next();
+  });
 
   const nextApp = next({
     dev: process.env.NODE_ENV !== 'production',
