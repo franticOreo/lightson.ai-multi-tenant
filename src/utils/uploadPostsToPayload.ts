@@ -1,4 +1,3 @@
-import fetch from 'node-fetch'; // If needed
 import { Request, Response } from 'express';
 import {getInstagramPosts, getPayloadAuthToken, getInstagramHandle} from './instagramFunctions'; 
 import jwt from 'jsonwebtoken';
