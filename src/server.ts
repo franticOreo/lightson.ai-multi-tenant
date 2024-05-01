@@ -8,8 +8,6 @@ import { createUser } from './utils/tenantUserManagement';
 
 import jwt from 'jsonwebtoken';
 
-console.log("Server is running");
-
 
 dotenv.config({
   path: path.resolve(__dirname, '../.env'),
@@ -19,6 +17,9 @@ import express from 'express'
 import payload from 'payload'
 
 import { seed } from './payload/seed'
+import Waitlist from './models/Waitlist';
+
+
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -68,7 +69,25 @@ app.post('/api/signup', async (req, res) => {
   }
 });
 
+
+app.post('/add-to-waitlist', async (req, res) => {
+  
+
+  try {
+    const { email, instagramHandle } = req.body;
+    const newEntry = new Waitlist({
+      email,
+      instagramHandle
+    });
+    await newEntry.save();
+    res.status(201).send('Added to waitlist successfully');
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
 app.get('/api/instagram/callback', handleInstagramCallback);
+
 
 const start = async (): Promise<void> => {
   await payload.init({
@@ -78,6 +97,8 @@ const start = async (): Promise<void> => {
       payload.logger.info(`Payload Admin URL: ${payload.getAdminURL()}`)
     },
   })
+
+
 
   if (process.env.PAYLOAD_SEED === 'true') {
     payload.logger.info('---- SEEDING DATABASE ----')
