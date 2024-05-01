@@ -75,11 +75,12 @@ app.post('/add-to-waitlist', async (req, res) => {
 
   try {
     const { email, instagramHandle } = req.body;
-    const newEntry = new Waitlist({
-      email,
-      instagramHandle
-    });
-    await newEntry.save();
+    console.log(email, instagramHandle)
+    // const newEntry = new Waitlist({
+    //   email,
+    //   instagramHandle
+    // });
+    // await newEntry.save();
     res.status(201).send('Added to waitlist successfully');
   } catch (error) {
     res.status(400).send(error.message);
