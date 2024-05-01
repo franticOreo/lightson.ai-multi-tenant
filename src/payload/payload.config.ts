@@ -4,7 +4,7 @@ import { slateEditor } from '@payloadcms/richtext-slate'
 import dotenv from 'dotenv'
 import path from 'path'
 
-import { Logo } from './payload/graphics/logo';
+import { Logo } from './graphics/logo';
 
 dotenv.config({
   path: path.resolve(__dirname, '../.env'),
@@ -12,11 +12,11 @@ dotenv.config({
 
 import { buildConfig } from 'payload/config'
 
-import { Posts } from './payload/collections/Posts'
-import { Tenants } from './payload/collections/Tenants'
-import { Users } from './payload/collections/Users'
-import { Media } from './payload/collections/Media'
-import { Business } from './payload/collections/Business';
+import { Posts } from './collections/Posts'
+import { Tenants } from './collections/Tenants'
+import { Users } from './collections/Users'
+import { Media } from './collections/Media'
+import { Business } from './collections/Business';
 
 export default buildConfig({
   collections: [Users, Tenants, Posts, Media, Business],
@@ -32,7 +32,6 @@ export default buildConfig({
             ...config.resolve,
             alias: {
               ...config.resolve.alias,
-              dotenv: path.resolve(__dirname, "./dotenv.js"),
             },
           },
         };

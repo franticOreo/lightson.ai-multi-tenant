@@ -1,12 +1,7 @@
 import type { Access } from 'payload/config'
+import type { User } from 'payload/generated-types'
 
 import { isSuperAdmin } from '../../../utilities/isSuperAdmin'
-import { User } from '../../../../payload-types'
-
-// import type { Access } from 'payload/config'
-// import type { User } from 'payload/generated-types'
-
-// import { isSuperAdmin } from '../../utilities/isSuperAdmin'
 
 export const adminsAndSelf: Access<any, User> = async ({ req: { user } }) => {
   if (user) {
@@ -57,3 +52,4 @@ export const adminsAndSelf: Access<any, User> = async ({ req: { user } }) => {
     }
   }
 }
+

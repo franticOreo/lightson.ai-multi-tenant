@@ -1,5 +1,5 @@
 import path from 'path'
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+// require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 export const createBranch = async (branchName, sourceBranch = 'main') => {
     const token = process.env.GITHUB_TOKEN;

@@ -1,11 +1,14 @@
 import dotenv from 'dotenv'
 import next from 'next'
+import nextBuild from 'next/dist/build'
 import path from 'path'
 
 import { handleInstagramCallback } from './utils/uploadPostsToPayload'; // Adjust the import path as necessary
 import { createUser } from './utils/tenantUserManagement';
 
 import jwt from 'jsonwebtoken';
+
+console.log("Server is running");
 
 
 dotenv.config({
@@ -83,34 +86,34 @@ const start = async (): Promise<void> => {
 
   app.use('/assets/', express.static(path.resolve(__dirname, './payload/assets')));
 
-  // if (process.env.NEXT_BUILD) {
-  //   console.log('NEXT_BUILD is', process.env.NEXT_BUILD)
-  //   const server = app.listen(PORT, async () => {
-  //     payload.logger.info(`Next.js is now building...`)
-  //     // @ts-expect-error
-  //     await nextBuild(path.join(__dirname, '../'))
-  //     process.exit()
-  //   });
+  if (process.env.NEXT_BUILD) {
+    console.log('NEXT_BUILD is', process.env.NEXT_BUILD)
+    const server = app.listen(PORT, async () => {
+      payload.logger.info(`Next.js is now building...`)
+      // @ts-expect-error
+      await nextBuild(path.join(__dirname, '../'))
+      process.exit()
+    });
 
-  // // Graceful shutdown
-  // process.on('SIGINT', () => {
-  //   console.log('SIGINT signal received: closing HTTP server');
-  //   server.close(() => {
-  //     console.log('HTTP server closed');
-  //     process.exit(0);
-  //   });
-  // });
+  // Graceful shutdown
+  process.on('SIGINT', () => {
+    console.log('SIGINT signal received: closing HTTP server');
+    server.close(() => {
+      console.log('HTTP server closed');
+      process.exit(0);
+    });
+  });
 
-  // process.on('SIGTERM', () => {
-  //   console.log('SIGTERM signal received: closing HTTP server');
-  //   server.close(() => {
-  //     console.log('HTTP server closed');
-  //     process.exit(0);
-  //   });
-  // });
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received: closing HTTP server');
+    server.close(() => {
+      console.log('HTTP server closed');
+      process.exit(0);
+    });
+  });
 
-  //   return
-  // }
+    return
+  }
 
   app.use((req, res, next) => {
     console.log(`Incoming request: ${req.method} ${req.url}`);

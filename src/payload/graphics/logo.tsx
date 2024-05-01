@@ -1,5 +1,5 @@
 import React from 'react';
-import logoSrc from '../../../public/logo.svg'; // Adjust the path as necessary
+import logoSrc from '../../../public/logo.svg';
 import './logo.scss';
 
 export const Logo = () => React.createElement(
