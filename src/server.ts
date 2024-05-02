@@ -17,7 +17,6 @@ import express from 'express'
 import payload from 'payload'
 
 import { seed } from './payload/seed'
-import Waitlist from './models/Waitlist';
 
 
 
@@ -26,6 +25,10 @@ const PORT = process.env.PORT || 3000
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+app.get('/', (req, res) => {
+  res.redirect('/join-waitlist');
+});
 
 app.post('/api/signup', async (req, res) => {
   try {

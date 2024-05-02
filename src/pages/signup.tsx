@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { Unbounded } from "next/font/google";
 const unbounded = Unbounded({ subsets: ["latin"] }); // Adjust subsets as needed
 
-import '../app/globals.css'
+
 
 //
 // NEEDS SERVER SIDE CHECK FOR USER!!!
