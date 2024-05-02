@@ -68,7 +68,7 @@ const WaitlistForm: React.FC = () =>  {
             label={loading ? 'Joining Waitlist...' : 'Join'}
             disabled={loading}
             appearance="primary"
-            className="button"
+            className="button mt-40"
           />
         </form>
       </div>
