@@ -17,9 +17,10 @@ import { Tenants } from './collections/Tenants'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Business } from './collections/Business';
+import { Waitlists } from './collections/Waitlists'
 
 export default buildConfig({
-  collections: [Users, Tenants, Posts, Media, Business],
+  collections: [Users, Tenants, Posts, Media, Business, Waitlists],
   // serverURL: process.env.NODE_ENV === 'production' ? 'https://lightson.ai' : 'http://localhost:3000',
   cors: '*',
   admin: {

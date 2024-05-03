@@ -9,11 +9,11 @@ export default function Header() {
   return (
     <footer className={classes.footer}>
       <Gutter className={classes.wrap}>
-        <Link href="/">
+        {/* <Link href="/"> */}
         <h3 className={classes.font}>
         lightson.ai
         </h3>
-        </Link>
+        {/* </Link> */}
         <nav className={classes.nav}>
         </nav>
       </Gutter>

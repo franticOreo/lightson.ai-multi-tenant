@@ -73,7 +73,7 @@ app.post('/api/signup', async (req, res) => {
 });
 
 
-app.post('/add-to-waitlist', async (req, res) => {
+app.post('/api/waitlist', async (req, res) => {
   
 
   try {

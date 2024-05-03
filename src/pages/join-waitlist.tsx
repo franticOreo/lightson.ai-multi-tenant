@@ -8,14 +8,10 @@ import { Input } from '../app/_components/Input';
 import { Gutter } from '../app/_components/Gutter';
 import { Button } from '../app/_components/Button';
 
-
-
 import Link from 'next/link'
 
 import { Unbounded } from "next/font/google";
 const unbounded = Unbounded({ subsets: ["latin"] }); // Adjust subsets as needed
-
-
 
 
 type FormData = {
@@ -34,7 +30,7 @@ const WaitlistForm: React.FC = () =>  {
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try {
-      const response = await fetch('/api/waitlist', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/waitlists`, {
         method: 'POST',
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' },
@@ -42,7 +38,7 @@ const WaitlistForm: React.FC = () =>  {
 
       if (!response.ok) throw new Error(response.statusText);
 
-      router.push('/thank-you'); // Redirect to a thank you page or similar
+      router.push('/'); // Redirect to a thank you page or similar
     } catch (error) {
       setError(error.message);
     } finally {
@@ -54,15 +50,12 @@ const WaitlistForm: React.FC = () =>  {
     <Gutter>
     <div className="card ">
       <div className="form-container">
-        <Link href="/"><h1 className={`text-xl font-bold mb-4 ${unbounded.className}`}>lightson.ai</h1></Link><br />
-        <h2 className={`text-xl font-bold mb-4 ${unbounded.className}`}>Use Your Instagram Content to Build a Business Website </h2>
-        <h3 className={`text-xl font-bold mb-4 ${unbounded.className}`}>Join Our Waitlist</h3>
+        <h1 className={`${unbounded.className}`}>lightson.ai</h1><br />
+        <h2 className={`${unbounded.className}`}>Use Your Instagram Content to Build a Business Website </h2>
+        <h3 className={`${unbounded.className}`}>Join Our Waitlist</h3>
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* <Message error={error} /> */}
           <Input name="email" label="Email" required register={register} error={errors.email} type="email" />
           <Input name="instagramHandle" label="Instagram Handle" required register={register} error={errors.instagramHandle} type="text" />
-          {/* Add inputs for survey responses */}
-          {/* <Button type="submit" label={loading ? 'Joining Waitlist...' : 'Join Waitlist'} disabled={loading} /> */}
           <Button
             type="submit"
             label={loading ? 'Joining Waitlist...' : 'Join'}
