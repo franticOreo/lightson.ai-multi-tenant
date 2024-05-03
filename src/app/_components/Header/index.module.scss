@@ -1,6 +1,8 @@
 @use '../../_css/queries.scss' as *;
 
-@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&display=swap');
+.header {
+  font-family: var(--font-unbounded);
+}
 
 .footer {
   padding: calc(var(--base) * 4) 0;

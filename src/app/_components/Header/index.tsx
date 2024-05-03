@@ -10,9 +10,13 @@ export default function Header() {
     <footer className={classes.footer}>
       <Gutter className={classes.wrap}>
         {/* <Link href="/"> */}
-        <h3 className={classes.font}>
-        lightson.ai
-        </h3>
+      <picture>
+            <img
+              className={classes.logo}
+              alt="lightson.ai text Logo"
+              src="/li_logo_text_long.svg"
+            />
+          </picture>
         {/* </Link> */}
         <nav className={classes.nav}>
         </nav>
