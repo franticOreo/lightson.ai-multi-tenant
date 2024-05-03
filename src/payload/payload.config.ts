@@ -42,7 +42,7 @@ export default buildConfig({
     },
     meta: {
       titleSuffix: "- lightson.ai",
-      favicon: "/src/app/favicon.svg",
+      favicon: "/src/app/favicon.ico",
       ogImage: "/payload/assets/logo.svg",
     },
     components: {

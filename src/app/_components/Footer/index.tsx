@@ -9,7 +9,7 @@ export default function Footer() {
   return (
     <footer className={classes.footer}>
       <Gutter className={classes.wrap}>
-      <Link href="/">
+      {/* <Link href="/"> */}
           <picture>
             <img
               className={classes.logo}
@@ -17,7 +17,7 @@ export default function Footer() {
               src="/logo.svg"
             />
           </picture>
-        </Link>
+        {/* </Link> */}
         <nav className={classes.nav}>
           <Link href="mailto:admin@lightson.ai" target="_blank" rel="noopener noreferrer">
           admin@lightson.ai
