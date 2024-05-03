@@ -25,6 +25,7 @@ const WaitlistForm: React.FC = () =>  {
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false); // State to track if the form has been submitted
   const router = useRouter();
 
   const onSubmit = async (data: FormData) => {
@@ -38,13 +39,25 @@ const WaitlistForm: React.FC = () =>  {
 
       if (!response.ok) throw new Error(response.statusText);
 
-      router.push('/'); // Redirect to a thank you page or similar
+      setSubmitted(true);
     } catch (error) {
       setError(error.message);
     } finally {
       setLoading(false);
     }
   };
+
+  if (submitted) {
+    return (
+      <Gutter>
+        <div className="card">
+          <div className="form-container">
+            <h1 className={`${unbounded.className}`}>We will speak to you soon!</h1>
+          </div>
+        </div>
+      </Gutter>
+    );
+  }
 
   return (
     <Gutter>
