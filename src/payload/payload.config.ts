@@ -18,10 +18,10 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Business } from './collections/Business';
 import { Waitlists } from './collections/Waitlists'
+import { InstagramProfiles } from './collections/InstagramProfiles'
 
 export default buildConfig({
-  collections: [Users, Tenants, Posts, Media, Business, Waitlists],
-  // serverURL: process.env.NODE_ENV === 'production' ? 'https://lightson.ai' : 'http://localhost:3000',
+  collections: [Users, Tenants, Posts, Media, Business, Waitlists, InstagramProfiles],
   cors: '*',
   admin: {
     bundler: webpackBundler(),
@@ -42,7 +42,7 @@ export default buildConfig({
     },
     meta: {
       titleSuffix: "- lightson.ai",
-      favicon: "/src/app/favicon.ico",
+      favicon: "/favicon.ico",
       ogImage: "/payload/assets/logo.svg",
     },
     components: {

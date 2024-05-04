@@ -13,6 +13,8 @@ export interface Config {
     posts: Post;
     media: Media;
     business: Business;
+    waitlists: Waitlist;
+    instagramProfiles: InstagramProfile;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
@@ -129,6 +131,30 @@ export interface Business {
   createdBy?: (string | null) | User;
   updatedBy?: (string | null) | User;
   tenant?: (string | null) | Tenant;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "waitlists".
+ */
+export interface Waitlist {
+  id: string;
+  email: string;
+  instagramHandle: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instagramProfiles".
+ */
+export interface InstagramProfile {
+  id: string;
+  payloadUserId?: string | null;
+  instagramUserId: string;
+  instagramHandle: string;
+  accessToken: string;
   updatedAt: string;
   createdAt: string;
 }
