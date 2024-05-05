@@ -19,8 +19,8 @@ export const Business: CollectionConfig = {
   },
   fields: [
     {
-      label: "Client Name",
-      name: "clientName",
+      label: "Full Name",
+      name: "fullName",
       type: "text",
       required: true,
     },
@@ -28,13 +28,13 @@ export const Business: CollectionConfig = {
       label: "Instagram Handle",
       name: "instagramHandle",
       type: "text",
-      required: true,
+      required: false,
     },
     {
       label: "Phone Number",
       name: "phoneNumber",
       type: "text",
-      required: true,
+      required: false,
     },
     {
       label: "Email",
@@ -46,7 +46,7 @@ export const Business: CollectionConfig = {
       label: "Business Name",
       name: "businessName",
       type: "text",
-      required: true,
+      required: false,
       admin: {
         position: "sidebar",
       },
@@ -55,7 +55,7 @@ export const Business: CollectionConfig = {
       label: "Business Bio",
       name: "businessBio",
       type: "textarea",
-      required: true,
+      required: false,
       admin: {
         position: "sidebar",
       },
@@ -64,7 +64,7 @@ export const Business: CollectionConfig = {
       label: "Business Address",
       name: "businessAddress",
       type: "textarea",
-      required: true,
+      required: false,
       admin: {
         position: "sidebar",
       },
@@ -73,7 +73,7 @@ export const Business: CollectionConfig = {
       label: "Operating Hours",
       name: "operatingHours",
       type: "text",
-      required: true,
+      required: false,
       admin: {
         position: "sidebar",
       },
@@ -82,7 +82,7 @@ export const Business: CollectionConfig = {
       label: "Language Style",
       name: "languageStyle",
       type: "text",
-      required: true,
+      required: false,
     },
     {
       label: "Keywords",
@@ -93,7 +93,7 @@ export const Business: CollectionConfig = {
         {
           name: "keyword",
           type: "text",
-          required: true,
+          required: false,
         },
       ],
     },
@@ -101,7 +101,17 @@ export const Business: CollectionConfig = {
       label: "Service Area",
       name: "serviceArea",
       type: "textarea",
+      required: false,
+    },
+    {
+      label: "User ID",
+      name: "userId",
+      type: "relationship",
+      relationTo: "users",
       required: true,
+      admin: {
+        position: "sidebar"
+      }
     },
     {
       name: "createdBy",

@@ -112,22 +112,23 @@ export interface Media {
  */
 export interface Business {
   id: string;
-  clientName: string;
-  instagramHandle: string;
-  phoneNumber: string;
+  fullName: string;
+  instagramHandle?: string | null;
+  phoneNumber?: string | null;
   email: string;
-  businessName: string;
-  businessBio: string;
-  businessAddress: string;
-  operatingHours: string;
-  languageStyle: string;
+  businessName?: string | null;
+  businessBio?: string | null;
+  businessAddress?: string | null;
+  operatingHours?: string | null;
+  languageStyle?: string | null;
   keywords?:
     | {
-        keyword: string;
+        keyword?: string | null;
         id?: string | null;
       }[]
     | null;
-  serviceArea: string;
+  serviceArea?: string | null;
+  userId: string | User;
   createdBy?: (string | null) | User;
   updatedBy?: (string | null) | User;
   tenant?: (string | null) | Tenant;

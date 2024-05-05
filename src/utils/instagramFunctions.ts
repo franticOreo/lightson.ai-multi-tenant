@@ -12,7 +12,7 @@ export async function getInstagramHandle(accessToken: string) {
         const response = await fetch(`https://graph.instagram.com/me?fields=id,username&access_token=${accessToken}`);
         const data = await response.json();
         console.log('Response from Instagram API:', data);
-        return data.username;
+        return data;
     } catch (error) {
         console.error('Error fetching user profile:', error);
         throw error;
@@ -158,3 +158,26 @@ export async function getPayloadAuthToken() {
       throw error; // Rethrow or handle as needed
     }
   }
+
+  
+
+interface InstagramProfileData {
+  payloadUserId?: string;
+  instagramUserId: string;
+  instagramHandle: string;
+  accessToken: string;
+}
+
+export async function createInstagramProfileEntry(profileData: InstagramProfileData) {
+  try {
+    const newProfile = await payload.create({
+      collection: 'instagramProfiles',
+      data: profileData,
+    });
+    console.log('New Instagram Profile created:', newProfile);
+    return newProfile;
+  } catch (error) {
+    console.error('Error creating Instagram Profile:', error);
+    throw error;
+  }
+}

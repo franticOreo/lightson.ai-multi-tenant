@@ -1,8 +1,6 @@
 import { takeUserProfileScreenshot } from './instagramFunctions'; 
 import OpenAI from "openai";
 import { understandImage, createBioLanguageKwPrompt, profileToBioLanguageKw} from "./gpt";
-import { getPayloadAuthToken } from './instagramFunctions';
-import payload from "payload";
 import axios from 'axios';
 
 export const runtime = "edge";

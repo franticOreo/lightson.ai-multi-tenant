@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
-import {getInstagramPosts, getPayloadAuthToken, getInstagramHandle} from './instagramFunctions'; 
+import {getInstagramPosts, getPayloadAuthToken, getInstagramHandle, createInstagramProfileEntry} from './instagramFunctions'; 
 import jwt from 'jsonwebtoken';
 import { generateRemainingBusinessDetails, createBusinessEntry } from './createBusinessDetails';
 import { postsCreationPipeline } from './postCreation';
 import { createTenant, assignTenantToUser } from './tenantUserManagement';
+import payload from 'payload';
 
 export function extractUserTokenFromState(state: string | undefined): string | null {
   if (!state) return null;
@@ -11,31 +12,20 @@ export function extractUserTokenFromState(state: string | undefined): string | n
   try {
     const decodedState = decodeURIComponent(state);
     const parsedState = JSON.parse(decodedState);
-    const userToken = parsedState.userToken;
-    return userToken; // Return the JWT string directly
+    return parsedState.userId
   } catch (error) {
     console.error('Error extracting userToken from state:', error);
     return null;
   }
 }
 
-
 export async function handleInstagramCallback(req: Request, res: Response) {
-  const { code } = req.query;
-  const userToken = extractUserTokenFromState(req.query.state as string | undefined);
+  const { code, state } = req.query;
+  console.log(req.query)
+  
 
-  console.log(userToken)
+  const payloadUserId = extractUserTokenFromState(state as string | undefined);
 
-  if (!userToken) {
-    return res.status(400).json({ error: 'userToken is undefined or invalid' });
-  }
-
-  const decodedUserToken = jwt.decode(userToken);
-  if (!decodedUserToken) {
-    return res.status(400).json({ error: 'Failed to decode userToken' });
-  }
-
-  const userId = decodedUserToken.client_user_id
 
   try {
     const clientId = '743103918004392';
@@ -60,76 +50,94 @@ export async function handleInstagramCallback(req: Request, res: Response) {
     interface InstagramAuthResponse {
       access_token: string;
     }
+    // Get the access token from Instagram
+    const { access_token: instagramAccessToken } = await response.json() as InstagramAuthResponse;
 
-    const instagramAuthData = await response.json() as InstagramAuthResponse;
-    console.log(instagramAuthData)
+    // get the instagram handle and user id using access token
+    const { id: instagramUserId, username: instagramHandle } = await getInstagramHandle(instagramAccessToken);
 
-    const instagramHandle = await getInstagramHandle(instagramAuthData.access_token)
+    const entryResponse = await createInstagramProfileEntry({
+      payloadUserId: payloadUserId,
+      instagramUserId: instagramUserId,
+      instagramHandle: instagramHandle,
+      accessToken: instagramAccessToken,
+    })
 
-    let createdTenant;
-    let createdUser;
-
-    try {
-      createdTenant = await createTenant(instagramHandle);
-      createdUser = await assignTenantToUser(userId, createdTenant.id);
-    } catch (error) {
-      return res.status(500).json({ error: 'Error creating User or Tenant' });
-    }
-
-
-
-    if (instagramAuthData.access_token) {
-      const payloadToken = await getPayloadAuthToken()
-
-      const bioLanguageKw = await generateRemainingBusinessDetails(payloadToken, instagramHandle, decodedUserToken.clientServiceArea)
-
-      const keywords = bioLanguageKw.SEO_keywords;
-
-      const businessDetails = {
-          clientName: decodedUserToken.client_name,
-          instagramHandle: instagramHandle,
-          phoneNumber: decodedUserToken.client_phone_number,
-          email: decodedUserToken.client_email,
-          businessName: decodedUserToken.client_business_name,
-          businessBio: bioLanguageKw.business_bio,
-          businessAddress: decodedUserToken.client_business_address,
-          operatingHours: decodedUserToken.client_operating_hours,
-          languageStyle: bioLanguageKw.language_style,
-          keywords: Array.isArray(keywords) ? keywords.map(keyword => ({ keyword })) : typeof keywords === 'string' ? keywords.split(', ').map(keyword => ({ keyword })) : [],
-          serviceArea: decodedUserToken.client_service_area,
-        };
-      
-      console.log(businessDetails)
-
-
-      const response = await createBusinessEntry(businessDetails, payloadToken)
-
-      const posts = await getInstagramPosts(instagramAuthData.access_token)
-      const lastFourPosts = posts.slice(-4); 
-
-      const postsResponse = postsCreationPipeline({
-                                              posts: lastFourPosts,
-                                              instagramToken: instagramAuthData.access_token,
-                                              clientBusinessBio: businessDetails.businessBio,
-                                              clientLanguageStyle: businessDetails.languageStyle,
-                                              clientServiceArea: businessDetails.serviceArea,
-                                              clientKeywords: keywords,
-                                              instagramHandle: businessDetails.instagramHandle,
-                                              userId: createdUser.id,
-                                              tenantId: createdTenant.id,
-                                                    });
-      
-
-      res.redirect('/')
-      
-      
-    } else {
-      return res.status(400).json({ error: 'Failed to obtain access token' });
-    }
+    // Return the instagramHandle to the client
+    return res.status(200).json({ instagramHandle });
   } catch (error) {
+    console.error('Error during Instagram authentication:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
+
+
+
+
+//     let createdTenant;
+//     let createdUser;
+
+//     try {
+//       createdTenant = await createTenant(instagramHandle);
+//       createdUser = await assignTenantToUser(userId, createdTenant.id);
+//     } catch (error) {
+//       return res.status(500).json({ error: 'Error creating User or Tenant' });
+//     }
+
+
+//     // Create Business Details
+//     if (instagramAuthData.access_token) {
+//       const payloadToken = await getPayloadAuthToken()
+
+//       const bioLanguageKw = await generateRemainingBusinessDetails(payloadToken, instagramHandle, decodedUserToken.clientServiceArea)
+
+//       const keywords = bioLanguageKw.SEO_keywords;
+
+//       const businessDetails = {
+//           clientName: decodedUserToken.client_name,
+//           instagramHandle: instagramHandle,
+//           phoneNumber: decodedUserToken.client_phone_number,
+//           email: decodedUserToken.client_email,
+//           businessName: decodedUserToken.client_business_name,
+//           businessBio: bioLanguageKw.business_bio,
+//           businessAddress: decodedUserToken.client_business_address,
+//           operatingHours: decodedUserToken.client_operating_hours,
+//           languageStyle: bioLanguageKw.language_style,
+//           keywords: Array.isArray(keywords) ? keywords.map(keyword => ({ keyword })) : typeof keywords === 'string' ? keywords.split(', ').map(keyword => ({ keyword })) : [],
+//           serviceArea: decodedUserToken.client_service_area,
+//         };
+      
+//       console.log(businessDetails)
+
+
+//       const response = await createBusinessEntry(businessDetails, payloadToken)
+
+//       const posts = await getInstagramPosts(instagramAuthData.access_token)
+//       const lastFourPosts = posts.slice(-4); 
+
+//       const postsResponse = postsCreationPipeline({
+//                                               posts: lastFourPosts,
+//                                               instagramToken: instagramAuthData.access_token,
+//                                               clientBusinessBio: businessDetails.businessBio,
+//                                               clientLanguageStyle: businessDetails.languageStyle,
+//                                               clientServiceArea: businessDetails.serviceArea,
+//                                               clientKeywords: keywords,
+//                                               instagramHandle: businessDetails.instagramHandle,
+//                                               userId: createdUser.id,
+//                                               tenantId: createdTenant.id,
+//                                                     });
+      
+
+//       res.redirect('/')
+      
+      
+//     } else {
+//       return res.status(400).json({ error: 'Failed to obtain access token' });
+//     }
+//   } catch (error) {
+//     return res.status(500).json({ error: 'Internal server error' });
+//   }
+// }
 
 
 

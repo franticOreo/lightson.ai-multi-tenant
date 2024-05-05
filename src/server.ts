@@ -5,6 +5,8 @@ import path from 'path'
 
 import { handleInstagramCallback } from './utils/uploadPostsToPayload'; // Adjust the import path as necessary
 import { createUser } from './utils/tenantUserManagement';
+import { getPayloadAuthToken } from './utils/instagramFunctions';
+import { createBusinessEntry } from './utils/createBusinessDetails';
 
 import jwt from 'jsonwebtoken';
 
@@ -30,63 +32,58 @@ app.get('/', (req, res) => {
   res.redirect('/join-waitlist');
 });
 
+
+
 app.post('/api/signup', async (req, res) => {
   try {
     
     const {
-      client_password,
-      client_name,
-      client_business_name,
-      client_phone_number,
-      client_email,
-      client_service_area,
-      client_business_address,
-      client_operating_hours,
+      email,
+      password,
+      fullName,
+      businessName,
+      businessPhone,
+      businessAddress,
+      serviceArea,  
+      businessHours,
+      operatingHours,
     } = req.body;
     console.log(req.body)
 
-    const createdUser = await createUser(client_email, client_password)
+    const createdUser = await createUser(email, password);
+    const userId = createdUser.id;
 
-    const userToken = jwt.sign(
-      { 
-        client_name: client_name,
-        client_user_id: createdUser.id,
-        client_business_name: client_business_name,
-        client_phone_number: client_phone_number,
-        client_email: client_email,
-        client_service_area: client_service_area,
-        client_business_address: client_business_address,
-        client_operating_hours: client_operating_hours,
-      }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: '1h' }
-    );
+    const businessDetails = {
+      userId,
+      fullName,
+      email,
+      businessName,
+      businessPhone,
+      businessAddress,
+      operatingHours,
+      serviceArea,
+      businessHours,
+    };
 
-    const state = encodeURIComponent(JSON.stringify({ userToken }));
-    const instagramAuthUrl = `https://api.instagram.com/oauth/authorize?client_id=${process.env.INSTAGRAM_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_REDIRECT_URI)}&scope=user_profile,user_media&response_type=code&state=${state}`;
-    res.redirect(instagramAuthUrl);
+    const payloadToken = await getPayloadAuthToken();
+    console.log("Payload token received:", payloadToken);
+ 
+    console.log("Creating business entry...");
+    const createdBusiness = await createBusinessEntry(businessDetails, payloadToken);
+    console.log("Business entry created:", createdBusiness);
+
+    const clientId = '743103918004392';
+    const scope = 'user_profile,user_media';
+    const state = encodeURIComponent(JSON.stringify({ userId: '22' }));
+    const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=${scope}&response_type=code&state=${state}`;
+
+    // return back to the client with the instagram redirect.
+    res.json({ authUrl: "https://www.google.com" });
+
 
   } catch (error) {
     console.error('Signup error:', error);
     res.status(500).send({ error: 'Signup failed' });
-  }
-});
-
-
-app.post('/api/waitlist', async (req, res) => {
-  
-
-  try {
-    const { email, instagramHandle } = req.body;
-    console.log(email, instagramHandle)
-    // const newEntry = new Waitlist({
-    //   email,
-    //   instagramHandle
-    // });
-    // await newEntry.save();
-    res.status(201).send('Added to waitlist successfully');
-  } catch (error) {
-    res.status(400).send(error.message);
   }
 });
 

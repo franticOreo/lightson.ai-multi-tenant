@@ -1,96 +1,101 @@
-import { getCookie } from 'cookies-next';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { Unbounded } from "next/font/google";
 const unbounded = Unbounded({ subsets: ["latin"] }); // Adjust subsets as needed
 
+import { Input } from '../app/_components/Input'; 
+import { Gutter } from '../app/_components/Gutter';
+import { Button } from '../app/_components/Button';
 
 
+type FormData = {
+    email: string;
+    password: string;
+    fullName: string;
+    businessName: string;
+    businessPhone: string;
+    businessAddress: string;
+    serviceArea: string;
+    businessHours: string;
+    operatingHours: string;
+  };
 //
 // NEEDS SERVER SIDE CHECK FOR USER!!!
 //
-export default function SignupPage( {username} ) {
+const SignupForm: React.FC = () =>  {
+    const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [submitted, setSubmitted] = useState(false); // State to track if the form has been submitted
     const router = useRouter();
-    console.log(process.env.NEXT_PUBLIC_REDIRECT_URI);
-    // Function to handle Instagram authorization
-    const handleInstagramAuth = () => {
-        const clientId = '743103918004392';
-        const scope = 'user_profile,user_media';
-        const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=${scope}&response_type=code`;
 
-        // Redirecting user to the Instagram Authorization Window
-        console.log(authUrl)
-        window.location.href = authUrl;
+    console.log(process.env.NEXT_PUBLIC_REDIRECT_URI);
+
+    const onSubmit = async (data: FormData) => {
+        setLoading(true);
+        try {
+            // // signup user
+            const response = await fetch('/api/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+    
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Server responded with an error:', errorText);
+                setError('An error occurred during signup: ' + errorText);
+            } else {
+                const result = await response.json();
+                console.log(result)
+                // Redirect the user to Instagram for authentication
+                console.log('Signup successful, awaiting redirection...');
+                window.location.href = result.authUrl;
+                
+            }
+    
+        } catch (error) {
+            console.error('Signup failed:', error);
+            setError('An error occurred during signup.');
+        }
+        setLoading(false);
     };
 
 
-    const { msg } = router.query
     return (
-    <div className="min-h-screen flex items-center justify-center bg-secondary">
-        <div className="form-container card px-8 py-9 rounded-md shadow-lg w-full max-w-4xl">
-            <Link href="/"><h1 className={`text-xl font-bold mb-4 ${unbounded.className}`}>lightson.ai</h1></Link><br/>
-            {msg ?
-                <h3 className="text-red-500">{msg}</h3>
-            :
-                <></>
-            }
-    <h2 className={`text-xl font-bold mb-4 ${unbounded.className}`}>Use Your Instagram Content to Build a Business Website </h2>
-    <form action='/api/signup' method='POST' className="space-y-4">
-    <div className='flex flex-col'>
-    <label htmlFor="client_email">Email:</label>
-    <input name="client_email" id="client_email" type="email" placeholder='Client Email' className='input-neu' required></input><br/>
-    </div>
-    <div className="flex flex-col">
-        <label htmlFor="client_password" className="font-medium">Password:</label>
-        <input minLength={5} name="client_password" id="client_password" type="password" placeholder='Password' className='input-neu' required></input>
-    </div>
-    <div className="flex flex-col">
-    <label htmlFor="client_name">Name:</label>
-    <input name="client_name" id="client_name" type="text" placeholder='Client Name' className='input-neu' required></input><br/>
-    </div>
-    {/* <div className='flex flex-col'>
-    <label htmlFor="client_instagram_handle"> Instagram Handle:</label>
-    <input name="client_instagram_handle" id="client_instagram_handle" type="text" placeholder='Client Instagram Handle' className='input-neu'></input><br/>
-    </div> */}
-    <div className='flex flex-col'>
-    <label htmlFor="client_business_name"> Business Name:</label>
-    <input name="client_business_name" id="client_business_name" type="text" placeholder='Client Business Name' className='input-neu' required></input><br/>
-    </div>
-    <div className='flex flex-col'>
-    <label htmlFor="client_phone_number">Business Number:</label>
-    <input name="client_phone_number" id="client_phone_number" type="tel" placeholder='Client Phone Number' className='input-neu' required></input><br/>
-    </div>
-    <div className='flex flex-col'>
-    <label htmlFor="client_service_area">Service Area:</label>
-    <input name="client_service_area" id="client_service_area" type="text" placeholder='Client Service Area' className='input-neu' required></input><br/>
-    </div>
-    <div className='flex flex-col'>
-    <label htmlFor="client_business_address">Business Address:</label>
-    <input name="client_business_address" id="client_business_address" type="text" placeholder='Client Business Address' className='input-neu' required></input><br/>
-    </div>
-    <div className='flex flex-col'>
-    <label htmlFor="client_operating_hours">Operating Hours:</label>
-    <input name="client_operating_hours" id="client_operating_hours" type="text" placeholder='Client Operating Hours' className='input-neu' required></input><br/>
-    </div>
-    <input type="submit" value="Generate Website" className='w-full p-7 mt-30 border-black border-2 bg-accent hover:bg-[#79F7FF] hover:shadow-[2px_2px_0px_rgba(0,0,0,1)] active:bg-[#00E1EF] rounded-full sm:mt-0 text-lg  leading-none'/>
-</form>
+        <Gutter>
+            <div className="card ">
+                <div className="form-container">
+                    <h1 className={`${unbounded.className}`}>lightson.ai</h1><br />
+                    <h2 className={`text-xl font-bold mb-4 ${unbounded.className}`}>Generate a Website Using Your Content </h2>
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <Input name="email" label="Email" required register={register} error={errors.email} type="email" />
+                        <Input name="password" label="Password" required register={register} error={errors.password} type="password" />
+                        <Input name="fullName" label="Full Name" required register={register} error={errors.fullName} type="text" />
+                        <Input name="businessName" label="Business Name" required register={register} error={errors.businessName} type="text" />
+                        <Input name="businessPhone" label="Business Phone" register={register} error={errors.businessPhone} type="number" />
+                        <Input name="businessAddress" label="Business Address" register={register} error={errors.businessAddress} type="text" />
+                        <Input name="serviceArea" label="Service Area" register={register} error={errors.serviceArea} type="text" />
+                        <Input name="businessHours" label="Business Hours" register={register} error={errors.businessHours} type="text" />
+                        <Input name="operatingHours" label="Operating Hours" register={register} error={errors.operatingHours} type="text" />
+                        <Button
+                            type="submit"
+                            label={loading ? 'Generating...' : 'Generate Site'}
+                            disabled={loading}
+                            appearance="primary"
+                            className="button mt-40"
+                        />
+                    </form>
+                </div>
             </div>
-        </div>
+        </Gutter>
     );
 }
 
-export async function getServerSideProps(context) {
-    const req = context.req
-    const res = context.res
-    var username = getCookie('username', { req, res });
-    if (username != undefined){
-        return {
-            redirect: {
-                permanent: false,
-                destination: "/"
-            }
-        }
-    }
-    return { props: {username:false} };
-};
+export default SignupForm;
