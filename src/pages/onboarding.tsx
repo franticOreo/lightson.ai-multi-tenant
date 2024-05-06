@@ -1,11 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-
-import { Unbounded } from "next/font/google";
-const unbounded = Unbounded({ subsets: ["latin"] }); // Adjust subsets as needed
 
 import { Input } from '../app/_components/Input'; 
 import { Gutter } from '../app/_components/Gutter';
@@ -31,8 +24,8 @@ export function Onboarding() {
                         <LoadingShimmer number={5} /> // Display shimmer effect
                     ) : (
                         <>
-                            <h1 className={`${unbounded.className}`}>lightson.ai</h1><br />
-                            <h2 className={`text-xl font-bold mb-4 ${unbounded.className}`}>We are building Your site!</h2>
+                            <h1 className='unbounded'>lightson.ai</h1><br />
+                            <h2 className='unbounded'>We are building Your site!</h2>
                             <form>
                                 {/* <Input name="email" label="Email" required register={register} error={errors.email} type="email" /> */}
                             </form>

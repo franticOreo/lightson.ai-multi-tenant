@@ -4,8 +4,7 @@ import { useForm } from 'react-hook-form';
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Unbounded } from "next/font/google";
-const unbounded = Unbounded({ subsets: ["latin"] }); // Adjust subsets as needed
+
 
 import { Input } from '../app/_components/Input'; 
 import { Gutter } from '../app/_components/Gutter';
@@ -69,8 +68,8 @@ const SignupForm: React.FC = () =>  {
         <Gutter>
             <div className="card ">
                 <div className="form-container">
-                    <h1 className={`${unbounded.className}`}>lightson.ai</h1><br />
-                    <h2 className={`text-xl font-bold mb-4 ${unbounded.className}`}>Generate a Website Using Your Content </h2>
+                    <h1 className='unbounded'>lightson.ai</h1><br />
+                    <h2 className='unbounded'>Generate a Website Using Your Content </h2>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Input name="email" label="Email" required register={register} error={errors.email} type="email" />
                         <Input name="password" label="Password" required register={register} error={errors.password} type="password" />

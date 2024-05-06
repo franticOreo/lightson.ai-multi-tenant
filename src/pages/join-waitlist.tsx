@@ -8,11 +8,6 @@ import { Input } from '../app/_components/Input';
 import { Gutter } from '../app/_components/Gutter';
 import { Button } from '../app/_components/Button';
 
-import Link from 'next/link'
-
-import { Unbounded } from "next/font/google";
-const unbounded = Unbounded({ subsets: ["latin"] }); // Adjust subsets as needed
-
 
 type FormData = {
   email: string;
@@ -52,7 +47,7 @@ const WaitlistForm: React.FC = () =>  {
       <Gutter>
         <div className="card">
           <div className="form-container">
-            <h1 className={`${unbounded.className}`}>We will speak to you soon!</h1>
+            <h1 className='unbounded'>We will speak to you soon!</h1>
           </div>
         </div>
       </Gutter>
@@ -63,9 +58,9 @@ const WaitlistForm: React.FC = () =>  {
     <Gutter>
     <div className="card ">
       <div className="form-container">
-        <h1 className={`${unbounded.className}`}>lightson.ai</h1><br />
-        <h2 className={`${unbounded.className}`}>Use Your Instagram Content to Build a Business Website </h2>
-        <h3 className={`${unbounded.className}`}>Join Our Waitlist</h3>
+        <h1 className='unbounded'>lightson.ai</h1><br />
+        <h2 className='unbounded'>Use Your Instagram Content to Build a Business Website </h2>
+        <h3 className='unbounded'>Join Our Waitlist</h3>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Input name="email" label="Email" required register={register} error={errors.email} type="email" />
           <Input name="instagramHandle" label="Instagram Handle" required register={register} error={errors.instagramHandle} type="text" />
