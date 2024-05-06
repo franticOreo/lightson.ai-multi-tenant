@@ -1,133 +1,196 @@
-import { Request, Response } from 'express';
-import {getInstagramPosts, getPayloadAuthToken, getInstagramHandle, createInstagramProfileEntry} from './instagramFunctions'; 
-import jwt from 'jsonwebtoken';
-import { generateRemainingBusinessDetails, createBusinessEntry } from './createBusinessDetails';
-import { postsCreationPipeline } from './postCreation';
+import {getInstagramPosts } from './instagramFunctions'; 
+import { generateRemainingBusinessDetails } from './createBusinessDetails';
+// import { postsCreationPipeline } from './postCreation';
 import { createTenant, assignTenantToUser } from './tenantUserManagement';
+import { getPayloadClient } from './getPayloadClient';
 import payload from 'payload';
+import dotenv from 'dotenv';
+import path from 'path';
 
-export function extractUserTokenFromState(state: string | undefined): string | null {
-  if (!state) return null;
+dotenv.config({
+  path: path.resolve(__dirname, '../../.env'),
+});
 
+const { PAYLOAD_SECRET } = process.env;
+
+const payloadClient = getPayloadClient()
+
+async function getInstagramProfileByUserId(payloadUserId: string) {
   try {
-    const decodedState = decodeURIComponent(state);
-    const parsedState = JSON.parse(decodedState);
-    return parsedState.userId
+    const result = await payload.find({
+      collection: 'instagramProfiles',
+      where: {
+        'payloadUserId': { // Assuming the relationship field is named 'user'
+          equals: payloadUserId
+        }
+      },
+      depth: 1 // Adjust depth as needed to fetch related documents
+    });
+    return result;
   } catch (error) {
-    console.error('Error extracting userToken from state:', error);
-    return null;
+    console.error('Error fetching user details:', error);
+    throw error;
   }
 }
 
-export async function handleInstagramCallback(req: Request, res: Response) {
-  const { code, state } = req.query;
-  console.log(req.query)
-  
-
-  const payloadUserId = extractUserTokenFromState(state as string | undefined);
-
-
+async function getBusinessDetailsByUserId(payloadUserId: string) {
   try {
-    const clientId = '743103918004392';
-    const clientSecret = '2647020baecf2da6ba40f57d151d730b';
-    const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI
-    const tokenUrl = 'https://api.instagram.com/oauth/access_token';
-
-    const response = await fetch(tokenUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+    const result = await payload.find({
+      collection: 'business',
+      where: {
+        'userId': { // Assuming the relationship field is named 'user'
+          equals: payloadUserId
+        }
       },
-      body: new URLSearchParams({
-        client_id: clientId,
-        client_secret: clientSecret,
-        grant_type: 'authorization_code',
-        redirect_uri: redirectUri,
-        code: code as string,
-      }),
+      depth: 1 // Adjust depth as needed to fetch related documents
+    });
+    return result;
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    throw error;
+  }
+}
+
+async function updateBusinessDetails(payloadUserId: string, newData: any) {
+  try {
+
+    // Find the business entry by userId
+    const business = await payload.find({
+      collection: 'business',
+      where: {
+        userId: {
+          equals: payloadUserId
+        }
+      },
+      limit: 1 // Assuming there's only one business per user
     });
 
-    interface InstagramAuthResponse {
-      access_token: string;
+    console.log('Found business', business)
+    const businessId = business.docs[0].id;
+    console.log('Business ID:', businessId);
+
+    if (business.docs.length > 0) {
+      
+      
+      const business = await payload.find({
+        collection: 'business',
+        where: {
+          id: {
+            equals: businessId
+          }
+        },
+        limit: 1 // Assuming there's only one business per user
+      });
+
+      console.log('finding business with id: ', business)
+   
+
+      // Update the business entry with new data
+      const updatedBusiness = await payload.update({
+        collection: 'business',
+        where: {
+          id: {
+            equals: businessId
+          }
+        },
+        data: newData,
+        user: {
+          id: payloadUserId
+        }
+      });
+
+      return updatedBusiness;
+    } else {
+      throw new Error('No business found for the given user ID');
     }
-    // Get the access token from Instagram
-    const { access_token: instagramAccessToken } = await response.json() as InstagramAuthResponse;
-
-    // get the instagram handle and user id using access token
-    const { id: instagramUserId, username: instagramHandle } = await getInstagramHandle(instagramAccessToken);
-
-    const entryResponse = await createInstagramProfileEntry({
-      payloadUserId: payloadUserId,
-      instagramUserId: instagramUserId,
-      instagramHandle: instagramHandle,
-      accessToken: instagramAccessToken,
-    })
-
-    console.log('Created instagram profile entry:', entryResponse)
-
-    // Return the instagramHandle to the client
-    return res.redirect(`/onboarding?userId=${payloadUserId}`);
   } catch (error) {
-    console.error('Error during Instagram authentication:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('Error updating business details:', error);
+    throw error;
   }
+}
+
+
+export default async function uploadInitialPostsToPayload(payloadUserId: string, nPosts: number): Promise<void> {
+
+
+  const instagramProfileData = await getInstagramProfileByUserId(payloadUserId)
+  const instagramHandle = instagramProfileData.docs[0].instagramHandle;
+  const instagramAuthToken = instagramProfileData.docs[0].accessToken;
+
+  console.log(instagramHandle)
+  console.log(instagramAuthToken)
+
+  const businessDetailsData = await getBusinessDetailsByUserId(payloadUserId)
+  const serviceArea = businessDetailsData.docs[0].serviceArea;
+
+  try {
+    console.log('Creating Tenant')
+    const createdTenant = await createTenant(instagramHandle);
+    console.log('Assigning Tenant to User')
+    const createdUser = await assignTenantToUser(payloadUserId, createdTenant.id);
+  } catch (error) {
+    console.error('Error creating User or Tenant:', error);
+    throw error;
+  }
+
+  const bioLanguageKw = await generateRemainingBusinessDetails(PAYLOAD_SECRET, instagramHandle, serviceArea)
+  console.log(bioLanguageKw)
+
+  const keywords = bioLanguageKw.SEO_keywords;
+
+  const newBusinessData = {
+      instagramHandle,
+      businessBio: bioLanguageKw.business_bio,
+      languageStyle: bioLanguageKw.language_style,
+      keywords: Array.isArray(keywords) ? keywords.map(keyword => ({ keyword })) : typeof keywords === 'string' ? keywords.split(', ').map(keyword => ({ keyword })) : [],
+    };
+  
+
+  const updatedBusiness = await updateBusinessDetails(payloadUserId, newBusinessData)
+
+  console.log('Updated Business', updatedBusiness)
+
+  // const posts = await getInstagramPosts(instagramAuthToken)
+  // const recentPosts = posts.slice(0, nPosts); 
+
+  // const postsResponse = postsCreationPipeline({
+  //                                       posts: lastFourPosts,
+  //                                       instagramToken: instagramAuthData.access_token,
+  //                                       clientBusinessBio: businessDetails.businessBio,
+  //                                       clientLanguageStyle: businessDetails.languageStyle,
+  //                                       clientServiceArea: businessDetails.serviceArea,
+  //                                       clientKeywords: keywords,
+  //                                       instagramHandle: businessDetails.instagramHandle,
+  //                                       userId: createdUser.id,
+  //                                       tenantId: createdTenant.id,
+  //                                             });
+
+  
+  
+
 }
 
 
 
 
-//     let createdTenant;
-//     let createdUser;
 
-//     try {
-//       createdTenant = await createTenant(instagramHandle);
-//       createdUser = await assignTenantToUser(userId, createdTenant.id);
-//     } catch (error) {
-//       return res.status(500).json({ error: 'Error creating User or Tenant' });
-//     }
+
+
+
+
+
+
 
 
 //     // Create Business Details
 //     if (instagramAuthData.access_token) {
 //       const payloadToken = await getPayloadAuthToken()
 
-//       const bioLanguageKw = await generateRemainingBusinessDetails(payloadToken, instagramHandle, decodedUserToken.clientServiceArea)
-
-//       const keywords = bioLanguageKw.SEO_keywords;
-
-//       const businessDetails = {
-//           clientName: decodedUserToken.client_name,
-//           instagramHandle: instagramHandle,
-//           phoneNumber: decodedUserToken.client_phone_number,
-//           email: decodedUserToken.client_email,
-//           businessName: decodedUserToken.client_business_name,
-//           businessBio: bioLanguageKw.business_bio,
-//           businessAddress: decodedUserToken.client_business_address,
-//           operatingHours: decodedUserToken.client_operating_hours,
-//           languageStyle: bioLanguageKw.language_style,
-//           keywords: Array.isArray(keywords) ? keywords.map(keyword => ({ keyword })) : typeof keywords === 'string' ? keywords.split(', ').map(keyword => ({ keyword })) : [],
-//           serviceArea: decodedUserToken.client_service_area,
-//         };
-      
-//       console.log(businessDetails)
+      // const bioLanguageKw = await generateRemainingBusinessDetails(payloadToken, instagramHandle, decodedUserToken.clientServiceArea)
 
 
-//       const response = await createBusinessEntry(businessDetails, payloadToken)
 
-//       const posts = await getInstagramPosts(instagramAuthData.access_token)
-//       const lastFourPosts = posts.slice(-4); 
 
-//       const postsResponse = postsCreationPipeline({
-//                                               posts: lastFourPosts,
-//                                               instagramToken: instagramAuthData.access_token,
-//                                               clientBusinessBio: businessDetails.businessBio,
-//                                               clientLanguageStyle: businessDetails.languageStyle,
-//                                               clientServiceArea: businessDetails.serviceArea,
-//                                               clientKeywords: keywords,
-//                                               instagramHandle: businessDetails.instagramHandle,
-//                                               userId: createdUser.id,
-//                                               tenantId: createdTenant.id,
-//                                                     });
       
 
 //       res.redirect('/')

@@ -152,7 +152,7 @@ export interface Waitlist {
  */
 export interface InstagramProfile {
   id: string;
-  payloadUserId?: string | null;
+  payloadUserId: string | User;
   instagramUserId: string;
   instagramHandle: string;
   accessToken: string;
