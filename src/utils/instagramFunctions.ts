@@ -162,7 +162,7 @@ export async function getPayloadAuthToken() {
   
 
 interface InstagramProfileData {
-  payloadUserId?: string;
+  payloadUserId: string;
   instagramUserId: string;
   instagramHandle: string;
   accessToken: string;

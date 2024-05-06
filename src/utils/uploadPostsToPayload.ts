@@ -1,8 +1,7 @@
 import {getInstagramPosts } from './instagramFunctions'; 
 import { generateRemainingBusinessDetails } from './createBusinessDetails';
-// import { postsCreationPipeline } from './postCreation';
+import { postsCreationPipeline } from './postCreation';
 import { createTenant, assignTenantToUser } from './tenantUserManagement';
-import { getPayloadClient } from './getPayloadClient';
 import payload from 'payload';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -13,7 +12,6 @@ dotenv.config({
 
 const { PAYLOAD_SECRET } = process.env;
 
-const payloadClient = getPayloadClient()
 
 async function getInstagramProfileByUserId(payloadUserId: string) {
   try {
@@ -123,9 +121,11 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
   const businessDetailsData = await getBusinessDetailsByUserId(payloadUserId)
   const serviceArea = businessDetailsData.docs[0].serviceArea;
 
+  let createdTenantId: string;
   try {
     console.log('Creating Tenant')
     const createdTenant = await createTenant(instagramHandle);
+    createdTenantId = createdTenant.id
     console.log('Assigning Tenant to User')
     const createdUser = await assignTenantToUser(payloadUserId, createdTenant.id);
   } catch (error) {
@@ -146,24 +146,26 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
     };
   
 
-  const updatedBusiness = await updateBusinessDetails(payloadUserId, newBusinessData)
+  const updatedBusinessObj = await updateBusinessDetails(payloadUserId, newBusinessData)
+  const updatedBusiness = updatedBusinessObj.docs[0]
+  const updatedBusinessKeywordsString = updatedBusiness.keywords.map(kw => kw.keyword).join(', ');
 
   console.log('Updated Business', updatedBusiness)
 
-  // const posts = await getInstagramPosts(instagramAuthToken)
-  // const recentPosts = posts.slice(0, nPosts); 
+  const posts = await getInstagramPosts(instagramAuthToken)
+  const recentPosts = posts.slice(0, nPosts); 
 
-  // const postsResponse = postsCreationPipeline({
-  //                                       posts: lastFourPosts,
-  //                                       instagramToken: instagramAuthData.access_token,
-  //                                       clientBusinessBio: businessDetails.businessBio,
-  //                                       clientLanguageStyle: businessDetails.languageStyle,
-  //                                       clientServiceArea: businessDetails.serviceArea,
-  //                                       clientKeywords: keywords,
-  //                                       instagramHandle: businessDetails.instagramHandle,
-  //                                       userId: createdUser.id,
-  //                                       tenantId: createdTenant.id,
-  //                                             });
+  const postsResponse = postsCreationPipeline({
+                                        posts: recentPosts,
+                                        instagramToken: instagramAuthToken,
+                                        clientBusinessBio: updatedBusiness.businessBio,
+                                        clientLanguageStyle: updatedBusiness.languageStyle,
+                                        clientServiceArea: updatedBusiness.serviceArea,
+                                        clientKeywords: updatedBusinessKeywordsString,
+                                        instagramHandle: updatedBusiness.instagramHandle,
+                                        userId: payloadUserId,
+                                        tenantId: createdTenantId,
+                                              });
 
   
   
