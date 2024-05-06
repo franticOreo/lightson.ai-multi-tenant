@@ -33,7 +33,8 @@ app.get('/', (req, res) => {
 });
 
 
-
+// signup user to our CMS and input their form details into the business collection.
+// 
 app.post('/api/signup', async (req, res) => {
   try {
     
@@ -70,15 +71,16 @@ app.post('/api/signup', async (req, res) => {
  
     console.log("Creating business entry...");
     const createdBusiness = await createBusinessEntry(businessDetails, payloadToken);
-    console.log("Business entry created:", createdBusiness);
+    console.log("Business entry created");
 
     const clientId = '743103918004392';
     const scope = 'user_profile,user_media';
-    const state = encodeURIComponent(JSON.stringify({ userId: '22' }));
+    const state = encodeURIComponent(JSON.stringify({ userId: userId }));
     const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=${scope}&response_type=code&state=${state}`;
 
+    console.log("Generated Instagram auth URL:", authUrl);
     // return back to the client with the instagram redirect.
-    res.json({ authUrl: "https://www.google.com" });
+    res.json({ authUrl });
 
 
   } catch (error) {

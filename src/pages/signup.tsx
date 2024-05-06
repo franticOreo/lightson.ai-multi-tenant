@@ -35,7 +35,7 @@ const SignupForm: React.FC = () =>  {
 
     console.log(process.env.NEXT_PUBLIC_REDIRECT_URI);
 
-    const onSubmit = async (data: FormData) => {
+    const onSubmit = async (formData: FormData) => {
         setLoading(true);
         try {
             // // signup user
@@ -44,20 +44,17 @@ const SignupForm: React.FC = () =>  {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(formData),
             });
-    
+            const data = await response.json();
+            console.log(data)
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error('Server responded with an error:', errorText);
                 setError('An error occurred during signup: ' + errorText);
             } else {
-                const result = await response.json();
-                console.log(result)
-                // Redirect the user to Instagram for authentication
-                console.log('Signup successful, awaiting redirection...');
-                window.location.href = result.authUrl;
-                
+                // Handle the redirection URL received from the server
+                window.location.href = data.authUrl;
             }
     
         } catch (error) {

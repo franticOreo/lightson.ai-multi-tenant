@@ -13,23 +13,27 @@ export const InstagramProfiles: CollectionConfig = {
   },
   fields: [
     {
-      name: 'payloadUserId',
-      type: 'text',
-      required: false,
-      unique: true,
+      label: "Payload User Id",
+      name: "payloadUserId",
+      type: "relationship",
+      relationTo: "users",
+      required: true,
     },
     {
+      label: "Instagram User ID",
       name: 'instagramUserId',
       type: 'text',
       required: true,
       unique: true,
     },
     {
+      label: "Instagram Handle",
       name: 'instagramHandle',
       type: 'text',
       required: true,
     },
     {
+      label: "Instagram Access Token",
       name: 'accessToken',
       type: 'text',
       required: true,

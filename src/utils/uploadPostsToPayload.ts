@@ -63,8 +63,10 @@ export async function handleInstagramCallback(req: Request, res: Response) {
       accessToken: instagramAccessToken,
     })
 
+    console.log('Created instagram profile entry:', entryResponse)
+
     // Return the instagramHandle to the client
-    return res.status(200).json({ instagramHandle });
+    return res.redirect(`/onboarding?userId=${payloadUserId}`);
   } catch (error) {
     console.error('Error during Instagram authentication:', error);
     return res.status(500).json({ error: 'Internal server error' });
