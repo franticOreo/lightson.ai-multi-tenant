@@ -18,8 +18,24 @@ export async function createTenant(clientInstagramHandle: string) {
   }
 }
 
+
+
 export async function createUser(clientEmail: string, password: string) {
   console.log(`Creating user with email: ${clientEmail}`);
+
+  const existingUser = await payload.find({
+    collection: "users",
+    where: {
+      email: {
+        equals: clientEmail
+      }
+    }
+  });
+
+  if (existingUser.docs.length > 0) {
+    throw new Error('User already exists with this email');
+  }
+
   try {
     const result = await payload.create({
       collection: "users",

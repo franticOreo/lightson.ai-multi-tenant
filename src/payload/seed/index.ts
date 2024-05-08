@@ -5,8 +5,8 @@ export const seed = async (payload: Payload): Promise<void> => {
   await payload.create({
     collection: "users",
     data: {
-      email: "demo@payloadcms.com",
-      password: "demo",
+      email: process.env.SUPER_ADMIN_EMAIL,
+      password: process.env.SUPER_ADMIN_PASSWORD,
       roles: ["super-admin"],
     },
   });
@@ -111,32 +111,5 @@ export const seed = async (payload: Payload): Promise<void> => {
   ]);
 
   // create tenant-scoped posts
-  // await Promise.all([
-  //   await payload.create({
-  //     collection: "posts",
-  //     data: {
-  //       tenant: abc.id,
-  //       title: "ABC Home",
-  //       date: new Date(),
-  //       richText: [
-  //         {
-  //           text: "Hello, ABC!",
-  //         },
-  //       ],
-  //     },
-  //   }),
-  //   await payload.create({
-  //     collection: "posts",
-  //     data: {
-  //       title: "BBC Home",
-  //       tenant: bbc.id,
-  //       date: new Date(),
-  //       richText: [
-  //         {
-  //           text: "Hello, BBC!",
-  //         },
-  //       ],
-  //     },
-  //   }),
-  // ]);
+
 };

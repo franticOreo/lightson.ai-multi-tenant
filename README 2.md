@@ -5,5 +5,5 @@ Known Bugs/Issues:
 - /signup form claims "field is required" when fields are filled (after going back to previous page).
 - takeUserProfileScreenshot will likely return empty instagram page if they identify a bot,
 will need to implement a IP proxy method or rotator to avoid this at scale.
-- 
+- createBusinessEntry in startSignup, I don't think auth token is required.
 
