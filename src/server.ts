@@ -7,12 +7,16 @@ import { handleInstagramCallback } from './utils/handleInstagramCallback'; // Ad
 import startSignUp from './utils/startSignUp';
 
 
-const dotenvResult = dotenv.config();
+if (process.env.NODE_ENV !== 'production') {
+  const dotenvResult = dotenv.config({
+    path: path.resolve(__dirname, '../.env'),
+  });
 
-if (dotenvResult.error) {
-  console.error('Failed to load .env file:', dotenvResult.error);
-} else {
-  console.log('.env file loaded:', dotenvResult.parsed);
+  if (dotenvResult.error) {
+    console.error('Failed to load .env file:', dotenvResult.error);
+  } else {
+    console.log('.env file loaded:', dotenvResult.parsed);
+  }
 }
 
 import express from 'express'
