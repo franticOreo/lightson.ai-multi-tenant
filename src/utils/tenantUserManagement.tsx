@@ -18,8 +18,6 @@ export async function createTenant(clientInstagramHandle: string) {
   }
 }
 
-
-
 export async function createUser(clientEmail: string, password: string) {
   console.log(`Creating user with email: ${clientEmail}`);
 

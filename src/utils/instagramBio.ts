@@ -26,8 +26,3 @@ export async function fetchInstagramUserHeader(username: string) {
     return null;
   }
 }
-
-// Example usage:
-fetchInstagramUserHeader('ayresconstruction').then(userProfile => {
-  console.log(userProfile);
-});

@@ -10,6 +10,11 @@ RUN yarn build
 
 FROM base as runtime
 
+# Install dependencies for Better Stack logging tool
+RUN apk add --no-cache curl bash
+RUN curl -sSL https://logs.betterstack.com/setup-vector/ubuntu/McfhGFLH516DTNeH5oA4nxC6 \
+    -o /tmp/setup-vector.sh && \
+    bash /tmp/setup-vector.sh
 
 ENV NODE_ENV=production
 ENV PAYLOAD_CONFIG_PATH=src/payload/payload.config.ts
