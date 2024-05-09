@@ -8,6 +8,7 @@ WORKDIR /home/node/app
 COPY package*.json ./
 
 COPY . .
+RUN yarn add cross-env payload
 RUN yarn build
 
 FROM base as runtime
