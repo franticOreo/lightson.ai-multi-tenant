@@ -107,7 +107,8 @@ export function makePostPrompt(postCaption: string, imageUnderstanding: string, 
 
 
 
-export async function createPostFields(blogPrompt: string, aiClient: any): Promise<any> {
+export async function createPostFields(blogPrompt: string): Promise<any> {
+  const aiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   let maxRetries = 3;
   let retryCount = 0;
   let blogFields;

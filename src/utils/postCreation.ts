@@ -1,10 +1,8 @@
 import axios from 'axios';
 import { downloadImageToMemory, uploadImageToCollection, getPayloadAuthToken } from './instagramFunctions';
 import { makePostPrompt, createPostFields, understandImage } from './gpt';
-import OpenAI from "openai";
 
-require('dotenv').config();
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
 
 async function sendPostEntryDataToCollection(postEntryData: any, accessToken: string, client_instagram_handle: string) {
     try {
@@ -95,7 +93,7 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
             const postUnderstanding = await understandImage(imageUrl);
 
             const blogPrompt = await makePostPrompt(postCaption, postUnderstanding, bioLanguageKwObj, clientServiceArea);
-            const postFields = await createPostFields(blogPrompt, openai);
+            const postFields = await createPostFields(blogPrompt);
 
             const postEntryData = await createPostEntry(instagramToken, instagramHandle, userId, tenantId, payloadToken, post, postFields);
             return postEntryData;

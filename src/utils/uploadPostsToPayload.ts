@@ -10,10 +10,6 @@ dotenv.config({
   path: path.resolve(__dirname, '../../.env'),
 });
 
-console.log('API Key:', process.env.OPENAI_API_KEY);
-
-
-
 const { PAYLOAD_SECRET } = process.env;
 
 
