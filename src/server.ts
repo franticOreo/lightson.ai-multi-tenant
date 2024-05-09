@@ -6,12 +6,16 @@ import path from 'path'
 import { handleInstagramCallback } from './utils/handleInstagramCallback'; // Adjust the import path as necessary
 import startSignUp from './utils/startSignUp';
 
-import jwt from 'jsonwebtoken';
 
-
-dotenv.config({
+const dotenvResult = dotenv.config({
   path: path.resolve(__dirname, '../.env'),
-})
+});
+
+if (dotenvResult.error) {
+  console.error('Failed to load .env file:', dotenvResult.error);
+} else {
+  console.log('.env file loaded:', dotenvResult.parsed);
+}
 
 import express from 'express'
 import payload from 'payload'
