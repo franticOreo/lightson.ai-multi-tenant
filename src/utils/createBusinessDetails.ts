@@ -1,5 +1,4 @@
 import { takeUserProfileScreenshot } from './instagramFunctions'; 
-import OpenAI from "openai";
 import { understandImage, createBioLanguageKwPrompt, profileToBioLanguageKw} from "./gpt";
 import axios from 'axios';
 import { fetchInstagramUserHeader } from './instagramBio';
@@ -8,7 +7,7 @@ export const runtime = "edge";
 
 require('dotenv').config();
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
 
 export async function createBusinessEntry(businessDetails: any, payloadToken: string) {
     const response = await axios({
@@ -33,13 +32,13 @@ export async function createBusinessEntry(businessDetails: any, payloadToken: st
 
     }
 
-export async function generateRemainingBusinessDetails(payloadToken: string, instagramHandle: string, clientServiceArea: string) {
+export async function generateRemainingBusinessDetails(payloadToken: string, instagramHandle: string, clientServiceArea: string, aiClient: OpenAI) {
     const userHeader = await fetchInstagramUserHeader(instagramHandle)
 
     const businessBio = userHeader.biography
 
     const bioLanguageKwPrompt = createBioLanguageKwPrompt(businessBio, clientServiceArea)
-    const bioLanguageKw = await profileToBioLanguageKw(bioLanguageKwPrompt, openai)
+    const bioLanguageKw = await profileToBioLanguageKw(bioLanguageKwPrompt, aiClient)
 
     return bioLanguageKw
 
