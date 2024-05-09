@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getInstagramPosts, downloadImageToMemory, uploadImageToCollection, getPayloadAuthToken } from './instagramFunctions';
+import { downloadImageToMemory, uploadImageToCollection, getPayloadAuthToken } from './instagramFunctions';
 import { makePostPrompt, createPostFields, understandImage } from './gpt';
 import OpenAI from "openai";
 
@@ -92,7 +92,7 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
             const postCaption = post.caption;
             const imageUrl = post.media_url;
             console.log(imageUrl);
-            const postUnderstanding = await understandImage(imageUrl, openai);
+            const postUnderstanding = await understandImage(imageUrl);
 
             const blogPrompt = await makePostPrompt(postCaption, postUnderstanding, bioLanguageKwObj, clientServiceArea);
             const postFields = await createPostFields(blogPrompt, openai);

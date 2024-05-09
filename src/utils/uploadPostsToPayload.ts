@@ -5,13 +5,14 @@ import { createTenant, assignTenantToUser } from './tenantUserManagement';
 import payload from 'payload';
 import dotenv from 'dotenv';
 import path from 'path';
-import OpenAI from "openai";
 
 dotenv.config({
   path: path.resolve(__dirname, '../../.env'),
 });
 
-const aiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+console.log('API Key:', process.env.OPENAI_API_KEY);
+
+
 
 const { PAYLOAD_SECRET } = process.env;
 
@@ -136,7 +137,7 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
     throw error;
   }
 
-  const bioLanguageKw = await generateRemainingBusinessDetails(PAYLOAD_SECRET, instagramHandle, serviceArea, aiClient)
+  const bioLanguageKw = await generateRemainingBusinessDetails(PAYLOAD_SECRET, instagramHandle, serviceArea)
   console.log(bioLanguageKw)
 
   const keywords = bioLanguageKw.SEO_keywords;

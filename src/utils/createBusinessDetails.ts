@@ -1,7 +1,5 @@
-import { takeUserProfileScreenshot } from './instagramFunctions'; 
-import { understandImage, createBioLanguageKwPrompt, profileToBioLanguageKw} from "./gpt";
+import { createBioLanguageKwPrompt, profileToBioLanguageKw} from "./gpt";
 import axios from 'axios';
-import { OpenAI } from 'openai';
 import { fetchInstagramUserHeader } from './instagramBio';
 
 export const runtime = "edge";
@@ -33,13 +31,13 @@ export async function createBusinessEntry(businessDetails: any, payloadToken: st
 
     }
 
-export async function generateRemainingBusinessDetails(payloadToken: string, instagramHandle: string, clientServiceArea: string, aiClient: OpenAI) {
+export async function generateRemainingBusinessDetails(payloadToken: string, instagramHandle: string, clientServiceArea: string) {
     const userHeader = await fetchInstagramUserHeader(instagramHandle)
 
     const businessBio = userHeader.biography
 
     const bioLanguageKwPrompt = createBioLanguageKwPrompt(businessBio, clientServiceArea)
-    const bioLanguageKw = await profileToBioLanguageKw(bioLanguageKwPrompt, aiClient)
+    const bioLanguageKw = await profileToBioLanguageKw(bioLanguageKwPrompt)
 
     return bioLanguageKw
 

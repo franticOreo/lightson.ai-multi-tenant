@@ -1,7 +1,8 @@
-import json from "json5";
+import { OpenAI } from 'openai';  
 
-export async function understandImage(imageUrl: string, aiClient: any, prompt: string = "What's in this image?"): Promise<string> {
+export async function understandImage(imageUrl: string, prompt: string = "What's in this image?"): Promise<string> {
     console.log('GPT is analysing image...')
+    const aiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const response = await aiClient.chat.completions.create({
       model: "gpt-4-vision-preview",
       messages: [
@@ -25,7 +26,9 @@ export async function understandImage(imageUrl: string, aiClient: any, prompt: s
     return response.choices[0].message.content//OpenAIStream(response);
   };
 
-export async function profileToBioLanguageKw(bioLanguageKwPrompt: string, aiClient: any): Promise<any> {
+export async function profileToBioLanguageKw(bioLanguageKwPrompt: string): Promise<any> {
+    const aiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
     const maxRetries = 3;
     let retryCount = 0;
   
