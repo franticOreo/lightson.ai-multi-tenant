@@ -7,9 +7,7 @@ import { handleInstagramCallback } from './utils/handleInstagramCallback'; // Ad
 import startSignUp from './utils/startSignUp';
 
 
-const dotenvResult = dotenv.config({
-  path: path.resolve(__dirname, '../.env'),
-});
+const dotenvResult = dotenv.config();
 
 if (dotenvResult.error) {
   console.error('Failed to load .env file:', dotenvResult.error);
