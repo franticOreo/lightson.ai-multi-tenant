@@ -38,6 +38,7 @@ app.get('/api/instagram/callback', handleInstagramCallback);
 
 
 const start = async (): Promise<void> => {
+  console.log('PAYLOAD_SECRET:', process.env.PAYLOAD_SECRET); 
   await payload.init({
     secret: process.env.PAYLOAD_SECRET || '',
     express: app,
