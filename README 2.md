@@ -9,3 +9,4 @@ will need to implement a IP proxy method or rotator to avoid this at scale.
 
 - fetchInstagramUserHeader : need to utilise profile pic and full-name (no longer required in sign up flow)
 
+- openai client is instatiated locally, probally needs be classed.
