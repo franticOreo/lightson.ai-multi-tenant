@@ -38,6 +38,8 @@ app.get('/api/instagram/callback', handleInstagramCallback);
 
 
 const start = async (): Promise<void> => {
+  console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY);
+  console.log('PAYLOAD_PUBLIC_PAYLOAD_SECRET:', process.env.PAYLOAD_PUBLIC_PAYLOAD_SECRET); 
   console.log('PAYLOAD_SECRET:', process.env.PAYLOAD_SECRET); 
   await payload.init({
     secret: process.env.PAYLOAD_SECRET || '',
