@@ -1,5 +1,7 @@
 import type { Payload } from "payload";
 
+
+
 export const seed = async (payload: Payload): Promise<void> => {
   // create super admin
   await payload.create({

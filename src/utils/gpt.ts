@@ -60,8 +60,8 @@ export async function profileToBioLanguageKw(bioLanguageKwPrompt: string, aiClie
   }
 
 
-export function createBioLanguageKwPrompt(profileUnderstanding: string, clientServiceArea: string): string {
-    return `Read this page description: ${profileUnderstanding} 
+export function createBioLanguageKwPrompt(businessBio: string, clientServiceArea: string): string {
+    return `Read this page description: ${businessBio} 
   and create three fields: 
   - \`business_bio\` : 2-3 sentences. 
   - \`language_style\`: to suit the business and its content

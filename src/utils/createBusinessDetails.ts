@@ -2,6 +2,7 @@ import { takeUserProfileScreenshot } from './instagramFunctions';
 import OpenAI from "openai";
 import { understandImage, createBioLanguageKwPrompt, profileToBioLanguageKw} from "./gpt";
 import axios from 'axios';
+import { fetchInstagramUserHeader } from './instagramBio';
 
 export const runtime = "edge";
 
@@ -33,15 +34,11 @@ export async function createBusinessEntry(businessDetails: any, payloadToken: st
     }
 
 export async function generateRemainingBusinessDetails(payloadToken: string, instagramHandle: string, clientServiceArea: string) {
-    const screenshotBuffer = await takeUserProfileScreenshot(`https://www.instagram.com/${instagramHandle}`, instagramHandle);
-    
-    const encoded = screenshotBuffer.toString("base64");
-    const imageUrl = `data:image/png;base64,${encoded}`
-    // SHOULD MAKE THIS STREAMING RESPONSE FOR FRONT END
-    
-    const profileUnderstanding = await understandImage(imageUrl, openai);
+    const userHeader = await fetchInstagramUserHeader(instagramHandle)
 
-    const bioLanguageKwPrompt = createBioLanguageKwPrompt(profileUnderstanding, clientServiceArea)
+    const businessBio = userHeader.biography
+
+    const bioLanguageKwPrompt = createBioLanguageKwPrompt(businessBio, clientServiceArea)
     const bioLanguageKw = await profileToBioLanguageKw(bioLanguageKwPrompt, openai)
 
     return bioLanguageKw

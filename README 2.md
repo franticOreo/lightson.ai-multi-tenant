@@ -7,3 +7,5 @@ Known Bugs/Issues:
 will need to implement a IP proxy method or rotator to avoid this at scale.
 - createBusinessEntry in startSignup, I don't think auth token is required.
 
+- fetchInstagramUserHeader : need to utilise profile pic and full-name (no longer required in sign up flow)
+
