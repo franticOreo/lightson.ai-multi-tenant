@@ -6,7 +6,9 @@ FROM base as builder
 
 WORKDIR /home/node/app
 COPY package*.json ./
-COPY .env ./
+
+RUN ls -la /home/node/app
+# COPY .env ./
 
 COPY . .
 RUN yarn add cross-env payload
