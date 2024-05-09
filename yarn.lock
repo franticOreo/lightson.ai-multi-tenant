@@ -3031,9 +3031,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001406, caniuse-lite@^1.0.30001587, caniuse-lite@^1.0.30001599:
-  version "1.0.30001616"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001616.tgz#4342712750d35f71ebba9fcac65e2cf8870013c3"
-  integrity sha512-RHVYKov7IcdNjVHJFNY/78RdG4oGVjbayxv8u5IO74Wv7Hlq4PnJE6mo/OjFijjVFNy5ijnCt6H3IIo4t+wfEw==
+  version "1.0.30001617"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001617.tgz#809bc25f3f5027ceb33142a7d6c40759d7a901eb"
+  integrity sha512-mLyjzNI9I+Pix8zwcrpxEbGlfqOkF9kM3ptzmKNw5tizSyYwMe+nGLTqMK9cO+0E+Bh6TsBxNAaHWEM8xwSsmA==
 
 chalk@^2.4.2:
   version "2.4.2"
@@ -3923,9 +3923,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.4.668:
-  version "1.4.759"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.759.tgz#ed7f4d9eed25124708ab0f4422e66b16534648d3"
-  integrity sha512-qZJc+zsuI+/5UjOSFnpkJBwwLMH1AZgyKqJ7LUNnRsB7v/cDjMu9DvXgp9kH6PTTZxjnPXGp2Uhurw+2Ll4Hjg==
+  version "1.4.760"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.760.tgz#1d3c10805644ff2b43ceb467482fb9754412b730"
+  integrity sha512-xF6AWMVM/QGQseTPgXjUewfNjCW2fgUcV/z5cSG0r+SiYcgtvcmRAL3oH/MSZwHBBD+fyKTXdQ4qGENJMSedEQ==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
@@ -8968,9 +8968,9 @@ supports-preserve-symlinks-flag@^1.0.0:
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
 svgo@^3.2.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/svgo/-/svgo-3.3.0.tgz#26d0b220f44ae96819ed6d040573334366fffa9b"
-  integrity sha512-y350OL6eAmhDbWcASdukXoG0MbpdfJQPHwEUAaTW1HBNSO2VErJ35fs7uNLSWjzFDhfua517RcouBzjZoO1JFg==
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/svgo/-/svgo-3.3.1.tgz#27f7b40017eeaff227b6f9caea646b1c242319f5"
+  integrity sha512-xQQTIGRl3gHTO2PFlZFLl+Xwofj+CMOPitfoByGBNAniQnY6SbGgd31u3C8RTqdlqZqYNl9Sb83VXbimVHcU6w==
   dependencies:
     "@trysound/sax" "0.2.0"
     commander "^7.2.0"
