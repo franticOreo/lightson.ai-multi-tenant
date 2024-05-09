@@ -7,9 +7,6 @@ FROM base as builder
 WORKDIR /home/node/app
 COPY package*.json ./
 
-# Install all dependencies, including cross-env and payload
-RUN yarn install
-
 COPY . .
 RUN yarn build
 
