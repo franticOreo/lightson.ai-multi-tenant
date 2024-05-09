@@ -1,4 +1,5 @@
 FROM node:18.8-alpine as base
+RUN echo "Base image loaded: ------------------------------"
 
 FROM base as builder
 

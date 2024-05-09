@@ -1,10 +1,7 @@
 services:
 
   payload:
-    # environment:
-    #   - NODE_ENV=production
     image: node:18-alpine
-    # platform: linux/arm64
     ports:
       - "3000:3000"
     volumes:
