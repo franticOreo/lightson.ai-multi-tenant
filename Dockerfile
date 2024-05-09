@@ -1,5 +1,7 @@
 FROM node:18.8-alpine as base
-RUN echo "Base image loaded: ------------------------------"
+
+# Install cross-env globally
+RUN npm install -g cross-env
 
 FROM base as builder
 
