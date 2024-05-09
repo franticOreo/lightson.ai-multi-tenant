@@ -6,6 +6,8 @@ import { fetchInstagramUserHeader } from './instagramBio';
 
 export const runtime = "edge";
 
+console.log('dummy')
+
 require('dotenv').config();
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
