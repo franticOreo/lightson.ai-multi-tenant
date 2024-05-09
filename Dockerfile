@@ -1,13 +1,14 @@
 FROM node:18.8-alpine as base
 
-RUN echo "Hello MUDAFUCKA"
-# Install cross-env globally
-RUN npm install -g cross-env
+RUN echo "Hello ya KENT"
 
 FROM base as builder
 
 WORKDIR /home/node/app
 COPY package*.json ./
+
+# Install all dependencies, including cross-env and payload
+RUN yarn install
 
 COPY . .
 RUN yarn build
