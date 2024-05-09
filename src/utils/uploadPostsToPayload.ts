@@ -5,10 +5,13 @@ import { createTenant, assignTenantToUser } from './tenantUserManagement';
 import payload from 'payload';
 import dotenv from 'dotenv';
 import path from 'path';
+import OpenAI from "openai";
 
 dotenv.config({
   path: path.resolve(__dirname, '../../.env'),
 });
+
+const aiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const { PAYLOAD_SECRET } = process.env;
 
@@ -133,7 +136,7 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
     throw error;
   }
 
-  const bioLanguageKw = await generateRemainingBusinessDetails(PAYLOAD_SECRET, instagramHandle, serviceArea)
+  const bioLanguageKw = await generateRemainingBusinessDetails(PAYLOAD_SECRET, instagramHandle, serviceArea, aiClient)
   console.log(bioLanguageKw)
 
   const keywords = bioLanguageKw.SEO_keywords;
@@ -166,45 +169,7 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
                                         userId: payloadUserId,
                                         tenantId: createdTenantId,
                                               });
-
-  
-  
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-//     // Create Business Details
-//     if (instagramAuthData.access_token) {
-//       const payloadToken = await getPayloadAuthToken()
-
-      // const bioLanguageKw = await generateRemainingBusinessDetails(payloadToken, instagramHandle, decodedUserToken.clientServiceArea)
-
-
-
-
-      
-
-//       res.redirect('/')
-      
-      
-//     } else {
-//       return res.status(400).json({ error: 'Failed to obtain access token' });
-//     }
-//   } catch (error) {
-//     return res.status(500).json({ error: 'Internal server error' });
-//   }
-// }
 
 
 

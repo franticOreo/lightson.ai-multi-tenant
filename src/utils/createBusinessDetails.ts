@@ -1,6 +1,7 @@
 import { takeUserProfileScreenshot } from './instagramFunctions'; 
 import { understandImage, createBioLanguageKwPrompt, profileToBioLanguageKw} from "./gpt";
 import axios from 'axios';
+import { OpenAI } from 'openai';
 import { fetchInstagramUserHeader } from './instagramBio';
 
 export const runtime = "edge";
