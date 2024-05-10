@@ -73,3 +73,21 @@ export async function assignTenantToUser(userId: string, tenantId: string) {
     throw error;
   }
 }
+
+export async function tenantExists(subdomain: string): Promise<boolean> {
+  try {
+    const result = await payload.find({
+      collection: 'tenants',
+      where: {
+        name: {
+          equals: subdomain
+        }
+      }
+    });
+
+    return result.docs.length > 0;
+  } catch (error) {
+    console.error(`Error checking tenant existence: ${error}`);
+    throw error;
+  }
+}

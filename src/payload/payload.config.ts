@@ -3,16 +3,8 @@ import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { slateEditor } from '@payloadcms/richtext-slate'
 import dotenv from 'dotenv'
 import path from 'path'
-
 import { Logo } from './graphics/logo';
-
-dotenv.config()
-// dotenv.config({
-//   path: path.resolve(__dirname, '../../.env'),
-// })
-
 import { buildConfig } from 'payload/config'
-
 import { Posts } from './collections/Posts'
 import { Tenants } from './collections/Tenants'
 import { Users } from './collections/Users'
@@ -20,6 +12,10 @@ import { Media } from './collections/Media'
 import { Business } from './collections/Business';
 import { Waitlists } from './collections/Waitlists'
 import { InstagramProfiles } from './collections/InstagramProfiles'
+
+dotenv.config()
+
+
 
 export default buildConfig({
   collections: [Users, Tenants, Posts, Media, Business, Waitlists, InstagramProfiles],

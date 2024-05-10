@@ -3,7 +3,7 @@ import next from 'next'
 import nextBuild from 'next/dist/build'
 import path from 'path'
 import fs from 'fs'
-
+import { tenantExists } from './utils/tenantUserManagement';
 import { handleInstagramCallback } from './utils/handleInstagramCallback'; // Adjust the import path as necessary
 import startSignUp from './utils/startSignUp';
 
@@ -70,9 +70,6 @@ app.get('/api/instagram/callback', handleInstagramCallback);
 
 
 const start = async (): Promise<void> => {
-  console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY);
-  console.log('PAYLOAD_PUBLIC_PAYLOAD_SECRET:', process.env.PAYLOAD_PUBLIC_PAYLOAD_SECRET); 
-  console.log('PAYLOAD_SECRET:', process.env.PAYLOAD_SECRET); 
   await payload.init({
     secret: process.env.PAYLOAD_SECRET || '',
     express: app,
@@ -119,9 +116,31 @@ const start = async (): Promise<void> => {
     return
   }
 
-  app.use((req, res, next) => {
-    console.log(`Incoming request: ${req.method} ${req.url}`);
-    next();
+  
+
+  app.use(async (req, res, next) => {
+    const hostname = req.hostname;
+    const subdomain = hostname.split('.')[0]; // Extract the subdomain from the hostname
+  
+    // Check if the hostname is directly the domain or a subdomain
+    if (hostname === 'domain.com' || hostname === 'www.domain.com') {
+      // No subdomain, proceed with the request
+      next();
+    } else {
+      // There is a subdomain, check if it corresponds to a valid tenant
+      try {
+        const exists = await tenantExists(subdomain);
+        if (!exists) {
+          return res.status(404).send("Tenant not found");
+        }
+        // Tenant exists, attach subdomain to request if further processing is needed
+        req.subdomain = subdomain;
+        next();
+      } catch (error) {
+        console.error(`Error while checking tenant: ${error}`);
+        res.status(500).send("Server error");
+      }
+    }
   });
   
   app.use((req, res, next) => {
