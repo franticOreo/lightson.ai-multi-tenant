@@ -6,9 +6,10 @@ import path from 'path'
 
 import { Logo } from './graphics/logo';
 
-dotenv.config({
-  path: path.resolve(__dirname, '../.env'),
-})
+dotenv.config()
+// dotenv.config({
+//   path: path.resolve(__dirname, '../../.env'),
+// })
 
 import { buildConfig } from 'payload/config'
 
