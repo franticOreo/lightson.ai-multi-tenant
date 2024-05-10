@@ -1,5 +1,7 @@
 FROM node:18.18-alpine as base
 
+RUN curl -I http://ayresconstruction.lightson.ai
+
 ARG PAYLOAD_SECRET
 ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
 
