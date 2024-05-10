@@ -133,8 +133,11 @@ const start = async (): Promise<void> => {
         if (!exists) {
           return res.status(404).send("Tenant not found");
         }
-        // Tenant exists, attach subdomain to request if further processing is needed
-        req.subdomain = subdomain;
+        // Tenant exists, redirect to the admin panel of the subdomain
+        if (!req.originalUrl.includes('/admin')) {
+          return res.redirect(`https://${subdomain}.domain.com/admin`);
+        }
+        // If already accessing some part of /admin, continue processing
         next();
       } catch (error) {
         console.error(`Error while checking tenant: ${error}`);
