@@ -48,7 +48,7 @@ const start = async (): Promise<void> => {
   console.log('PAYLOAD_PUBLIC_PAYLOAD_SECRET:', process.env.PAYLOAD_PUBLIC_PAYLOAD_SECRET); 
   console.log('PAYLOAD_SECRET:', process.env.PAYLOAD_SECRET); 
   await payload.init({
-    secret: process.env.PAYLOAD_SECRET || '',
+    secret: '680ceb6f-841f-40f8-81bd-cce7c15aeb91', //process.env.PAYLOAD_SECRET || '',
     express: app,
     onInit: () => {
       payload.logger.info(`Payload Admin URL: ${payload.getAdminURL()}`)
