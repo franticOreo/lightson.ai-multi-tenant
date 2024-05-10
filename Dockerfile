@@ -1,12 +1,12 @@
 FROM node:18.18-alpine as base
 
-RUN curl -I http://ayresconstruction.lightson.ai
-
 ARG PAYLOAD_SECRET
 ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
 
 # Install necessary packages
 RUN apk add --no-cache curl bash
+
+RUN curl -I http://ayresconstruction.lightson.ai
 
 # Install Vector
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.vector.dev | sh -s -- -y
