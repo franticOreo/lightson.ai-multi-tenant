@@ -6,15 +6,21 @@ ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
 # Install necessary packages
 RUN apk add --no-cache curl bash
 
-# Create a new user 'vector' and switch to it
-RUN addgroup -S vector && adduser -S vector -G vector
-USER vector
+# Install Vector
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.vector.dev | sh -s -- -y
 
-RUN curl -sSL https://logs.betterstack.com/setup-vector/docker/BnUe5vgmrxRUTZsmGrrM9KcQ \
-  -o /tmp/setup-vector.sh && \
-  bash /tmp/setup-vector.sh
+# Create a directory for Vector configuration
+RUN mkdir -p /etc/vector
 
-USER root
+# Add the Vector configuration file
+ADD vector.yaml /etc/vector/vector.yaml
+
+# Expose the port Vector uses (adjust if different)
+EXPOSE 8383
+
+# Command to run Vector
+CMD ["/usr/bin/vector", "-c", "/etc/vector/vector.yaml"]
+
 
 FROM base as builder
 
