@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import next from 'next'
 import nextBuild from 'next/dist/build'
 import path from 'path'
+import fs from 'fs'
 
 import { handleInstagramCallback } from './utils/handleInstagramCallback'; // Adjust the import path as necessary
 import startSignUp from './utils/startSignUp';
@@ -28,6 +29,31 @@ import { seed } from './payload/seed'
 
 const app = express()
 const PORT = process.env.PORT || 3000
+
+// Serve static files from the public directory
+app.use(express.static('public'));
+
+// Route for Let's Encrypt ACME challenge
+app.get('/.well-known/acme-challenge/:content', (req, res) => {
+    const content = req.params.content;
+    const filePath = path.join(__dirname, 'public', '.well-known', 'acme-challenge', content);
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.status(404).send('File not found');
+    }
+});
+
+// Route for Cloudflare custom hostname challenge
+app.get('/.well-known/cf-custom-hostname-challenge/:challenge', (req, res) => {
+    const challenge = req.params.challenge;
+    const filePath = path.join(__dirname, 'public', '.well-known', 'cf-custom-hostname-challenge', challenge);
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.status(404).send('File not found');
+    }
+});
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
