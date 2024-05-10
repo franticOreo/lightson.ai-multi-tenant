@@ -30,20 +30,6 @@ import { seed } from './payload/seed'
 const app = express()
 const PORT = process.env.PORT || 3000
 
-// Serve static files from the public directory
-app.use(express.static('public'));
-
-// Route for Let's Encrypt ACME challenge
-app.get('/.well-known/acme-challenge/:content', (req, res) => {
-    const content = req.params.content;
-    const filePath = path.join(__dirname, 'public', '.well-known', 'acme-challenge', content);
-    if (fs.existsSync(filePath)) {
-        res.sendFile(filePath);
-    } else {
-        res.status(404).send('File not found');
-    }
-});
-
 // Route for Cloudflare custom hostname challenge
 app.get('/.well-known/cf-custom-hostname-challenge/:challenge', (req, res) => {
     const challenge = req.params.challenge;
