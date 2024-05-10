@@ -8,7 +8,7 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
     try {
       const response = await axios({
         method: 'post',
-        url: `http://${client_instagram_handle}.${process.env.PAYLOAD_PUBLIC_SERVER_BASE}/api/posts`, // Adjust this URL to your post creation endpoint
+        url: `https://${client_instagram_handle}.${process.env.PAYLOAD_PUBLIC_SERVER_BASE}/api/posts`, // Adjust this URL to your post creation endpoint
         data: postEntryData,
         headers: {
           'Content-Type': 'application/json',
