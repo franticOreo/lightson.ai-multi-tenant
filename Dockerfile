@@ -4,7 +4,7 @@ ARG PAYLOAD_SECRET
 ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
 
 # Install necessary packages
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl bash
 
 # Create a new user 'vector' and switch to it
 RUN addgroup -S vector && adduser -S vector -G vector
@@ -15,7 +15,6 @@ RUN curl -sSL https://logs.betterstack.com/setup-vector/docker/BnUe5vgmrxRUTZsmG
   bash /tmp/setup-vector.sh
 
 USER root
-
 
 FROM base as builder
 
