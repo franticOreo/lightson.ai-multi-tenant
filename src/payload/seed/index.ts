@@ -1,6 +1,8 @@
 import type { Payload } from "payload";
 
+import dotenv from 'dotenv';
 
+dotenv.config();
 
 export const seed = async (payload: Payload): Promise<void> => {
   // create super admin
@@ -33,7 +35,7 @@ export const seed = async (payload: Payload): Promise<void> => {
       collection: "tenants",
       data: {
         name: "CBC",
-        domains: [{ domain: "cbc.localhost.com:3000" }],
+        domains: [{ domain: "cbc.localhost.com:3000" }], 
       },
     }),
   ]);
