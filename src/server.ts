@@ -32,17 +32,6 @@ import { seed } from './payload/seed'
 const app = express()
 const PORT = process.env.PORT || 3000
 
-// Route for Cloudflare custom hostname challenge
-app.get('/.well-known/cf-custom-hostname-challenge/:challenge', (req, res) => {
-    const challenge = req.params.challenge;
-    const filePath = path.join(__dirname, 'public', '.well-known', 'cf-custom-hostname-challenge', challenge);
-    if (fs.existsSync(filePath)) {
-        res.sendFile(filePath);
-    } else {
-        res.status(404).send('File not found');
-    }
-});
-
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
