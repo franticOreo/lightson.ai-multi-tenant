@@ -38,11 +38,6 @@ FROM base as runtime
 ENV NODE_ENV=production
 ENV PAYLOAD_CONFIG_PATH=src/payload/payload.config.ts
 
-ARG SUPER_ADMIN_EMAIL
-ENV SUPER_ADMIN_EMAIL=$SUPER_ADMIN_EMAIL
-ARG SUPER_ADMIN_PASSWORD
-ENV SUPER_ADMIN_PASSWORD=$SUPER_ADMIN_PASSWORD
-
 WORKDIR /home/node/app
 COPY package*.json  ./
 
@@ -50,6 +45,7 @@ RUN yarn install --production
 
 COPY --from=builder /home/node/app/dist ./dist
 COPY --from=builder /home/node/app/build ./build
+COPY --from=builder /home/node/app/.next ./.next
 
 EXPOSE 3000
 
