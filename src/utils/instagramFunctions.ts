@@ -1,4 +1,3 @@
-import puppeteer from 'puppeteer';
 import axios from 'axios';
 import FormData from 'form-data';
 import payload from 'payload';
@@ -18,35 +17,6 @@ export async function getInstagramHandle(accessToken: string) {
         throw error;
     }
 }
-
-
-// puppeteer.use(StealthPlugin());
-
-export async function takeUserProfileScreenshot(instagramUrl: string, instagramHandle: string): Promise<Buffer> {
-  try {
-      const browser = await puppeteer.launch({
-          // args: ['--no-sandbox', '--disable-setuid-sandbox'], // Add these args for better compatibility in cloud environments
-      });
-      const page = await browser.newPage();
-      await page.goto(instagramUrl);
-      await page.setViewport({ width: 1920, height: 1080 });
-      await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for the page to load
-
-      const screenshotBuffer = await page.screenshot({
-          encoding: "binary", // Ensures the screenshot is returned as a Buffer
-          clip: { x: 1920 * 0.2, y: 1080 * 0.05, width: 1920 * 0.6, height: 1080 * 0.85 }
-      }) as Buffer; // Type assertion to Buffer
-      console.log('Profile URL:', instagramUrl)
-      await browser.close();
-      console.log(`Screenshot for ${instagramHandle} taken successfully.`);
-
-      return screenshotBuffer;
-  } catch (error) {
-      console.error(`Failed to take screenshot for ${instagramHandle}: ${error}`);
-      throw error;
-  }
-}
-
 
 export async function getInstagramPosts(INSTAGRAM_TOKEN: string) {
     // Set up the API endpoint and access token
