@@ -100,7 +100,7 @@ const start = async (): Promise<void> => {
     const subdomain = hostname.split('.')[0]; // Extract the subdomain from the hostname
   
     // Check if the hostname is directly the domain or a subdomain
-    if (hostname === 'domain.com' || hostname === 'www.domain.com') {
+    if (hostname === 'lightson.ai' || hostname === 'www.lightson.ai') {
       // No subdomain, proceed with the request
       next();
     } else {
