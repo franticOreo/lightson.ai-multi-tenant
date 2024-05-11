@@ -1,10 +1,7 @@
 FROM node:18.18-alpine as base
 
-# ARG PAYLOAD_SECRET
-# ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
-CMD ["ls", "-la", "/home/node/app"]
-
-COPY .env /home/node/app/.env
+ARG PAYLOAD_SECRET
+ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
 
 
 # Install necessary packages
@@ -26,7 +23,6 @@ COPY .env /home/node/app/.env
 
 # # Command to run Vector
 # CMD ["/usr/bin/vector", "-c", "/etc/vector/vector.yaml"]
-
 
 FROM base as builder
 
