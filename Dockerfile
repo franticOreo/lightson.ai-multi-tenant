@@ -2,9 +2,10 @@ FROM node:18.18-alpine as base
 
 # ARG PAYLOAD_SECRET
 # ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
+CMD ["ls", "-la", "/home/node/app"]
 
 COPY .env /home/node/app/.env
-CMD ["ls", "-la", "/home/node/app"]
+
 
 # Install necessary packages
 # RUN apk add --no-cache curl bash
