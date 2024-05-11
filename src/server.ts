@@ -112,7 +112,7 @@ const start = async (): Promise<void> => {
         }
         // Tenant exists, redirect to the admin panel of the subdomain
         if (!req.originalUrl.includes('/admin')) {
-          return res.redirect(`https://${subdomain}.domain.com/admin`);
+          return res.redirect(`https://${subdomain}.lightson.ai/admin`);
         }
         // If already accessing some part of /admin, continue processing
         next();
