@@ -1,7 +1,7 @@
 FROM node:18.18-alpine as base
 
-ARG PAYLOAD_SECRET
-ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
+# ARG PAYLOAD_SECRET
+# ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
 
 # Install necessary packages
 RUN apk add --no-cache curl bash
