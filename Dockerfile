@@ -3,25 +3,28 @@ FROM node:18.18-alpine as base
 # ARG PAYLOAD_SECRET
 # ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
 
+COPY .env /home/node/app/.env
+CMD ["ls", "-la", "/home/node/app"]
+
 # Install necessary packages
-RUN apk add --no-cache curl bash
+# RUN apk add --no-cache curl bash
 
-RUN curl -I http://ayresconstruction.lightson.ai
+# RUN curl -I http://ayresconstruction.lightson.ai
 
-# Install Vector
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.vector.dev | sh -s -- -y
+# # Install Vector
+# RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.vector.dev | sh -s -- -y
 
-# Create a directory for Vector configuration
-RUN mkdir -p /etc/vector
+# # Create a directory for Vector configuration
+# RUN mkdir -p /etc/vector
 
-# Add the Vector configuration file
-ADD vector.yaml /etc/vector/vector.yaml
+# # Add the Vector configuration file
+# ADD vector.yaml /etc/vector/vector.yaml
 
-# Expose the port Vector uses (adjust if different)
-EXPOSE 8383
+# # Expose the port Vector uses (adjust if different)
+# EXPOSE 8383
 
-# Command to run Vector
-CMD ["/usr/bin/vector", "-c", "/etc/vector/vector.yaml"]
+# # Command to run Vector
+# CMD ["/usr/bin/vector", "-c", "/etc/vector/vector.yaml"]
 
 
 FROM base as builder
