@@ -16,6 +16,7 @@ import { InstagramProfiles } from './collections/InstagramProfiles'
 dotenv.config()
 
 export default buildConfig({
+  serverURL: "https://lightson.ai",
   collections: [Users, Tenants, Posts, Media, Business, Waitlists, InstagramProfiles],
   cors: '*',
   admin: {
