@@ -93,37 +93,9 @@ const start = async (): Promise<void> => {
     return
   }
 
-  
-
-  app.use(async (req, res, next) => {
-    const hostname = req.hostname;
-    const subdomain = hostname.split('.')[0]; // Extract the subdomain from the hostname
-
-    console.log('hostname is', hostname)
-    console.log('subdomain is', subdomain)
-  
-    // Check if the hostname is directly the domain or a subdomain
-    if (hostname === 'lightson.ai' || hostname === 'www.lightson.ai') {
-      // No subdomain, proceed with the request
-      next();
-    } else {
-      // There is a subdomain, check if it corresponds to a valid tenant
-      try {
-        const exists = await tenantExists(subdomain);
-        if (!exists) {
-          return res.status(404).send("Tenant not found");
-        }
-        // Tenant exists, redirect to the admin panel of the subdomain
-        if (!req.originalUrl.includes('/admin')) {
-          return res.redirect(`https://${subdomain}.lightson.ai/admin`);
-        }
-        // If already accessing some part of /admin, continue processing
-        next();
-      } catch (error) {
-        console.error(`Error while checking tenant: ${error}`);
-        res.status(500).send("Server error");
-      }
-    }
+  app.use((req, res, next) => {
+    console.log(`Incoming request: ${req.method} ${req.url}`);
+    next();
   });
   
   app.use((req, res, next) => {
