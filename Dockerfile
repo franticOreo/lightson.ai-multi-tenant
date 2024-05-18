@@ -1,11 +1,3 @@
-FROM nginx:stable-alpine
-
-RUN apk add --no-cache ca-certificates certbot
-WORKDIR /etc/letsencrypt
-RUN openssl req -x509 -days 365 -nodes -newkey rsa:2048 -keyout ./cert.key -out ./cert.pem -subj "/C=US/ST=SomeState/L=YourCity/O=YourCompany/CN=localhost"
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-VOLUME /etc/letsencrypt
-EXPOSE 80 443
 # Default command (can be overridden by payloadCMD)
 
 
