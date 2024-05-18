@@ -30,6 +30,9 @@ EXPOSE 3000
 
 CMD ["node", "dist/server.js"]
 
+FROM nginx:stable-alpine
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # WORKDIR /home/node/app
 
