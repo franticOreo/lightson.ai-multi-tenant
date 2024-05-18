@@ -11,9 +11,10 @@ services:
     command: sh -c "yarn install && yarn dev"
     depends_on:
       - mongo
+      - nginx
     env_file:
       - .env
-
+      
   mongo:
     image: mongo:latest
     ports:
@@ -24,7 +25,17 @@ services:
       - data:/data/db
     logging:
       driver: none
-
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      LETSENCRYPT_HOST: lightson.ai
+      LETSENCRYPT_EMAIL: admin@lightson.ai
+    volumes:
+      - certbot-etc:/etc/letsencrypt  # Persistent storage for certificates (name can be changed)
 volumes:
   data:
   node_modules:
+  certbot-etc:
