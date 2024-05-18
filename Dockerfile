@@ -28,6 +28,9 @@ COPY --from=builder /home/node/app/.next ./.next
 
 # EXPOSE 3000
 
+CMD ["node", "dist/server.js"]
+
+
 FROM nginx:stable-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 RUN mkdir -p /var/log/nginx
