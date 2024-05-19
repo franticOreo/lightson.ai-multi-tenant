@@ -1,11 +1,4 @@
-# Default command (can be overridden by payloadCMD)
-
-
-
 FROM node:18.18-alpine as base
-
-ARG PAYLOAD_SECRET
-ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
 
 FROM base as builder
 
@@ -33,13 +26,3 @@ COPY --from=builder /home/node/app/.next ./.next
 EXPOSE 3000
 
 CMD ["node", "dist/server.js"]
-
-
-# WORKDIR /home/node/app
-
-# FROM nginx:stable-alpine
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
-# RUN mkdir -p /var/log/nginx
-# EXPOSE 80
-# CMD ["nginx", "-g", "daemon off;"]
-# WORKDIR /home/node/app
