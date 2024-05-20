@@ -19,11 +19,15 @@
     "lint:fix": "eslint --fix --ext .ts,.tsx src"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.577.0",
     "@aws-sdk/client-sso-oidc": "^3.565.0",
+    "@aws-sdk/lib-storage": "^3.578.0",
     "@payloadcms/bundler-webpack": "^1.0.0",
     "@payloadcms/db-mongodb": "^1.0.0",
+    "@payloadcms/plugin-cloud-storage": "^1.1.2",
     "@payloadcms/richtext-slate": "^1.0.0",
     "@swc/core": "^1.4.17",
+    "aws-crt": "^1.21.2",
     "aws-sdk": "^2.1623.0",
     "axios": "^1.6.8",
     "cookies-next": "^4.1.1",

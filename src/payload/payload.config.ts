@@ -12,8 +12,22 @@ import { Media } from './collections/Media'
 import { Business } from './collections/Business';
 import { Waitlists } from './collections/Waitlists'
 import { InstagramProfiles } from './collections/InstagramProfiles'
+import { cloudStorage } from '@payloadcms/plugin-cloud-storage'
+import { s3Adapter } from '@payloadcms/plugin-cloud-storage/s3'
 
 dotenv.config()
+
+const digitalOceanAdapter = s3Adapter({
+  config: {
+    endpoint: process.env.DO_SPACES_ENDPOINT,
+    region: process.env.DO_SPACE_REGION,
+    credentials: {
+      accessKeyId: process.env.DO_SPACES_ACCESS_KEY,
+      secretAccessKey: process.env.DO_SPACES_SECRET_ACCESS_KEY,
+    },
+  },
+  bucket: process.env.DO_SPACES_BUCKET,
+})
 
 export default buildConfig({
   collections: [Users, Tenants, Posts, Media, Business, Waitlists, InstagramProfiles],
@@ -56,4 +70,14 @@ export default buildConfig({
   graphQL: {
     schemaOutputFile: path.resolve(__dirname, "./graphql/schema.graphql"),
   },
+  plugins: [
+    cloudStorage({
+      collections: {
+        'media': {
+          adapter: digitalOceanAdapter,
+          disableLocalStorage: true
+        },
+      },
+    }),
+  ],
 });

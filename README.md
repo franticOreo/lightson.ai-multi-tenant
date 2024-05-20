@@ -12,3 +12,6 @@ will need to implement a IP proxy method or rotator to avoid this at scale.
 - openai client is instatiated locally, probally needs be classed.
 
 - Docker/Payload : .env variables are not being passed???
+
+- ARG PAYLOAD_SECRET 
+
