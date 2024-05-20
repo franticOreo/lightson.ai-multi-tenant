@@ -24,6 +24,7 @@
     "@payloadcms/db-mongodb": "^1.0.0",
     "@payloadcms/richtext-slate": "^1.0.0",
     "@swc/core": "^1.4.17",
+    "aws-sdk": "^2.1623.0",
     "axios": "^1.6.8",
     "cookies-next": "^4.1.1",
     "copyfiles": "^2.4.1",
