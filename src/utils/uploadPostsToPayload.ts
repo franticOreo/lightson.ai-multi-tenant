@@ -167,7 +167,3 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
                                         tenantId: createdTenantId,
                                               });
 }
-
-
-
-
