@@ -19,3 +19,5 @@ will need to implement a IP proxy method or rotator to avoid this at scale.
 
 - Remove tenant field in post creation, should be automatically set and invisible for end-user.
 
+- lastloggedintenant field within the Users field needs to be removed from standard users. This value should never change. 
+
