@@ -17,3 +17,5 @@ will need to implement a IP proxy method or rotator to avoid this at scale.
 
 - Handle the case where during the instagram authentication, the user has 0 posts.
 
+- Remove tenant field in post creation, should be automatically set and invisible for end-user.
+
