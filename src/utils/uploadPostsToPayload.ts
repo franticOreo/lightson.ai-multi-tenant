@@ -135,7 +135,7 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
     const businessDetailsData = await getBusinessDetailsByUserId(payloadUserId);
     const tenantDetails = await handleTenantCreation(payloadUserId, instagramProfileData);
     const updatedBusinessDetails = await handleBusinessDetailsUpdate(payloadUserId, businessDetailsData, instagramProfileData);
-    await handlePostCreation(nPosts, instagramProfileData, updatedBusinessDetails, tenantDetails);
+    const postCreationResponse = await handlePostCreation(nPosts, instagramProfileData, updatedBusinessDetails, tenantDetails);
 
     const user = await getUserByUserId(payloadUserId)
     const email = user.docs[0].email || ''
