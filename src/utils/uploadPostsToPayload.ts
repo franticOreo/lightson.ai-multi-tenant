@@ -11,7 +11,8 @@ dotenv.config({
   path: path.resolve(__dirname, '../../.env'),
 });
 
-const { PAYLOAD_SECRET } = process.env;
+const PAYLOAD_SECRET = process.env.PAYLOAD_SECRET as string;
+
 
 // create function to get user entry from user collection by user id
 async function getUserByUserId(userId: string) {
@@ -137,7 +138,9 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
     await handlePostCreation(nPosts, instagramProfileData, updatedBusinessDetails, tenantDetails);
 
     const user = await getUserByUserId(payloadUserId)
-    const userLoginResponse = await loginUser(user.docs[0].email, user.docs[0].password, false)
+    const email = user.docs[0].email || ''
+    const password = user.docs[0].password || ''
+    const userLoginResponse = await loginUser(email, password, false)
     const apiKey = userLoginResponse.user.apiKey
 
     const envVariables = [
@@ -149,7 +152,6 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
       { key: "BUSINESS_NAME", value: businessDetailsData.docs[0].businessName, target: ["production"], type: "plain" },
       { key: "USER_API_KEY", value: apiKey, target: ["production"], type: "sensitive" },
       
-
       { key: "BUSINESS_BIO", value: businessDetailsData.docs[0].businessBio, target: ["production"], type: "plain" },
       { key: "BUSINESS_ADDRESS", value: businessDetailsData.docs[0].businessAddress, target: ["production"], type: "plain" },
       { key: "BUSINESS_SERVICE_AREA", value: businessDetailsData.docs[0].serviceArea, target: ["production"], type: "plain" },
@@ -210,7 +212,7 @@ async function handlePostCreation(nPosts: number, instagramProfileData: any, upd
   const posts = await getInstagramPosts(instagramAuthToken);
   const recentPosts = posts.slice(0, nPosts);
 
-  const updatedBusinessKeywordsString = updatedBusinessDetails.keywords.map(kw => kw.keyword).join(', ');
+  const updatedBusinessKeywordsString = updatedBusinessDetails.keywords.map((kw: { keyword: string }) => kw.keyword).join(', ');
 
   const postsResponse = postsCreationPipeline({
     posts: recentPosts,

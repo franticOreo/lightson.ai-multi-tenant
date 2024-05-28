@@ -3,7 +3,7 @@ import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
 dotenv.config();
 
-export async function understandImage(imageUrl: string, prompt: string = "What's in this image?", responseFormat: string = "text"): Promise<string> {
+export async function understandImage(imageUrl: string, prompt: string = "What's in this image?", responseFormat: "text" | "json_object" = "text"): Promise<string> {
     console.log('GPT is analysing image...')
     const aiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const response = await aiClient.chat.completions.create({
@@ -28,7 +28,7 @@ export async function understandImage(imageUrl: string, prompt: string = "What's
       max_tokens: 300,
     });
   
-    return response.choices[0].message.content//OpenAIStream(response);
+    return response.choices[0].message.content || "No content available";
   };
 
 
@@ -60,7 +60,7 @@ export async function profileToBioLanguageKw(bioLanguageKwPrompt: string): Promi
         ]
       });
   
-      profileBioLanguageKw = JSON.parse(response.choices[0].message.content);
+      profileBioLanguageKw = JSON.parse(response.choices[0].message.content || '{}');
   
       if ('business_bio' in profileBioLanguageKw && 'language_style' in profileBioLanguageKw && 'SEO_keywords' in profileBioLanguageKw) {
         break; // Exit the loop if all required keys are present
@@ -127,7 +127,7 @@ export async function createPostFields(blogPrompt: string): Promise<any> {
   const aiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   let maxRetries = 3;
   let retryCount = 0;
-  let blogFields;
+  let blogFields: { title?: string; content?: string; excerpt?: string; slug?: string; } = {};
 
   while (retryCount < maxRetries) {
     const response = await aiClient.chat.completions.create({
@@ -150,7 +150,7 @@ export async function createPostFields(blogPrompt: string): Promise<any> {
   
     console.log(response.choices[0].message.content)
 
-    blogFields = JSON.parse(response.choices[0].message.content);
+    blogFields = JSON.parse(response.choices[0].message.content || '{}');
 
     if (['title', 'content', 'excerpt', 'slug'].every(key => key in blogFields)) {
       break; // Exit the loop if all required keys are present

@@ -1,57 +1,3 @@
-// {
-//   "compilerOptions": {
-//     "lib": [
-//       "dom",
-//       "dom.iterable",
-//       "esnext"
-//     ],
-//     "target": "es5",
-//     "allowJs": true,
-//     "strict": false, // Note: One had false, another true. Choose based on your strictness requirement.
-//     "esModuleInterop": true,
-//     "skipLibCheck": true,
-//     "jsx": "preserve", // Note: If you're using Next.js, you might want to keep it as "preserve".
-//     "sourceMap": true,
-//     "resolveJsonModule": true,
-//     "module": "CommonJS",
-//     "moduleResolution": "node",
-//     "isolatedModules": true,
-//     "incremental": true,
-//     "noEmit": true, // Note: Important for Next.js, might not be desired for other setups.
-//     "paths": {
-//       "node_modules/*": [
-//         "./node_modules/*"
-//       ],
-//       "@/*": [
-//         "./*"
-//       ]
-//     },
-//     "plugins": [
-//       {
-//         "name": "next"
-//       }
-//     ],
-//     "forceConsistentCasingInFileNames": true,
-//     "strictNullChecks": false
-//   },
-//   "include": [
-//     // "src",
-//     // "src/**/*",
-//     // "src/custom.d.ts",
-//     // "next-env.d.ts",
-//     "**/*.ts",
-//     "**/*.tsx",
-//     ".next/types/**/*.ts"
-// , "instagram"  ],
-//   "exclude": [
-//     "node_modules",
-//     "dist",
-//     "build"
-//   ],
-//   "ts-node": {
-//     "transpileOnly": true
-//   }
-// }
 {
   "compilerOptions": {
     "esModuleInterop": true,
@@ -85,7 +31,8 @@
         "name": "next"
       }
     ],
-    "strictNullChecks": false
+    "strictNullChecks": true,
+    "noImplicitAny": true
   },
   "include": [
     "**/*.ts",
