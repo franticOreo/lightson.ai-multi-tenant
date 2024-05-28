@@ -1,6 +1,6 @@
 import { createUser } from './tenantUserManagement';
-import { getPayloadAuthToken } from './instagramFunctions';
 import { createBusinessEntry } from './createBusinessDetails';   
+import { loginUser } from './instagramFunctions';
 
 export default async function startSignUp(req, res) {
     try {
@@ -33,7 +33,9 @@ export default async function startSignUp(req, res) {
         businessHours,
       };
   
-      const payloadToken = await getPayloadAuthToken();
+      const loginResponse = await loginUser(email, password, true)
+      const payloadToken = loginResponse.token
+
       console.log("Payload token received:", payloadToken);
    
       console.log("Creating business entry...");

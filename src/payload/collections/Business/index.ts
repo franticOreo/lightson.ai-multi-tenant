@@ -114,6 +114,18 @@ export const Business: CollectionConfig = {
       }
     },
     {
+      label: "Primary Color",
+      name: "primaryColor",
+      type: "text",
+      required: false,
+    },
+    {
+      label: "Secondary Color",
+      name: "secondaryColor",
+      type: "text",
+      required: false,
+    },
+    {
       name: "createdBy",
       type: "relationship",
       relationTo: "users",

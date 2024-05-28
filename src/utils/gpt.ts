@@ -1,10 +1,13 @@
 import { OpenAI } from 'openai';  
 
-export async function understandImage(imageUrl: string, prompt: string = "What's in this image?"): Promise<string> {
+import dotenv from 'dotenv';
+dotenv.config();
+
+export async function understandImage(imageUrl: string, prompt: string = "What's in this image?", responseFormat: string = "text"): Promise<string> {
     console.log('GPT is analysing image...')
     const aiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const response = await aiClient.chat.completions.create({
-      model: "gpt-4-vision-preview",
+      model: "gpt-4o",
       messages: [
         {
           role: "user",
@@ -17,14 +20,27 @@ export async function understandImage(imageUrl: string, prompt: string = "What's
                 },
             }
           ],
+          
         },
       ],
+      response_format : { type: responseFormat },
       // stream: true,
       max_tokens: 300,
     });
   
     return response.choices[0].message.content//OpenAIStream(response);
   };
+
+
+// test understandImage with url= https://scontent.cdninstagram.com/v/t51.29350-15/446114704_1812680229224962_28830565818587702_n.webp?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0NDAuc2RyLmYyOTM1MCJ9&_nc_ht=scontent.cdninstagram.com&_nc_cat=110&_nc_ohc=oNeJvuZONlsQ7kNvgEfBUeV&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzM3NjE0MDI4MTAzMTkzNzA2Nw%3D%3D.2-ccb7-5&oh=00_AYDBJqbru-hSzmZ4gw_Q6MxW9ivPsMTRw4gJxs-Va5v3ZA&oe=6659955C&_nc_sid=10d13b
+export async function pickColors(imageUrl: string) {
+  const prompt = "Respond in JSON. I have supplied a company logo. I need two HEX color codes that will complement this logo. The first color should be a primary color and the second should be a complementary secondary color. Please suggest colors that harmonize well with these design elements. The output should be in the following format: PRIMARY_COLOR=#XXXXXX SECONDARY_COLOR=#XXXXXX"
+  let response = await understandImage(imageUrl, prompt, "json_object")
+  while (!response.includes("PRIMARY_COLOR") || !response.includes("SECONDARY_COLOR")) {
+    response = await understandImage(imageUrl, prompt, "json_object")
+  }
+  return response;
+}
 
 export async function profileToBioLanguageKw(bioLanguageKwPrompt: string): Promise<any> {
     const aiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });

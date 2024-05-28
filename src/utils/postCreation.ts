@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { downloadImageToMemory, uploadImageToCollection, getPayloadAuthToken } from './instagramFunctions';
+import { downloadImageToMemory, uploadImageToCollection, loginUser } from './instagramFunctions';
 import { makePostPrompt, createPostFields, understandImage } from './gpt';
 
 
@@ -76,7 +76,8 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
     userId: string,
     tenantId: string,
   }) {
-    const payloadToken = await getPayloadAuthToken();
+    const loginResponse = await loginUser(null, null, true);
+    const payloadToken = loginResponse.token;
 
     const bioLanguageKwObj = {
         clientBusinessBio,

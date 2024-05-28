@@ -132,6 +132,8 @@ export interface Business {
     | null;
   serviceArea?: string | null;
   userId: string | User;
+  primaryColor?: string | null;
+  secondaryColor?: string | null;
   createdBy?: (string | null) | User;
   updatedBy?: (string | null) | User;
   tenant?: (string | null) | Tenant;

@@ -5,6 +5,10 @@ import fs from 'fs';
 
 import { v4 as uuidv4 } from 'uuid'; // Ensure you have 'uuid' installed (`npm install uuid`)
 
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 
 export async function getInstagramHandle(accessToken: string) {
     try {
@@ -50,33 +54,62 @@ export async function getInstagramPosts(INSTAGRAM_TOKEN: string) {
 
 
 
-export async function getPayloadAuthToken() {
-    const payloadUrl = process.env.NEXT_PUBLIC_DOMAIN
-    try {
-      const req = await fetch(`${payloadUrl}/api/users/login`, {
-        method: "POST", 
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: process.env.SUPER_ADMIN_EMAIL,
-          password: process.env.SUPER_ADMIN_PASSWORD
-        }),
-      });
+// export async function getPayloadAuthToken() {
+//     const payloadUrl = process.env.NEXT_PUBLIC_DOMAIN
+//     try {
+//       const req = await fetch(`${payloadUrl}/api/users/login`, {
+//         method: "POST", 
+//         credentials: "include",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({
+//           email: process.env.SUPER_ADMIN_EMAIL,
+//           password: process.env.SUPER_ADMIN_PASSWORD
+//         }),
+//       });
   
-      if (!req.ok) { // Check if the response status is not OK
-        throw new Error(`Server responded with a non-OK status: ${req.status}`);
-      }
+//       if (!req.ok) { // Check if the response status is not OK
+//         throw new Error(`Server responded with a non-OK status: ${req.status}`);
+//       }
   
-      const data = await req.json();
-      console.log(data);
-      return data.token;
-    } catch (err) {
-      console.error(err);
-      throw err; // It's generally a good idea to rethrow the error after logging it
+//       const data = await req.json();
+//       console.log(data);
+//       return data.token;
+//     } catch (err) {
+//       console.error(err);
+//       throw err; // It's generally a good idea to rethrow the error after logging it
+//     }
+//   }
+
+export async function loginUser(email: string, password: string, admin: boolean = false) {
+  const payloadUrl = process.env.NEXT_PUBLIC_DOMAIN;
+  const loginEmail = admin ? process.env.SUPER_ADMIN_EMAIL : email;
+  const loginPassword = admin ? process.env.SUPER_ADMIN_PASSWORD : password;
+
+  try {
+    const req = await fetch(`${payloadUrl}/api/users/login`, {
+      method: "POST", 
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: loginEmail,
+        password: loginPassword
+      }),
+    });
+
+    if (!req.ok) { // Check if the response status is not OK
+      throw new Error(`Server responded with a non-OK status: ${req.status}`);
     }
+
+    const data = await req.json();
+    return data
+  } catch (err) {
+    console.error(err);
+    throw err; // It's generally a good idea to rethrow the error after logging it
   }
+}
 
   export async function downloadImageToMemory(url: string) {
     console.log(`Starting download of image from URL: ${url}`); // Log before starting the download
@@ -99,17 +132,17 @@ export async function getPayloadAuthToken() {
 }
 
 
-  export async function uploadImageToCollection(imageBuffer: Buffer, instagramHandle: string, accessToken: string) {
+  export async function uploadImageToCollection(imageBuffer: Buffer, imageTitle: string, accessToken: string, makeUnique: boolean = true) {
     try {
-      const uniqueId = uuidv4();
-      const tempImagePath = `./temp_${instagramHandle}_${uniqueId}.jpg`; // Now includes a UUID
+      const uniqueId = makeUnique ? uuidv4() : "";
+      const tempImagePath = `./${imageTitle}_${uniqueId}.jpg`; // Now includes a UUID
 
       fs.writeFileSync(tempImagePath, imageBuffer);
   
       // Prepare the form data for upload
       const formData = new FormData();
       formData.append('file', fs.createReadStream(tempImagePath));
-      formData.append('alt', instagramHandle);
+      formData.append('alt', imageTitle);
   
       // Perform the upload
       const response = await axios({
@@ -155,3 +188,4 @@ export async function createInstagramProfileEntry(profileData: InstagramProfileD
     throw error;
   }
 }
+

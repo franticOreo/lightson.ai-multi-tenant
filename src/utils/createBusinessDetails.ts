@@ -1,6 +1,7 @@
 import { createBioLanguageKwPrompt, profileToBioLanguageKw} from "./gpt";
 import axios from 'axios';
 import { fetchInstagramUserHeader } from './instagramBio';
+import { pickColors } from './gpt';
 
 export const runtime = "edge";
 
@@ -10,7 +11,7 @@ require('dotenv').config();
 
 export async function createBusinessEntry(businessDetails: any, payloadToken: string) {
     const response = await axios({
-        method: 'post',
+        method: 'POST',
         url: `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/api/business`, // Adjust this URL to your post creation endpoint
         data: businessDetails,
         headers: {
@@ -33,13 +34,21 @@ export async function createBusinessEntry(businessDetails: any, payloadToken: st
 
 export async function generateRemainingBusinessDetails(payloadToken: string, instagramHandle: string, clientServiceArea: string) {
     const userHeader = await fetchInstagramUserHeader(instagramHandle)
+    
+    const colors = await pickColors(userHeader.profilePicUrlHD) || {}; // Ensure colors is an object
 
     const businessBio = userHeader.biography
 
     const bioLanguageKwPrompt = createBioLanguageKwPrompt(businessBio, clientServiceArea)
-    const bioLanguageKw = await profileToBioLanguageKw(bioLanguageKwPrompt)
+    const bioLanguageKw = await profileToBioLanguageKw(bioLanguageKwPrompt) || {}; // Ensure bioLanguageKw is an object
 
-    return bioLanguageKw
+    // combine bioLanguageKw and colors
+    const remainingDetails = {
+        ...bioLanguageKw,
+        ...colors
+    }
+
+    return remainingDetails
 
 }
 
