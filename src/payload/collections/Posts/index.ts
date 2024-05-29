@@ -4,8 +4,9 @@ import richText from "../../fields/richText";
 import { tenant } from "../../fields/tenant";
 import { loggedIn } from "./access/loggedIn";
 import { tenantAdmins } from "./access/tenantAdmins";
-import { tenants } from "./access/tenants";
+import { apiOrTenants } from "./access/apiOrTenants";
 import formatSlug from "./hooks/formatSlug";
+import payload from "payload";
 
 import { tenantAdminFieldAccess } from "../../fields/tenant/access/tenantAdmins";
 
@@ -16,7 +17,7 @@ export const Posts: CollectionConfig = {
     defaultColumns: ["title", "slug", "updatedAt"],
   },
   access: {
-    read: tenants,
+    read: apiOrTenants,
     create: loggedIn,
     update: tenantAdmins,
     delete: tenantAdmins,

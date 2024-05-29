@@ -7,15 +7,17 @@ import { tenantAdmins } from "./access/tenantAdmins";
 import { loginAfterCreate } from "./hooks/loginAfterCreate";
 import { recordLastLoggedInTenant } from "./hooks/recordLastLoggedInTenant";
 import { isSuperOrTenantAdmin } from "./utilities/isSuperOrTenantAdmin";
+import { v4 as uuidv4 } from 'uuid';
 
 export const Users: CollectionConfig = {
   slug: "users",
-  auth: {
-    useAPIKey: true,
-  },
   admin: {
     useAsTitle: "email",
   },
+  auth: {
+    useAPIKey: true,
+  },
+
   access: {
     read: adminsAndSelf,
     create: anyone,
@@ -24,6 +26,14 @@ export const Users: CollectionConfig = {
     admin: isSuperOrTenantAdmin,
   },
   hooks: {
+    beforeChange: [
+      async ({ operation, data }) => {
+        if (operation === 'create') {
+          data.apiKey = uuidv4(); // Generate a new API key
+        }
+        return data;
+      },
+    ],
     afterChange: [loginAfterCreate],
     afterLogin: [recordLastLoggedInTenant],
   },
@@ -103,6 +113,16 @@ export const Users: CollectionConfig = {
       },
       admin: {
         position: "sidebar",
+      },
+    },
+    {
+      name: 'apiKey',
+      type: 'text',
+      hidden: false, // Optionally hide this from the admin UI
+      access: {
+        read: ({ req: { user }, doc }) => user && (user.id === doc.id || user.roles.includes('super-admin')),
+        update: () => false, // API keys should not be manually editable
+        create: () => false,
       },
     },
   ],

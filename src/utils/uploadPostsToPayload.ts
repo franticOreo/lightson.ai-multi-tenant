@@ -128,53 +128,6 @@ async function updateBusinessDetails(payloadUserId: string, newData: any) {
   }
 }
 
-
-export default async function uploadInitialPostsToPayload(payloadUserId: string, nPosts: number): Promise<void> {
-  try {
-    const instagramProfileData = await getInstagramProfileByUserId(payloadUserId);
-    const businessDetailsData = await getBusinessDetailsByUserId(payloadUserId);
-    const tenantDetails = await handleTenantCreation(payloadUserId, instagramProfileData);
-    const updatedBusinessDetails = await handleBusinessDetailsUpdate(payloadUserId, businessDetailsData, instagramProfileData);
-    const postCreationResponse = await handlePostCreation(nPosts, instagramProfileData, updatedBusinessDetails, tenantDetails);
-
-    const user = await getUserByUserId(payloadUserId)
-    const email = user.docs[0].email || ''
-    const password = user.docs[0].password || ''
-    const userLoginResponse = await loginUser(email, password, false)
-    const apiKey = userLoginResponse.user.apiKey
-
-    const envVariables = [
-      // Fixed .env vars.
-      { key: "GOOGLE_MAPS_API_KEY", value: process.env.GOOGLE_MAPS_API_KEY, target: ["production"], type: "sensitive" },
-      { key: "NEXT_PUBLIC_DOMAIN", value: process.env.NEXT_PUBLIC_DOMAIN, target: ["production"], type: "plain" },
-      { key: "SENDGRID_API_KEY", value: process.env.SENDGRID_API_KEY, target: ["production"], type: "sensitive" },
-      // Variable .env vars.
-      { key: "BUSINESS_NAME", value: businessDetailsData.docs[0].businessName, target: ["production"], type: "plain" },
-      { key: "USER_API_KEY", value: apiKey, target: ["production"], type: "sensitive" },
-      
-      { key: "BUSINESS_BIO", value: businessDetailsData.docs[0].businessBio, target: ["production"], type: "plain" },
-      { key: "BUSINESS_ADDRESS", value: businessDetailsData.docs[0].businessAddress, target: ["production"], type: "plain" },
-      { key: "BUSINESS_SERVICE_AREA", value: businessDetailsData.docs[0].serviceArea, target: ["production"], type: "plain" },
-      { key: "BUSINESS_PHONE_NUMBER", value: businessDetailsData.docs[0].phoneNumber, target: ["production"], type: "plain" },
-      { key: "BUSINESS_EMAIL", value: businessDetailsData.docs[0].email, target: ["production"], type: "plain" },
-      { key: "BUSINESS_OPERATING_HOURS", value: businessDetailsData.docs[0].operatingHours, target: ["production"], type: "plain" },
-      { key: "PRIMARY_COLOR", value: businessDetailsData.docs[0].primaryColor, target: ["production"], type: "plain" },
-      { key: "SECONDARY_COLOR", value: businessDetailsData.docs[0].secondaryColor, target: ["production"], type: "plain" },
-    ];
-
-    const branchName = `${payloadUserId}-${instagramProfileData.docs[0].instagramHandle}`
-    const vercelProjectName = `${payloadUserId}-${instagramProfileData.docs[0].instagramHandle}`
-
-
-    const projectDeploymentResponse = await setupProjectAndDeploy(branchName, vercelProjectName, envVariables)
-
-
-  } catch (error) {
-    console.error('Error in uploadInitialPostsToPayload:', error);
-    throw error;
-  }
-}
-
 async function handleTenantCreation(payloadUserId: string, instagramProfileData: any): Promise<any> {
   console.log('Creating Tenant');
   const instagramHandle = instagramProfileData.docs[0].instagramHandle;
@@ -226,3 +179,66 @@ async function handlePostCreation(nPosts: number, instagramProfileData: any, upd
     tenantId: tenantDetails.tenantId,
   });
 }
+
+export default async function uploadInitialPostsToPayload(payloadUserId: string, nPosts: number): Promise<void> {
+  try {
+    const instagramProfileData = await getInstagramProfileByUserId(payloadUserId);
+    const businessDetailsData = await getBusinessDetailsByUserId(payloadUserId);
+    const tenantDetails = await handleTenantCreation(payloadUserId, instagramProfileData);
+    const updatedBusinessDetails = await handleBusinessDetailsUpdate(payloadUserId, businessDetailsData, instagramProfileData);
+    // const postCreationResponse = await handlePostCreation(nPosts, instagramProfileData, updatedBusinessDetails, tenantDetails);
+    console.log(payloadUserId)
+    const user = await getUserByUserId(payloadUserId)
+    console.log('---------------------')
+    console.log(user)
+    console.log('---------------------')
+    // const email = user.docs[0].email || ''
+    // const password = user.docs[0].password || ''
+    // const userLoginResponse = await loginUser(email, password, false)
+    
+    const apiKey = user.docs[0].apiKey
+
+    const envVariables = [
+      // Fixed .env vars.
+      { key: "GOOGLE_MAPS_API_KEY", value: process.env.GOOGLE_MAPS_API_KEY, target: ["production"], type: "sensitive" },
+      { key: "NEXT_PUBLIC_DOMAIN", value: process.env.NEXT_PUBLIC_DOMAIN, target: ["production"], type: "plain" },
+      { key: "SENDGRID_API_KEY", value: process.env.SENDGRID_API_KEY, target: ["production"], type: "sensitive" },
+      // Variable .env vars.
+      { key: "BUSINESS_NAME", value: businessDetailsData.docs[0].businessName, target: ["production"], type: "plain" },
+      { key: "USER_API_KEY", value: apiKey, target: ["production"], type: "sensitive" },
+      
+      { key: "BUSINESS_BIO", value: businessDetailsData.docs[0].businessBio, target: ["production"], type: "plain" },
+      { key: "BUSINESS_ADDRESS", value: businessDetailsData.docs[0].businessAddress, target: ["production"], type: "plain" },
+      { key: "BUSINESS_SERVICE_AREA", value: businessDetailsData.docs[0].serviceArea, target: ["production"], type: "plain" },
+      { key: "BUSINESS_PHONE_NUMBER", value: businessDetailsData.docs[0].phoneNumber, target: ["production"], type: "plain" },
+      { key: "BUSINESS_EMAIL", value: businessDetailsData.docs[0].email, target: ["production"], type: "plain" },
+      { key: "BUSINESS_OPERATING_HOURS", value: businessDetailsData.docs[0].operatingHours, target: ["production"], type: "plain" },
+      { key: "PRIMARY_COLOR", value: businessDetailsData.docs[0].primaryColor, target: ["production"], type: "plain" },
+      { key: "SECONDARY_COLOR", value: businessDetailsData.docs[0].secondaryColor, target: ["production"], type: "plain" },
+    ];
+
+    const branchName = `${payloadUserId}-${instagramProfileData.docs[0].instagramHandle}`
+    const vercelProjectName = `${payloadUserId}-${instagramProfileData.docs[0].instagramHandle}`
+
+
+    const projectDeploymentResponse = await setupProjectAndDeploy(branchName, vercelProjectName, envVariables)
+
+
+  } catch (error) {
+    console.error('Error in uploadInitialPostsToPayload:', error);
+    throw error;
+  }
+}
+
+// Example of how to trigger getUserByUserId function to see what it returns
+async function testGetUserByUserId() {
+  const userId = '6656a477bf0593a948893c18';
+  try {
+    const user = await getUserByUserId(userId);
+    console.log('User details:', user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+  }
+}
+
+testGetUserByUserId();
