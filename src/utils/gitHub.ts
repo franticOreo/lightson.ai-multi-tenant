@@ -115,63 +115,6 @@ export const createBranch = async (branchName, sourceBranch = 'main') => {
     return true;
   }
 
-  // VERCEL
-  ////////////////////////////////////////////////////////////////////
-  
-  export const deployVercelProject = async (gitBranchName, vercelProjectName) => {
-    const token = process.env.VERCEL_TOKEN;
-  
-    const apiUrl = `https://api.vercel.com/v12/now/deployments`;
-  
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        name: vercelProjectName,
-        projectSettings: {
-          framework: 'nextjs',
-          installCommand: 'npm install', // Default install command
-          buildCommand: 'next build', // Default build command for Next.js
-        },
-        target: 'production', // or 'preview'
-        gitSource: {
-          type: 'github',
-          ref: gitBranchName,
-          repoId: '775700951'
-        },
-        env: {
-          USER_API_KEY: "6f011dd0-d185-4b57-8e52-06b8b50c97e8",
-          SENDGRID_API_KEY: "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",
-          GOOGLE_MAPS_API_KEY: "AIzaSyB2mMA-beQ0JYFsIwqznkqLzMT4SedwGBs",
-          NEXT_PUBLIC_DOMAIN: "https://lightson.ai",
-          PRIMARY_COLOR: "#f90001",
-          SECONDARY_COLOR: "#ff6500",
-          BUSINESS_NAME: "Ayres Construction",
-          BUSINESS_BIO: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris rutrum, elit non vehicula sollicitudin",
-          BUSINESS_ADDRESS: "123 Main St, Adelaide, SA 5000",
-          BUSINESS_SERVICE_AREA: "Adelaide, SA",
-          BUSINESS_PHONE_NUMBER: "08 8765 4321",
-          BUSINESS_EMAIL: "admin@ayresconstruction.com",
-          BUSINESS_OPERATING_HOURS: "Mon - Fri: 9am - 5pm"
-        }
-      })
-    });
-  
-    if (!response.ok) {
-      console.error('Failed to deploy:', response.status, await response.text());
-      return;
-    }
-  
-    const jsonResponse = await response.json();
-    console.log('Deployment response:', jsonResponse);
-    return jsonResponse;
-  };
-
-
-
   
 export const createDeployment = async (token, vercelProjectName, gitBranchName) => {
   const apiUrl = `https://api.vercel.com/v12/now/deployments`;
