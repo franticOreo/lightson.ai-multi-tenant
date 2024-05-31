@@ -11,7 +11,7 @@ import { isSuperOrTenantAdmin } from "./utilities/isSuperOrTenantAdmin";
 export const Users: CollectionConfig = {
   slug: "users",
   auth: {
-    useAPIKey: true,
+    useAPIKey: false,
   },
   admin: {
     useAsTitle: "email",
