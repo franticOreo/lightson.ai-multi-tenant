@@ -120,7 +120,7 @@ export const Users: CollectionConfig = {
       type: 'text',
       hidden: false, // Optionally hide this from the admin UI
       access: {
-        read: ({ req: { user }, doc }) => user && (user.id === doc.id || user.roles.includes('super-admin')),
+        read: ({ req: { user }, doc }) => user && (user.id === doc?.id || user.roles.includes('super-admin')),
         update: () => false, // API keys should not be manually editable
         create: () => false,
       },
