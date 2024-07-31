@@ -1,6 +1,8 @@
 import { createUser } from './tenantUserManagement';
 import { createBusinessEntry } from './createBusinessDetails';   
-import { loginUser } from './instagramFunctions';
+
+import { createInstagramProfileEntry} from './instagramFunctions'; 
+import uploadInitialPostsToPayload from './uploadPostsToPayload';
 
 export default async function startSignUp(req, res) {
     try {
@@ -9,6 +11,7 @@ export default async function startSignUp(req, res) {
         email,
         password,
         fullName,
+        instagramHandle,
         businessName,
         businessPhone,
         businessAddress,
@@ -20,9 +23,12 @@ export default async function startSignUp(req, res) {
   
       const createdUser = await createUser(email, password);
       const userId = createdUser.id;
+
+      console.log(createdUser)
   
       const businessDetails = {
         userId,
+        instagramHandle,
         fullName,
         email,
         businessName,
@@ -32,24 +38,34 @@ export default async function startSignUp(req, res) {
         serviceArea,
         businessHours,
       };
-  
-      const loginResponse = await loginUser(email, password, true)
-      const payloadToken = loginResponse.token
-
-      console.log("Payload token received:", payloadToken);
    
       console.log("Creating business entry...");
-      const createdBusiness = await createBusinessEntry(businessDetails, payloadToken);
+      console.log(businessDetails)
+      const createdBusiness = await createBusinessEntry(businessDetails);
+      console.log(createdBusiness)
       console.log("Business entry created");
   
-      const clientId = '743103918004392';
-      const scope = 'user_profile,user_media';
-      const state = encodeURIComponent(JSON.stringify({ userId: userId }));
-      const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=${scope}&response_type=code&state=${state}`;
+      
   
-      console.log("Generated Instagram auth URL:", authUrl);
-      // return back to the client with the instagram redirect.
-      res.json({ authUrl });
+      const entryResponse = await createInstagramProfileEntry({
+        payloadUserId: userId,
+        instagramUserId: 'notNanny',
+        instagramHandle: instagramHandle,
+        accessToken: 'notNanny',
+      })
+  
+      console.log('Created instagram profile entry:', entryResponse)
+  
+      // Return the instagramHandle to the client
+      res.redirect(`/onboarding?userId=${userId}`);
+  
+      try {
+        console.log('Beginning post creation pipeline.');
+        const response = await uploadInitialPostsToPayload(userId, instagramHandle, 4)
+        console.log(response)
+      } catch (error) {
+        console.error('Error during additional processing:', error);
+      }
   
   
     } catch (error) {

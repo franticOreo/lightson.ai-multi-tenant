@@ -1,7 +1,8 @@
 import type { CollectionConfig } from "payload/types";
 
 import { tenant } from "../../fields/tenant";
-import { loggedIn } from "./access/loggedIn";
+// import { loggedIn } from "./access/loggedIn";
+import { superAdmins } from '../../access/superAdmins'
 import { tenantAdmins } from "./access/tenantAdmins";
 import { isSuperOrPublic } from "../Users/utilities/isSuperOrPublic";
 
@@ -13,7 +14,7 @@ export const Business: CollectionConfig = {
   },
   access: {
     read: isSuperOrPublic,
-    create: loggedIn,
+    create: superAdmins,
     update: tenantAdmins,
     delete: tenantAdmins,
   },
@@ -124,36 +125,6 @@ export const Business: CollectionConfig = {
       name: "secondaryColor",
       type: "text",
       required: false,
-    },
-    {
-      name: "createdBy",
-      type: "relationship",
-      relationTo: "users",
-      admin: {
-        position: "sidebar",
-      },
-      hooks: {
-        beforeChange: [
-          async ({ req }) => {
-            return req.user.id;
-          },
-        ],
-      },
-    },
-    {
-      name: "updatedBy",
-      type: "relationship",
-      relationTo: "users",
-      admin: {
-        position: "sidebar",
-      },
-      hooks: {
-        beforeChange: [
-          async ({ req }) => {
-            return req.user.id;
-          },
-        ],
-      },
     },
     tenant,
   ],

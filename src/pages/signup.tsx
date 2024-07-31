@@ -12,6 +12,7 @@ import { Button } from '../app/_components/Button';
 
 
 type FormData = {
+    instagramHandle: string;
     email: string;
     password: string;
     fullName: string;
@@ -37,7 +38,6 @@ const SignupForm: React.FC = () =>  {
     const onSubmit = async (formData: FormData) => {
         setLoading(true);
         try {
-            // // signup user
             const response = await fetch('/api/signup', {
                 method: 'POST',
                 headers: {
@@ -52,8 +52,8 @@ const SignupForm: React.FC = () =>  {
                 console.error('Server responded with an error:', errorText);
                 setError('An error occurred during signup: ' + errorText);
             } else {
-                // Handle the redirection URL received from the server
-                window.location.href = data.authUrl;
+                // Removed redirection logic
+                console.log('Signup successful:', data);
             }
     
         } catch (error) {
@@ -71,6 +71,7 @@ const SignupForm: React.FC = () =>  {
                     <h1 className='unbounded'>lightson.ai</h1><br />
                     <h2 className='unbounded'>Generate a Website Using Your Content </h2>
                     <form onSubmit={handleSubmit(onSubmit)}>
+                        <Input name="instagramHandle" label="Instagram Handle" required register={register} error={errors.instagramHandle} type="text" />
                         <Input name="email" label="Email" required register={register} error={errors.email} type="email" />
                         <Input name="password" label="Password" required register={register} error={errors.password} type="password" />
                         <Input name="fullName" label="Full Name" required register={register} error={errors.fullName} type="text" />

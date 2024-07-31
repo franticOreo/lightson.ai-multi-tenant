@@ -23,6 +23,11 @@ will need to implement a IP proxy method or rotator to avoid this at scale.
 
 - lastloggedintenant field within the Users field needs to be removed from standard users. This value should never change. 
 
+- getInstagramPosts only returns the first image of coursels, the subsequent images could be stored or handled.
+
+- I am calling the Hiker API twice, I need to smartly store the response in a seperate db to avoid calling it twice. 
+
+
 ##
 
 

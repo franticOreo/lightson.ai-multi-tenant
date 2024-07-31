@@ -1,4 +1,4 @@
-import {getInstagramPosts, loginUser } from './instagramFunctions'; 
+import { getInstagramPosts } from './instagramFunctions'; 
 import { generateRemainingBusinessDetails } from './createBusinessDetails';
 import { postsCreationPipeline } from './postCreation';
 import { createTenant, assignTenantToUser } from './tenantUserManagement';
@@ -101,7 +101,7 @@ async function updateBusinessDetails(payloadUserId: string, newData: any) {
         limit: 1 // Assuming there's only one business per user
       });
 
-      console.log('finding business with id: ', business)
+      console.log('finding business with id: ', businessId)
    
 
       // Update the business entry with new data
@@ -129,19 +129,15 @@ async function updateBusinessDetails(payloadUserId: string, newData: any) {
 }
 
 
-export default async function uploadInitialPostsToPayload(payloadUserId: string, nPosts: number): Promise<void> {
+export default async function uploadInitialPostsToPayload(payloadUserId: string, instagramHandle: string, nPosts: number): Promise<void> {
   try {
     const instagramProfileData = await getInstagramProfileByUserId(payloadUserId);
     const businessDetailsData = await getBusinessDetailsByUserId(payloadUserId);
-    const tenantDetails = await handleTenantCreation(payloadUserId, instagramProfileData);
+    const tenantDetails = await handleTenantCreation(payloadUserId, instagramHandle);
     const updatedBusinessDetails = await handleBusinessDetailsUpdate(payloadUserId, businessDetailsData, instagramProfileData);
-    const postCreationResponse = await handlePostCreation(nPosts, instagramProfileData, updatedBusinessDetails, tenantDetails);
+    const postCreationResponse = await handlePostCreation(nPosts, instagramHandle, updatedBusinessDetails, tenantDetails);
 
-    const user = await getUserByUserId(payloadUserId)
-    const email = user.docs[0].email || ''
-    const password = user.docs[0].password || ''
-    const userLoginResponse = await loginUser(email, password, false)
-    const apiKey = userLoginResponse.user.apiKey
+
 
     const envVariables = [
       // Fixed .env vars.
@@ -150,7 +146,7 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
       { key: "SENDGRID_API_KEY", value: process.env.SENDGRID_API_KEY, target: ["production"], type: "sensitive" },
       // Variable .env vars.
       { key: "BUSINESS_NAME", value: businessDetailsData.docs[0].businessName, target: ["production"], type: "plain" },
-      { key: "USER_API_KEY", value: apiKey, target: ["production"], type: "sensitive" },
+      // { key: "USER_API_KEY", value: apiKey, target: ["production"], type: "sensitive" },
       
       { key: "BUSINESS_BIO", value: businessDetailsData.docs[0].businessBio, target: ["production"], type: "plain" },
       { key: "BUSINESS_ADDRESS", value: businessDetailsData.docs[0].businessAddress, target: ["production"], type: "plain" },
@@ -168,16 +164,14 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
 
     const projectDeploymentResponse = await setupProjectAndDeploy(branchName, vercelProjectName, envVariables)
 
-
   } catch (error) {
     console.error('Error in uploadInitialPostsToPayload:', error);
     throw error;
   }
 }
 
-async function handleTenantCreation(payloadUserId: string, instagramProfileData: any): Promise<any> {
+async function handleTenantCreation(payloadUserId: string, instagramHandle: string): Promise<any> {
   console.log('Creating Tenant');
-  const instagramHandle = instagramProfileData.docs[0].instagramHandle;
   const createdTenant = await createTenant(instagramHandle);
   console.log('Assigning Tenant to User');
   const createdUser = await assignTenantToUser(payloadUserId, createdTenant.id);
@@ -190,7 +184,8 @@ async function handleTenantCreation(payloadUserId: string, instagramProfileData:
 async function handleBusinessDetailsUpdate(payloadUserId: string, businessDetailsData: any, instagramProfileData: any): Promise<any> {
   const serviceArea = businessDetailsData.docs[0].serviceArea;
   const instagramHandle = instagramProfileData.docs[0].instagramHandle;
-  const remainingDetails = await generateRemainingBusinessDetails(PAYLOAD_SECRET, instagramHandle, serviceArea);
+
+  const remainingDetails = await generateRemainingBusinessDetails(instagramHandle, serviceArea);
   console.log(remainingDetails);
 
   const keywords = remainingDetails.SEO_keywords;
@@ -207,16 +202,15 @@ async function handleBusinessDetailsUpdate(payloadUserId: string, businessDetail
   return updatedBusinessObj.docs[0];
 }
 
-async function handlePostCreation(nPosts: number, instagramProfileData: any, updatedBusinessDetails: any, tenantDetails: any): Promise<void> {
-  const instagramAuthToken = instagramProfileData.docs[0].accessToken;
-  const posts = await getInstagramPosts(instagramAuthToken);
+async function handlePostCreation(nPosts: number, instagramHandle: string, updatedBusinessDetails: any, tenantDetails: any): Promise<void> {
+  //// need to get posts with Hiker API.
+  const posts = await getInstagramPosts(instagramHandle);
   const recentPosts = posts.slice(0, nPosts);
 
   const updatedBusinessKeywordsString = updatedBusinessDetails.keywords.map((kw: { keyword: string }) => kw.keyword).join(', ');
 
   const postsResponse = postsCreationPipeline({
     posts: recentPosts,
-    instagramToken: instagramAuthToken,
     clientBusinessBio: updatedBusinessDetails.businessBio,
     clientLanguageStyle: updatedBusinessDetails.languageStyle,
     clientServiceArea: updatedBusinessDetails.serviceArea,

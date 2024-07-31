@@ -4,7 +4,6 @@ import nextBuild from 'next/dist/build'
 import path from 'path'
 import fs from 'fs'
 import { tenantExists } from './utils/tenantUserManagement';
-import { handleInstagramCallback } from './utils/handleInstagramCallback'; // Adjust the import path as necessary
 import startSignUp from './utils/startSignUp';
 
 
@@ -14,8 +13,6 @@ import express from 'express'
 import payload from 'payload'
 
 import { seed } from './payload/seed'
-
-
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -30,8 +27,6 @@ app.get('/', (req, res) => {
 
 // signup user to our CMS and input their form details into the business collection.
 app.post('/api/signup', startSignUp)
-// startSignUp triggers instagram callback
-app.get('/api/instagram/callback', handleInstagramCallback);
 
 
 const start = async (): Promise<void> => {
@@ -75,13 +70,13 @@ const start = async (): Promise<void> => {
   }
 
   app.use((req, res, next) => {
-    console.log(`Incoming request: ${req.method} ${req.url}`);
+    // console.log(`Incoming request: ${req.method} ${req.url}`);
     next();
   });
   
   app.use((req, res, next) => {
     res.on('finish', () => {
-      console.log(`Request to ${req.method} ${req.url} sent response ${res.statusCode}`);
+      // console.log(`Request to ${req.method} ${req.url} sent response ${res.statusCode}`);
     });
     next();
   });

@@ -24,7 +24,7 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
     }
   }
   
-  export async function createPostEntry(instagramToken: string, instagramHandle: string, userId: string, tenantId: string, payloadToken: string,
+  export async function createPostEntry(instagramHandle: string, userId: string, tenantId: string, payloadToken: string,
     post: any, postFields: any,) {
     
     const postUrl = post.media_url
@@ -57,7 +57,6 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
 
   export async function postsCreationPipeline({
     posts,
-    instagramToken,
     clientBusinessBio,
     clientLanguageStyle,
     clientServiceArea,
@@ -67,7 +66,6 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
     tenantId,
   }: {
     posts: any,
-    instagramToken: string,
     clientBusinessBio: string,
     clientLanguageStyle: string,
     clientServiceArea: string,
@@ -96,7 +94,7 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
             const blogPrompt = await makePostPrompt(postCaption, postUnderstanding, bioLanguageKwObj, clientServiceArea);
             const postFields = await createPostFields(blogPrompt);
 
-            const postEntryData = await createPostEntry(instagramToken, instagramHandle, userId, tenantId, payloadToken, post, postFields);
+            const postEntryData = await createPostEntry(instagramHandle, userId, tenantId, payloadToken, post, postFields);
             return postEntryData;
         } catch (error) {
             console.error('Error processing post:', error);

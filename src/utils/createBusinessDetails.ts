@@ -2,6 +2,7 @@ import { createBioLanguageKwPrompt, profileToBioLanguageKw} from "./gpt";
 import axios from 'axios';
 import { fetchInstagramUserHeader } from './instagramBio';
 import { pickColors } from './gpt';
+import payload from 'payload';
 
 export const runtime = "edge";
 
@@ -9,30 +10,20 @@ require('dotenv').config();
 
 
 
-export async function createBusinessEntry(businessDetails: any, payloadToken: string) {
-    const response = await axios({
-        method: 'POST',
-        url: `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/api/business`, // Adjust this URL to your post creation endpoint
-        data: businessDetails,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${payloadToken}`,
-        },
-      })
-      .catch(error => {
-        if (error.response) {
-          console.error('Error creating business entry:', error.response.data);
-          console.error('HTTP Status Code:', error.response.status);
-        } else {
-          console.error('Error creating business entry:', error.message);
-        }
+export async function createBusinessEntry(businessDetails: any) {
+  console.log(businessDetails)
+  try {
+      const response = await payload.create({
+          collection: 'business', // Adjust 'business' to your actual collection name
+          data: businessDetails,
       });
-      
-    return response;
+      return response;
+  } catch (error) {
+      console.error('Error creating business entry:', error);
+  }
+}
 
-    }
-
-export async function generateRemainingBusinessDetails(payloadToken: string, instagramHandle: string, clientServiceArea: string) {
+export async function generateRemainingBusinessDetails(instagramHandle: string, clientServiceArea: string) {
     const userHeader = await fetchInstagramUserHeader(instagramHandle)
     
     const colors = await pickColors(userHeader.profilePicUrlHD) || {}; // Ensure colors is an object

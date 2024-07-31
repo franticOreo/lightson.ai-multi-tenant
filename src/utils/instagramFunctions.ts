@@ -3,7 +3,8 @@ import FormData from 'form-data';
 import payload from 'payload';
 import fs from 'fs';
 
-import { v4 as uuidv4 } from 'uuid'; // Ensure you have 'uuid' installed (`npm install uuid`)
+import { v4 as uuidv4 } from 'uuid'; 
+import { fetchInstagramData } from './instagramBio'; 
 
 import dotenv from 'dotenv';
 
@@ -22,65 +23,24 @@ export async function getInstagramHandle(accessToken: string) {
     }
 }
 
-export async function getInstagramPosts(INSTAGRAM_TOKEN: string) {
-    // Set up the API endpoint and access token
-    const api_url = "https://graph.instagram.com/me/media";
+export async function getInstagramPosts(instagramHandle: string) {
 
-    // Set up the API parameters
-    const params = {
-        "fields": "id,caption,media_url,timestamp,media_type,permalink",
-        "access_token": INSTAGRAM_TOKEN
-    };
+    const instagramData = await fetchInstagramData(instagramHandle);
 
-    try {
-        // Make a GET request to the API endpoint
-        const response = await axios.get(api_url, { params });
+    const posts = instagramData.graphql.user.edge_owner_to_timeline_media.edges;
+    return posts.map((post: any) => {
+        let displayUrl = post.node.display_url;
+        const captionText = post.node.edge_media_to_caption.edges.length > 0 ? post.node.edge_media_to_caption.edges[0].node.text : '';
 
-        // Check if the request was successful
-        if (response.status === 200) {
-            // Access the retrieved data
-            const data = response.data;
-            const posts = data.data;
-
-            const imagePosts = posts.filter(post => post.media_type === "IMAGE");
-            return imagePosts;
-        } else {
-            console.log("Failed to retrieve data from the Instagram Display API.");
+        // Check if the post is a carousel and extract the first image URL
+        if (post.node.__typename === "GraphSidecar" && post.node.edge_sidecar_to_children.edges.length > 0) {
+            displayUrl = post.node.edge_sidecar_to_children.edges[0].node.display_url;
         }
-    } catch (error) {
-        console.error("Error retrieving data from the Instagram Display API:", error);
-    }
+
+        return { media_url: displayUrl, caption: captionText };
+    });
+
 }
-
-
-
-// export async function getPayloadAuthToken() {
-//     const payloadUrl = process.env.NEXT_PUBLIC_DOMAIN
-//     try {
-//       const req = await fetch(`${payloadUrl}/api/users/login`, {
-//         method: "POST", 
-//         credentials: "include",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           email: process.env.SUPER_ADMIN_EMAIL,
-//           password: process.env.SUPER_ADMIN_PASSWORD
-//         }),
-//       });
-  
-//       if (!req.ok) { // Check if the response status is not OK
-//         throw new Error(`Server responded with a non-OK status: ${req.status}`);
-//       }
-  
-//       const data = await req.json();
-//       console.log(data);
-//       return data.token;
-//     } catch (err) {
-//       console.error(err);
-//       throw err; // It's generally a good idea to rethrow the error after logging it
-//     }
-//   }
 
 export async function loginUser(email: string, password: string, admin: boolean = false) {
   const payloadUrl = process.env.NEXT_PUBLIC_DOMAIN;
