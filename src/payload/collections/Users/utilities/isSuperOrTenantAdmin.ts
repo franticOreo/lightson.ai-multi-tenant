@@ -33,6 +33,9 @@ export const isSuperOrTenantAdmin = async (args: { req: PayloadRequest }): Promi
     req,
   })
 
+  console.log(`Tenant lookup result: ${foundTenants.totalDocs > 0 ? 'Found' : 'Not Found'}`);
+
+
   // if this tenant does not exist, deny access
   if (foundTenants.totalDocs === 0) {
     if (logs) {

@@ -4,6 +4,7 @@ dist
 .env
 graphql
 package-lock.json
+.env*
 
 # dependencies
 /.pnp

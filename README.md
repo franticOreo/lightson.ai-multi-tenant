@@ -27,7 +27,8 @@ will need to implement a IP proxy method or rotator to avoid this at scale.
 
 - I am calling the Hiker API twice, I need to smartly store the response in a seperate db to avoid calling it twice. 
 
-
+- !! URGENT !! Need to set DEV, STAGING, PROD environments properly.
+    - when tenant is created, in local, tenant should be `tenant.localhost:3000`.
 ##
 
 

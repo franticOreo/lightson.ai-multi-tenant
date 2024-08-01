@@ -15,6 +15,8 @@ export const recordLastLoggedInTenant: AfterLoginHook = async ({ req, user }) =>
       })
       ?.then(res => res.docs?.[0])
 
+    console.log(`Tenant found in header: ${relatedOrg ? relatedOrg.name : 'None'}`);
+
     await req.payload.update({
       id: user.id,
       collection: 'users',
