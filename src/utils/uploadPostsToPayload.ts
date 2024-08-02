@@ -128,48 +128,6 @@ async function updateBusinessDetails(payloadUserId: string, newData: any) {
   }
 }
 
-
-export default async function uploadInitialPostsToPayload(payloadUserId: string, instagramHandle: string, nPosts: number): Promise<void> {
-  try {
-    const instagramProfileData = await getInstagramProfileByUserId(payloadUserId);
-    const businessDetailsData = await getBusinessDetailsByUserId(payloadUserId);
-    const tenantDetails = await handleTenantCreation(payloadUserId, instagramHandle);
-    const updatedBusinessDetails = await handleBusinessDetailsUpdate(payloadUserId, businessDetailsData, instagramProfileData);
-    const postCreationResponse = await handlePostCreation(nPosts, instagramHandle, updatedBusinessDetails, tenantDetails);
-
-
-
-    const envVariables = [
-      // Fixed .env vars.
-      { key: "GOOGLE_MAPS_API_KEY", value: process.env.GOOGLE_MAPS_API_KEY, target: ["production"], type: "sensitive" },
-      { key: "NEXT_PUBLIC_DOMAIN", value: process.env.NEXT_PUBLIC_DOMAIN, target: ["production"], type: "plain" },
-      { key: "SENDGRID_API_KEY", value: process.env.SENDGRID_API_KEY, target: ["production"], type: "sensitive" },
-      // Variable .env vars.
-      { key: "BUSINESS_NAME", value: businessDetailsData.docs[0].businessName, target: ["production"], type: "plain" },
-      // { key: "USER_API_KEY", value: apiKey, target: ["production"], type: "sensitive" },
-      
-      { key: "BUSINESS_BIO", value: businessDetailsData.docs[0].businessBio, target: ["production"], type: "plain" },
-      { key: "BUSINESS_ADDRESS", value: businessDetailsData.docs[0].businessAddress, target: ["production"], type: "plain" },
-      { key: "BUSINESS_SERVICE_AREA", value: businessDetailsData.docs[0].serviceArea, target: ["production"], type: "plain" },
-      { key: "BUSINESS_PHONE_NUMBER", value: businessDetailsData.docs[0].phoneNumber, target: ["production"], type: "plain" },
-      { key: "BUSINESS_EMAIL", value: businessDetailsData.docs[0].email, target: ["production"], type: "plain" },
-      { key: "BUSINESS_OPERATING_HOURS", value: businessDetailsData.docs[0].operatingHours, target: ["production"], type: "plain" },
-      { key: "PRIMARY_COLOR", value: businessDetailsData.docs[0].primaryColor, target: ["production"], type: "plain" },
-      { key: "SECONDARY_COLOR", value: businessDetailsData.docs[0].secondaryColor, target: ["production"], type: "plain" },
-    ];
-
-    const branchName = `${payloadUserId}-${instagramProfileData.docs[0].instagramHandle}`
-    const vercelProjectName = `${payloadUserId}-${instagramProfileData.docs[0].instagramHandle}`
-
-
-    const projectDeploymentResponse = await setupProjectAndDeploy(branchName, vercelProjectName, envVariables)
-
-  } catch (error) {
-    console.error('Error in uploadInitialPostsToPayload:', error);
-    throw error;
-  }
-}
-
 async function handleTenantCreation(payloadUserId: string, instagramHandle: string): Promise<any> {
   console.log('Creating Tenant');
   const createdTenant = await createTenant(instagramHandle);
@@ -181,12 +139,11 @@ async function handleTenantCreation(payloadUserId: string, instagramHandle: stri
   };
 }
 
-async function handleBusinessDetailsUpdate(payloadUserId: string, businessDetailsData: any, instagramProfileData: any): Promise<any> {
+async function handleBusinessDetailsUpdate(payloadUserId: string, businessDetailsData: any, instagramHandle: string): Promise<any> {
   const serviceArea = businessDetailsData.docs[0].serviceArea;
-  const instagramHandle = instagramProfileData.docs[0].instagramHandle;
 
   const remainingDetails = await generateRemainingBusinessDetails(instagramHandle, serviceArea);
-  console.log(remainingDetails);
+  console.log('remainingDetails', remainingDetails);
 
   const keywords = remainingDetails.SEO_keywords;
   const newBusinessData = {
@@ -194,8 +151,8 @@ async function handleBusinessDetailsUpdate(payloadUserId: string, businessDetail
     businessBio: remainingDetails.business_bio,
     languageStyle: remainingDetails.language_style,
     keywords: Array.isArray(keywords) ? keywords.map(keyword => ({ keyword })) : typeof keywords === 'string' ? keywords.split(', ').map(keyword => ({ keyword })) : [],
-    primaryColor: remainingDetails.primaryColor,
-    secondaryColor: remainingDetails.secondaryColor
+    primaryColor: remainingDetails.PRIMARY_COLOR,
+    secondaryColor: remainingDetails.SECONDARY_COLOR
   };
 
   const updatedBusinessObj = await updateBusinessDetails(payloadUserId, newBusinessData);
@@ -219,4 +176,48 @@ async function handlePostCreation(nPosts: number, instagramHandle: string, updat
     userId: tenantDetails.userId,
     tenantId: tenantDetails.tenantId,
   });
+}
+
+export default async function uploadInitialPostsToPayload(payloadUserId: string, instagramHandle: string, nPosts: number): Promise<void> {
+  try {
+    // const instagramProfileData = await getInstagramProfileByUserId(payloadUserId);
+    const businessDetailsData = await getBusinessDetailsByUserId(payloadUserId);
+    const tenantDetails = await handleTenantCreation(payloadUserId, instagramHandle);
+    const updatedBusinessDetails = await handleBusinessDetailsUpdate(payloadUserId, businessDetailsData, instagramHandle);
+    const postCreationResponse = await handlePostCreation(nPosts, instagramHandle, updatedBusinessDetails, tenantDetails);
+
+
+  
+    const envVariables = [
+      // Fixed .env vars.
+      { key: "SENDGRID_API_KEY", value: process.env.SENDGRID_API_KEY || '', target: ["production"], type: "sensitive" },
+      { key: "GOOGLE_MAPS_API_KEY", value: process.env.GOOGLE_MAPS_API_KEY || '', target: ["production"], type: "sensitive" },
+      { key: "NEXT_PUBLIC_DOMAIN", value: "https://lightson.ai", target: ["production"], type: "plain" },
+      { key: "POSTS_API_KEY", value: process.env.POSTS_API_KEY || '', target: ["production"], type: "plain" },
+      // Variable .env vars.
+      { key: "BUSINESS_NAME", value: businessDetailsData.docs[0].businessName || '', target: ["production"], type: "plain" },
+      { key: "INSTAGRAM_HANDLE", value: instagramHandle, target: ["production"], type: "plain" },
+      { key: "BUSINESS_BIO", value: businessDetailsData.docs[0].businessBio || '', target: ["production"], type: "plain" },
+      { key: "BUSINESS_ADDRESS", value: businessDetailsData.docs[0].businessAddress || '', target: ["production"], type: "plain" },
+      { key: "BUSINESS_SERVICE_AREA", value: businessDetailsData.docs[0].serviceArea || '', target: ["production"], type: "plain" },
+      { key: "BUSINESS_PHONE_NUMBER", value: businessDetailsData.docs[0].phoneNumber || '', target: ["production"], type: "plain" },
+      { key: "BUSINESS_EMAIL", value: businessDetailsData.docs[0].email || '', target: ["production"], type: "plain" },
+      { key: "BUSINESS_OPERATING_HOURS", value: businessDetailsData.docs[0].operatingHours || '', target: ["production"], type: "plain" },
+      { key: "PRIMARY_COLOR", value: businessDetailsData.docs[0].primaryColor || '', target: ["production"], type: "plain" },
+      { key: "SECONDARY_COLOR", value: businessDetailsData.docs[0].secondaryColor || '', target: ["production"], type: "plain" },
+      { key: "AUTHOR_ID", value: payloadUserId, target: ["production"], type: "plain" },
+    ];
+
+    console.log('Env variables', envVariables)
+
+    const branchName = `${payloadUserId}-${instagramHandle}`
+    const vercelProjectName = `${payloadUserId}-${instagramHandle}`
+
+
+    const projectDeploymentResponse = await setupProjectAndDeploy(branchName, vercelProjectName, envVariables)
+
+  } catch (error) {
+    console.error('Error in uploadInitialPostsToPayload:', error);
+    throw error;
+  }
 }

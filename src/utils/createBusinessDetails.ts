@@ -11,6 +11,7 @@ require('dotenv').config();
 
 
 export async function createBusinessEntry(businessDetails: any) {
+console.log("createBusinessEntry called with:", businessDetails);
   console.log(businessDetails)
   try {
       const response = await payload.create({
@@ -24,9 +25,11 @@ export async function createBusinessEntry(businessDetails: any) {
 }
 
 export async function generateRemainingBusinessDetails(instagramHandle: string, clientServiceArea: string) {
+    // console.log("generateRemainingBusinessDetails called with:", instagramHandle, clientServiceArea);
     const userHeader = await fetchInstagramUserHeader(instagramHandle)
     
     const colors = await pickColors(userHeader.profilePicUrlHD) || {}; // Ensure colors is an object
+    console.log('Colors', colors)
 
     const businessBio = userHeader.biography
 
@@ -42,7 +45,6 @@ export async function generateRemainingBusinessDetails(instagramHandle: string, 
     return remainingDetails
 
 }
-
 
 
 

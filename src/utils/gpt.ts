@@ -39,7 +39,7 @@ export async function pickColors(imageUrl: string) {
   while (!response.includes("PRIMARY_COLOR") || !response.includes("SECONDARY_COLOR")) {
     response = await understandImage(imageUrl, prompt, "json_object")
   }
-  return response;
+  return JSON.parse(response);
 }
 
 export async function profileToBioLanguageKw(bioLanguageKwPrompt: string): Promise<any> {
