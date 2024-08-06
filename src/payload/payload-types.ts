@@ -131,8 +131,6 @@ export interface Business {
   userId: string | User;
   primaryColor?: string | null;
   secondaryColor?: string | null;
-  createdBy?: (string | null) | User;
-  updatedBy?: (string | null) | User;
   tenant?: (string | null) | Tenant;
   updatedAt: string;
   createdAt: string;

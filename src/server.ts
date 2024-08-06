@@ -38,11 +38,6 @@ const start = async (): Promise<void> => {
     },
   })
 
-  if (process.env.PAYLOAD_SEED === 'true' && process.env.APP_ENV === 'development') {
-    payload.logger.info('---- SEEDING DATABASE ----')
-    await seed(payload)
-  }
-
   app.use('/assets/', express.static(path.resolve(__dirname, './payload/assets')));
 
   if (process.env.NEXT_BUILD) {

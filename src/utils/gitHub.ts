@@ -1,5 +1,6 @@
-import path from 'path'
 import dotenv from 'dotenv'
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config()
 
@@ -49,40 +50,18 @@ export const createBranch = async (branchName, sourceBranch = 'main') => {
   
     return createResponseJson;
   };
-
-  // async function foo() {
-  //   const token = process.env.VERCEL_TOKEN;
-  //   const projectName = 'ayres-construction';
-  //   const branchName = 'ayres-construction';
   
-
-  
-  //   // Create deployment and get project ID
-  //   const deployment = await createDeployment(token, projectName, branchName);
-  //   if (!deployment) return;
-  
-  //   const projectId = deployment.projectId; // Assuming the response contains projectId
-  
-  //   // Set environment variables
-  //   const envVariables = [
-  //     // Your environment variables here
-  //   ];
-  //   await setEnvironmentVariables(token, projectId, envVariables);
-  
-  //   // Optionally trigger a new deployment if the initial one was just for setup
-  //   await triggerNewDeployment(token, projectName, branchName);
-  // }
-  
-  async function updateBranchFromMain(token, mainBranch, featureBranch) {
+  async function updateBranchFromMain(mainBranch, featureBranch) {
+    const gitToken = process.env.GITHUB_TOKEN
     // Fetch the latest commit from main branch
-    const mainSha = await getLatestCommitSha(token, mainBranch);
+    const mainSha = await getLatestCommitSha(gitToken, mainBranch);
     if (!mainSha) {
       console.error('Failed to fetch latest commit SHA from main branch');
       return false;
     }
   
     // Merge main branch into feature branch
-    return await mergeBranches(token, mainSha, featureBranch);
+    return await mergeBranches(gitToken, mainSha, featureBranch);
   }
   
   async function getLatestCommitSha(token, branch) {
@@ -173,18 +152,13 @@ export const setEnvironmentVariables = async (token, projectId, envVariables) =>
   return jsonResponse;
 };
 
-export const triggerNewDeployment = async (token, vercelProjectName, gitBranchName) => {
-  return await createDeployment(token, vercelProjectName, gitBranchName);
-};
-
 export default async function setupProjectAndDeploy(projectName, branchName, envVariables) {
-  const vercelToken = process.env.VERCEL_TOKEN;
-  const gitToken = process.env.GITHUB_TOKEN
 
+  // Create either production branch or a dev branch
   const createBranchResult = await createBranch(branchName)
 
   // Fetch and merge updates from 'main' to 'ayres-construction' before deploying
-  const updateResult = await updateBranchFromMain(gitToken, 'main', branchName);
+  const updateResult = await updateBranchFromMain('main', branchName);
   console.log(updateResult)
 
   if (!updateResult) {
@@ -192,16 +166,34 @@ export default async function setupProjectAndDeploy(projectName, branchName, env
     return;
   }
 
-  // Create deployment and get project ID
-  const deployment = await createDeployment(vercelToken, projectName, branchName);
-  if (!deployment) return;
+  if (process.env.APP_ENV === 'production') {
+    const vercelToken = process.env.VERCEL_TOKEN;
+    // Create deployment and get project ID
+    const deployment = await createDeployment(vercelToken, projectName, branchName);
+    if (!deployment) return;
 
-  const projectId = deployment.projectId; // Assuming the response contains projectId
+    const projectId = deployment.projectId; // Assuming the response contains projectId
 
-  await setEnvironmentVariables(vercelToken, projectId, envVariables);
+    await setEnvironmentVariables(vercelToken, projectId, envVariables);
 
-  // Optionally trigger a new deployment if the initial one was just for setup
-  await triggerNewDeployment(vercelToken, projectName, branchName);
+    // Optionally trigger a new deployment if the initial one was just for setup
+    await createDeployment(vercelToken, projectName, branchName);
+  } else {
+    // Run setupLocalServer for non-production environments
+    console.log('branchName:', branchName)
+    console.log('envVariables:', envVariables)
+
+    const directory = `../../local/dev-lightson_template-${branchName}`
+    fs.rmSync(directory, { recursive: true, force: true });
+    fs.mkdirSync(directory, { recursive: true });
+  
+    process.chdir(directory);
+    // Create .env file from envVariables
+    const envContent = Object.entries(envVariables)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('\n');
+    fs.writeFileSync(path.join(directory, '.env'), envContent);
+  }
 }
 
 

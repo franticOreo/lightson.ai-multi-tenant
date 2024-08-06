@@ -29,6 +29,9 @@ will need to implement a IP proxy method or rotator to avoid this at scale.
 
 - !! URGENT !! Need to set DEV, STAGING, PROD environments properly.
     - when tenant is created, in local, tenant should be `tenant.localhost:3000`.
+
+
+-- create just one .env vatiable : PUBLIC_DOMAIN...
 ##
 
 
