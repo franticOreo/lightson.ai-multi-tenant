@@ -167,5 +167,3 @@ export async function createPostFields(blogPrompt: string): Promise<any> {
 
   return blogFields;
 }  
-
-

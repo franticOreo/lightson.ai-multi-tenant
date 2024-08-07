@@ -112,7 +112,7 @@ export interface Media {
  */
 export interface Business {
   id: string;
-  fullName: string;
+  fullName?: string | null;
   instagramHandle?: string | null;
   phoneNumber?: string | null;
   email: string;

@@ -179,21 +179,6 @@ export default async function setupProjectAndDeploy(projectName, branchName, env
     // Optionally trigger a new deployment if the initial one was just for setup
     await createDeployment(vercelToken, projectName, branchName);
   } else {
-    // Run setupLocalServer for non-production environments
-    console.log('branchName:', branchName)
-    console.log('envVariables:', envVariables)
-
-    const directory = `../../local/dev-lightson_template-${branchName}`
-    fs.rmSync(directory, { recursive: true, force: true });
-    fs.mkdirSync(directory, { recursive: true });
-  
-    process.chdir(directory);
-    // Create .env file from envVariables
-    const envContent = Object.entries(envVariables)
-      .map(([key, value]) => `${key}=${value}`)
-      .join('\n');
-    fs.writeFileSync(path.join(directory, '.env'), envContent);
+    console.log('Not in production, skipping Vercel deployment')
   }
 }
-
-

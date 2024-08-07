@@ -140,7 +140,8 @@ async function handleTenantCreation(payloadUserId: string, instagramHandle: stri
 }
 
 async function handleBusinessDetailsUpdate(payloadUserId: string, businessDetailsData: any, instagramHandle: string): Promise<any> {
-  const serviceArea = businessDetailsData.docs[0].serviceArea;
+  console.log(businessDetailsData)
+  const serviceArea = businessDetailsData.docs[0].serviceArea || 'No location provided';
 
   const remainingDetails = await generateRemainingBusinessDetails(instagramHandle, serviceArea);
   console.log('remainingDetails', remainingDetails);
@@ -182,6 +183,7 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
   try {
     // const instagramProfileData = await getInstagramProfileByUserId(payloadUserId);
     const businessDetailsData = await getBusinessDetailsByUserId(payloadUserId);
+
     const tenantDetails = await handleTenantCreation(payloadUserId, instagramHandle);
     const updatedBusinessDetails = await handleBusinessDetailsUpdate(payloadUserId, businessDetailsData, instagramHandle);
     const postCreationResponse = await handlePostCreation(nPosts, instagramHandle, updatedBusinessDetails, tenantDetails);

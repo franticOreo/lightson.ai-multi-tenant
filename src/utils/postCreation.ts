@@ -2,8 +2,6 @@ import axios from 'axios';
 import { downloadImageToMemory, uploadImageToCollection, loginUser } from './instagramFunctions';
 import { makePostPrompt, createPostFields, understandImage } from './gpt';
 
-
-
 async function sendPostEntryDataToCollection(postEntryData: any, accessToken: string, client_instagram_handle: string) {
     // we 
     const protocol = process.env.APP_ENV === 'production' ? 'https' : 'http';
@@ -110,6 +108,4 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
 
     return responses.filter(response => response !== null);
 }
-
-// postsCreationPipeline()
 

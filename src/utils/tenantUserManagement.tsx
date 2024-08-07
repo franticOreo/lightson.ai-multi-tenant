@@ -18,8 +18,16 @@ export async function createTenant(clientInstagramHandle: string) {
   }
 }
 
-export async function createUser(clientEmail: string, password: string) {
+import crypto from 'crypto';
+
+export async function createUser(clientEmail: string, password?: string) {
   console.log(`Creating user with email: ${clientEmail}`);
+
+  // Generate a random password if none is provided
+  if (!password) {
+    password = crypto.randomBytes(16).toString('hex');
+    console.log(`Generated password for ${clientEmail}: ${password}`);
+  }
 
   const existingUser = await payload.find({
     collection: "users",

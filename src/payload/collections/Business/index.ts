@@ -23,7 +23,7 @@ export const Business: CollectionConfig = {
       label: "Full Name",
       name: "fullName",
       type: "text",
-      required: true,
+      required: false,
     },
     {
       label: "Instagram Handle",

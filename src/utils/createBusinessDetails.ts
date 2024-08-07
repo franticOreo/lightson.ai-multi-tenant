@@ -13,6 +13,12 @@ require('dotenv').config();
 export async function createBusinessEntry(businessDetails: any) {
 console.log("createBusinessEntry called with:", businessDetails);
   console.log(businessDetails)
+
+    // Set businessName to instagramHandle if not provided
+    if (!businessDetails.businessName) {
+        businessDetails.businessName = businessDetails.instagramHandle;
+    }
+
   try {
       const response = await payload.create({
           collection: 'business', // Adjust 'business' to your actual collection name
@@ -24,7 +30,7 @@ console.log("createBusinessEntry called with:", businessDetails);
   }
 }
 
-export async function generateRemainingBusinessDetails(instagramHandle: string, clientServiceArea: string) {
+export async function generateRemainingBusinessDetails(instagramHandle: string, clientServiceArea?: string) {
     // console.log("generateRemainingBusinessDetails called with:", instagramHandle, clientServiceArea);
     const userHeader = await fetchInstagramUserHeader(instagramHandle)
     

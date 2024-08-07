@@ -14,15 +14,7 @@ import { Button } from '../app/_components/Button';
 type FormData = {
     instagramHandle: string;
     email: string;
-    password: string;
-    fullName: string;
-    businessName: string;
-    businessPhone: string;
-    businessAddress: string;
-    serviceArea: string;
-    businessHours: string;
-    operatingHours: string;
-  };
+};
 //
 // NEEDS SERVER SIDE CHECK FOR USER!!!
 //
@@ -73,21 +65,7 @@ const SignupForm: React.FC = () =>  {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Input name="instagramHandle" label="Instagram Handle" required register={register} error={errors.instagramHandle} type="text" />
                         <Input name="email" label="Email" required register={register} error={errors.email} type="email" />
-                        <Input name="password" label="Password" required register={register} error={errors.password} type="password" />
-                        <Input name="fullName" label="Full Name" required register={register} error={errors.fullName} type="text" />
-                        <Input name="businessName" label="Business Name" required register={register} error={errors.businessName} type="text" />
-                        <Input name="businessPhone" label="Business Phone" register={register} error={errors.businessPhone} type="number" />
-                        <Input name="businessAddress" label="Business Address" register={register} error={errors.businessAddress} type="text" />
-                        <Input name="serviceArea" label="Service Area" register={register} error={errors.serviceArea} type="text" />
-                        <Input name="businessHours" label="Business Hours" register={register} error={errors.businessHours} type="text" />
-                        <Input name="operatingHours" label="Operating Hours" register={register} error={errors.operatingHours} type="text" />
-                        <Button
-                            type="submit"
-                            label={loading ? 'Generating...' : 'Generate Site'}
-                            disabled={loading}
-                            appearance="primary"
-                            className="button mt-40"
-                        />
+                        <Button type="submit" label={loading ? 'Generating...' : 'Generate Site'} disabled={loading} appearance="primary" className="button mt-40" />
                     </form>
                 </div>
             </div>

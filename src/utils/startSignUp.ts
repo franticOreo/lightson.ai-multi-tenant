@@ -6,39 +6,16 @@ import uploadInitialPostsToPayload from './uploadPostsToPayload';
 
 export default async function startSignUp(req, res) {
     try {
-      
-      const {
-        email,
-        password,
-        fullName,
-        instagramHandle,
-        businessName,
-        businessPhone,
-        businessAddress,
-        serviceArea,  
-        businessHours,
-        operatingHours,
-      } = req.body;
-      console.log(req.body)
-  
-      const createdUser = await createUser(email, password);
+      const { email, instagramHandle } = req.body;
+      const createdUser = await createUser(email);
       const userId = createdUser.id;
 
-      console.log(createdUser)
-  
       const businessDetails = {
-        userId,
-        instagramHandle,
-        fullName,
-        email,
-        businessName,
-        businessPhone,
-        businessAddress,
-        operatingHours,
-        serviceArea,
-        businessHours,
+          userId,
+          instagramHandle,
+          email
       };
-   
+
       console.log("Creating business entry...");
       console.log(businessDetails)
       const createdBusiness = await createBusinessEntry(businessDetails);
