@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 import { Input } from '../app/_components/Input'; 
 import { Gutter } from '../app/_components/Gutter';
 import { Button } from '../app/_components/Button';
 import { LoadingShimmer } from '../app/_components/LoadingShimmer';
 
-
 export function Onboarding() {
     const [isLoading, setIsLoading] = useState(true); // State to handle loading
+    const router = useRouter();
+    const { userId } = router.query;
 
-    // Example function to simulate data fetching
     useEffect(() => {
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 2000); // Simulate loading time
-    }, []);
+        if (userId) {
+            console.log(`User ID from query: ${userId}`);
+            // Perform any data fetching or other actions with the userId here
+            setTimeout(() => {
+                setIsLoading(false);
+            }, 2000); // Simulate loading time
+        }
+    }, [userId]);
 
     return (
         <Gutter>

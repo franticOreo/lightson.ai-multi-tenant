@@ -34,7 +34,8 @@ export default async function startSignUp(req, res) {
       console.log('Created instagram profile entry:', entryResponse)
   
       // Return the instagramHandle to the client
-      res.redirect(`/onboarding?userId=${userId}`);
+      console.log('Redirecting to onboarding...');
+      res.redirect(302, `/onboarding?userId=${userId}`);
   
       try {
         console.log('Beginning post creation pipeline.');

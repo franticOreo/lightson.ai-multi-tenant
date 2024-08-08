@@ -25,8 +25,6 @@ const SignupForm: React.FC = () =>  {
     const [submitted, setSubmitted] = useState(false); // State to track if the form has been submitted
     const router = useRouter();
 
-    console.log(process.env.NEXT_PUBLIC_REDIRECT_URI);
-
     const onSubmit = async (formData: FormData) => {
         setLoading(true);
         try {
@@ -37,17 +35,27 @@ const SignupForm: React.FC = () =>  {
                 },
                 body: JSON.stringify(formData),
             });
-            const data = await response.json();
-            console.log(data)
+
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error('Server responded with an error:', errorText);
                 setError('An error occurred during signup: ' + errorText);
             } else {
-                // Removed redirection logic
-                console.log('Signup successful:', data);
+                // Handle redirection
+                if (response.redirected) {
+                    console.log('Redirecting to:', response.url);
+                    window.location.href = response.url;
+                } else {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const data = await response.json();
+                        console.log('Signup successful:', data);
+                    } else {
+                        const text = await response.text();
+                        console.log('Received non-JSON response:', text);
+                    }
+                }
             }
-    
         } catch (error) {
             console.error('Signup failed:', error);
             setError('An error occurred during signup.');

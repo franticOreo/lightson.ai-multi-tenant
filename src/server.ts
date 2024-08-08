@@ -5,6 +5,7 @@ import path from 'path'
 import fs from 'fs'
 import { tenantExists } from './utils/tenantUserManagement';
 import startSignUp from './utils/startSignUp';
+import { WebSocketServer } from 'ws';
 
 
 dotenv.config();
