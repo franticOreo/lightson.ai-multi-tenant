@@ -109,7 +109,7 @@ export const createDeployment = async (token, vercelProjectName, gitBranchName) 
       projectSettings: {
         framework: 'nextjs',
         installCommand: 'npm install', // Default install command
-        buildCommand: 'next build', // Default build command for Next.js
+        buildCommand: 'npm run build', // Default build command for Next.js
       },
       target: 'production', // or 'preview'
       gitSource: {
