@@ -19,10 +19,12 @@ async function clientFetchBusinessData(accessToken: string, userId: string) {
           },
       });
 
-      console.log('Business data fetched successfully:', response.data);
+      
 
       // Filter the response data by userId
       const filteredData = response.data.docs.filter((doc: any) => doc.userId.id === userId);
+
+      console.log('filteredData', filteredData)
 
       return filteredData;
   } catch (error) {
@@ -33,7 +35,7 @@ async function clientFetchBusinessData(accessToken: string, userId: string) {
 
 export function Onboarding() {
     const [isLoading, setIsLoading] = useState(true); // State to handle loading
-    const [businessData, setBusinessData] = useState(null);
+    const [businessData, setBusinessData] = useState<any[]>([]);
     const router = useRouter();
     // const { userId, accessToken } = router.query;
     const userId = Array.isArray(router.query.userId) ? router.query.userId[0] : router.query.userId;
@@ -89,7 +91,9 @@ export function Onboarding() {
                         <>
                             <h1 className='unbounded'>lightson.ai</h1><br />
                             <h2 className='unbounded'>We are building Your site!</h2>
-                            <div> {businessData[0].projectDeploymentURL ? JSON.stringify(businessData[0].projectDeploymentURL) : ''} </div>
+                            <div>
+                                {businessData.length > 0 && businessData ? JSON.stringify(businessData) : 'No project deployment URL found.'}
+                            </div>
                         </>
                     )}
                 </div>
