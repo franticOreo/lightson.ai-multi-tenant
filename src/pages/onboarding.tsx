@@ -60,7 +60,7 @@ export function Onboarding() {
                     data = await clientFetchBusinessData(accessToken, userId);
                     if (data.some((item: any) => item.projectDeploymentURL)) {
                         console.log('projectDeploymentURL found')
-                        const projectDeploymentURL = data[0].projectDeploymentURL
+                        const projectDeploymentURL = "https://" + data[0].projectDeploymentURL
                         setDeploymentURL(projectDeploymentURL);
                         break;
                     } else {
