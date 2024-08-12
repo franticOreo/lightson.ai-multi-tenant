@@ -58,10 +58,10 @@ export function Onboarding() {
             while (retries < maxRetries) {
                 try {
                     data = await clientFetchBusinessData(accessToken, userId);
-                    if (data.some((item: any) => item.projectDeploymentURL)) {
-                        console.log('projectDeploymentURL found')
-                        const projectDeploymentURL = "https://" + data[0].projectDeploymentURL
-                        setDeploymentURL(projectDeploymentURL);
+                    if (data.some((item: any) => item.projectDomainURL)) {
+                        console.log('projectDomainURL found')
+                        const projectDomainURL = "https://" + data[0].projectDomainURL
+                        setDeploymentURL(projectDomainURL);
                         break;
                     } else {
                         retries++;
@@ -76,7 +76,7 @@ export function Onboarding() {
             }
         
             if (retries === maxRetries) {
-                console.error('Max retries reached. Failed to fetch business data with projectDeploymentURL.');
+                console.error('Max retries reached. Failed to fetch business data with projectDomainURL.');
             }
         };
 

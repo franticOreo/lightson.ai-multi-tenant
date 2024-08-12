@@ -126,7 +126,6 @@ export const createDeployment = async (token, vercelProjectName, gitBranchName) 
   }
 
   const jsonResponse = await response.json();
-  console.log('Deployment created:', jsonResponse);
   return jsonResponse;
 };
 
@@ -178,6 +177,7 @@ export default async function setupProjectAndDeploy(projectName, branchName, env
 
     // Optionally trigger a new deployment if the initial one was just for setup
     const finalDeployment = await createDeployment(vercelToken, projectName, branchName);
+    console.log('Deployment created:', finalDeployment);
     return finalDeployment;
   } else {
     console.log('Not in production, skipping Vercel deployment')

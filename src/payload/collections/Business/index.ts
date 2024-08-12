@@ -132,6 +132,12 @@ export const Business: CollectionConfig = {
       type: "text",
       required: false,
     },
+    {
+      label: "Project Domain URL",
+      name: "projectDomainURL",
+      type: "text",
+      required: false,
+    },
     tenant,
   ],
 };
