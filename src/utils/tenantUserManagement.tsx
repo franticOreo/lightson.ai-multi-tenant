@@ -2,12 +2,16 @@ import payload from 'payload';
 
 export async function createTenant(clientInstagramHandle: string) {
   console.log(`Creating tenant for Instagram handle: ${clientInstagramHandle}`);
+  
+  // Replace '.' and '_' with '-' in the clientInstagramHandle
+  const sanitizedHandle = clientInstagramHandle.replace(/[._]/g, '-');
+  
   try {
     const result = await payload.create({
       collection: "tenants",
       data: {
-        name: clientInstagramHandle,
-        domains: [{ domain: `${clientInstagramHandle}.${process.env.PAYLOAD_PUBLIC_SERVER_BASE}` }],
+        name: sanitizedHandle,
+        domains: [{ domain: `${sanitizedHandle}.${process.env.PAYLOAD_PUBLIC_SERVER_BASE}` }],
       },
     });
     console.log(`Tenant created successfully: ${JSON.stringify(result)}`);
@@ -25,7 +29,9 @@ export async function createUser(clientEmail: string, password?: string) {
 
   // Generate a random password if none is provided
   if (!password) {
-    password = crypto.randomBytes(16).toString('hex');
+    // TODO: FOR PRODUCTION
+    // password = crypto.randomBytes(16).toString('hex');
+    password = 'testy'
     console.log(`Generated password for ${clientEmail}: ${password}`);
   }
 
