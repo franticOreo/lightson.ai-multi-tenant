@@ -95,11 +95,9 @@ export function Onboarding() {
                             <h1 className='unbounded'>lightson.ai</h1><br />
                             <h2 className='unbounded'>We are building Your site!</h2>
                             <div>
-                            <Link href={deploymentURL} passHref>
-                                <a target="_blank" rel="noopener noreferrer">
+                                <a href={deploymentURL} target="_blank" rel="noopener noreferrer">
                                   {deploymentURL ? 'View your website' : 'Waiting for your website deployment...'}
                                 </a>
-                            </Link>
                             </div>
                         </>
                     )}
