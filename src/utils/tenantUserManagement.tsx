@@ -4,7 +4,7 @@ export async function createTenant(clientInstagramHandle: string) {
   console.log(`Creating tenant for Instagram handle: ${clientInstagramHandle}`);
   
   // Replace '.' and '_' with '-' in the clientInstagramHandle
-  const sanitizedHandle = clientInstagramHandle.replace(/[._]/g, '-');
+  const sanitizedHandle = clientInstagramHandle.replace(/[._]/g, '');
   
   try {
     const result = await payload.create({
