@@ -177,7 +177,8 @@ export default async function setupProjectAndDeploy(projectName, branchName, env
     await setEnvironmentVariables(vercelToken, projectId, envVariables);
 
     // Optionally trigger a new deployment if the initial one was just for setup
-    await createDeployment(vercelToken, projectName, branchName);
+    const finalDeployment = await createDeployment(vercelToken, projectName, branchName);
+    return finalDeployment;
   } else {
     console.log('Not in production, skipping Vercel deployment')
   }
