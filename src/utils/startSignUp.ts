@@ -1,7 +1,7 @@
 import { createUser } from './tenantUserManagement';
 import { createBusinessEntry } from './createBusinessDetails';   
 
-import { createInstagramProfileEntry} from './instagramFunctions'; 
+import { createInstagramProfileEntry, loginUser} from './instagramFunctions'; 
 import uploadInitialPostsToPayload from './uploadPostsToPayload';
 
 export default async function startSignUp(req, res) {
@@ -9,6 +9,11 @@ export default async function startSignUp(req, res) {
       const { email, instagramHandle } = req.body;
       const createdUser = await createUser(email);
       const userId = createdUser.id;
+
+      // TODO: NOT USE ADMIN
+      const loginResponse = await loginUser(null, null, true)
+      console.log(loginResponse)
+      const accessToken = loginResponse.token
 
       const businessDetails = {
           userId,
@@ -35,7 +40,8 @@ export default async function startSignUp(req, res) {
   
       // Return the instagramHandle to the client
       console.log('Redirecting to onboarding...');
-      res.redirect(302, `/onboarding?userId=${userId}`);
+      // TODO: change this!
+      res.redirect(302, `/onboarding?userId=${userId}&accessToken=${accessToken}`);
   
       try {
         console.log('Beginning post creation pipeline.');
