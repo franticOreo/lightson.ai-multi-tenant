@@ -4,6 +4,6 @@ import './logo.scss';
 export const Logo = () => React.createElement(
   'div',
   { className: 'logo' },
-  React.createElement('img', { src: '/logo.svg', alt: 'lightson.ai Logo' })
+  React.createElement('img', { src: 'https://lightsonaimedia.nyc3.cdn.digitaloceanspaces.com/public/logo.svg', alt: 'lightson.ai Logo' })
 );
 

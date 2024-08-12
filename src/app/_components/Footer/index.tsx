@@ -14,7 +14,7 @@ export default function Footer() {
             <img
               className={classes.logo}
               alt="lightson.ai Logo"
-              src="/logo.svg"
+              src="https://lightsonaimedia.nyc3.cdn.digitaloceanspaces.com/public/logo.svg"
             />
           </picture>
         {/* </Link> */}

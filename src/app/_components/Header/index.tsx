@@ -14,7 +14,7 @@ export default function Header() {
             <img
               className={classes.logo}
               alt="lightson.ai text Logo"
-              src="/li_logo_text_long.svg"
+              src="https://lightsonaimedia.nyc3.cdn.digitaloceanspaces.com/public/li_logo_text_long.svg"
             />
           </picture>
         {/* </Link> */}
