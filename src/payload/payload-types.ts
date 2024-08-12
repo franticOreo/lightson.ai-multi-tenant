@@ -131,6 +131,7 @@ export interface Business {
   userId: string | User;
   primaryColor?: string | null;
   secondaryColor?: string | null;
+  projectDeploymentURL?: string | null;
   tenant?: (string | null) | Tenant;
   updatedAt: string;
   createdAt: string;
