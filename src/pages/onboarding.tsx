@@ -6,6 +6,7 @@ import { Gutter } from '../app/_components/Gutter';
 import { Button } from '../app/_components/Button';
 import { LoadingShimmer } from '../app/_components/LoadingShimmer';
 import axios from 'axios';
+import Link from 'next/link';
 
 async function clientFetchBusinessData(accessToken: string, userId: string) {
   
@@ -35,7 +36,7 @@ async function clientFetchBusinessData(accessToken: string, userId: string) {
 
 export function Onboarding() {
     const [isLoading, setIsLoading] = useState(true); // State to handle loading
-    const [businessData, setBusinessData] = useState<any[]>([]);
+    const [deploymentURL, setDeploymentURL] = useState<string>('');
     const router = useRouter();
     // const { userId, accessToken } = router.query;
     const userId = Array.isArray(router.query.userId) ? router.query.userId[0] : router.query.userId;
@@ -58,7 +59,9 @@ export function Onboarding() {
                 try {
                     data = await clientFetchBusinessData(accessToken, userId);
                     if (data.some((item: any) => item.projectDeploymentURL)) {
-                        setBusinessData(data);
+                        console.log('projectDeploymentURL found')
+                        const projectDeploymentURL = data[0].projectDeploymentURL
+                        setDeploymentURL(projectDeploymentURL);
                         break;
                     } else {
                         retries++;
@@ -92,7 +95,9 @@ export function Onboarding() {
                             <h1 className='unbounded'>lightson.ai</h1><br />
                             <h2 className='unbounded'>We are building Your site!</h2>
                             <div>
-                                {businessData.length > 0 && businessData ? JSON.stringify(businessData) : 'No project deployment URL found.'}
+                              <Link href={deploymentURL}>
+                                {deploymentURL? deploymentURL: 'Waiting for your website deployment...'}
+                              </Link>
                             </div>
                         </>
                     )}
