@@ -218,7 +218,11 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
 
     const projectDeploymentResponse = await setupProjectAndDeploy(branchName, projectName, envVariables)
 
-    console.log('projectDeploymentResponse', projectDeploymentResponse)
+    // console.log('projectDeploymentResponse', projectDeploymentResponse)
+
+    // update business details with projectDeploymentURL
+    const updatedDeploymentDetails = await updateBusinessDetails(payloadUserId, { projectDeploymentURL: projectDeploymentResponse.url })
+    console.log('updatedDeploymentDetails', updatedDeploymentDetails)
 
   } catch (error) {
     console.error('Error in uploadInitialPostsToPayload:', error);
