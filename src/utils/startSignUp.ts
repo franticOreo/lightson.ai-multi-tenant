@@ -4,11 +4,15 @@ import { createBusinessEntry } from './createBusinessDetails';
 import { createInstagramProfileEntry, loginUser} from './instagramFunctions'; 
 import uploadInitialPostsToPayload from './uploadPostsToPayload';
 
+import { io } from '../server';
+
 export default async function startSignUp(req, res) {
     try {
       const { email, instagramHandle } = req.body;
       const createdUser = await createUser(email);
       const userId = createdUser.id;
+
+      io.emit('test', `User ${userId} signed up with email ${email}`);
 
       // TODO: NOT USE ADMIN
       const loginResponse = await loginUser(null, null, true)
@@ -45,8 +49,8 @@ export default async function startSignUp(req, res) {
   
       try {
         console.log('Beginning post creation pipeline.');
-        const response = await uploadInitialPostsToPayload(userId, instagramHandle, 4)
-        console.log(response)
+        // const response = await uploadInitialPostsToPayload(userId, instagramHandle, 4)
+        // console.log(response)
       } catch (error) {
         console.error('Error during additional processing:', error);
       }

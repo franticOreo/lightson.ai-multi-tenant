@@ -2,10 +2,10 @@ import dotenv from 'dotenv'
 import next from 'next'
 import nextBuild from 'next/dist/build'
 import path from 'path'
-import fs from 'fs'
-import { tenantExists } from './utils/tenantUserManagement';
 import startSignUp from './utils/startSignUp';
-import { WebSocketServer } from 'ws';
+
+import { createServer } from 'http'
+import { Server } from 'socket.io'
 
 
 dotenv.config();
@@ -18,11 +18,33 @@ import { seed } from './payload/seed'
 const app = express()
 const PORT = process.env.PORT || 3000
 
+const httpServer = createServer(app)
+const io = new Server(httpServer)
+
+io.on('connection', (socket) => {
+  console.log('a user connected')
+  socket.on('disconnect', () => {
+    console.log('user disconnected')
+  })
+
+  socket.on('clientReady', () => {
+    console.log('clientReady')
+  });
+
+  socket.emit('test', 'Hello from server');
+
+  io.emit('test', 'Hello from server using io.emit');
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+})
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.get('/', (req, res) => {
-  res.redirect('/join-waitlist');
+  res.redirect('/signup');
 });
 
 
@@ -86,17 +108,20 @@ const start = async (): Promise<void> => {
     dev: process.env.NODE_ENV !== 'production',
   })
 
-  const nextHandler = nextApp.getRequestHandler()
+  const nextHandler = nextApp.getRequestHandler()  
 
   app.use((req, res) => nextHandler(req, res))
 
   nextApp.prepare().then(() => {
     payload.logger.info('Starting Next.js...')
 
-    app.listen(PORT, async () => {
+    httpServer.listen(PORT, async () => {
       payload.logger.info(`Next.js App URL: ${process.env.PAYLOAD_PUBLIC_SERVER_URL}`)
     })
   })
 }
 
 start()
+
+export { io }
+

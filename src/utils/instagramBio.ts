@@ -37,16 +37,16 @@ export async function fetchInstagramUserHeader(username: string) {
 }
 
 
-import fs from 'fs';
+// import fs from 'fs';
 
-// test fetchInstagramData
-async function testFetchInstagramData() {
-  const data = await fetchInstagramData('ayresconstruction');
-  console.log('data', data);
+// // test fetchInstagramData
+// async function testFetchInstagramData() {
+//   const data = await fetchInstagramData('ayresconstruction');
+//   console.log('data', data);
 
-  // write data to file, output.json
-  fs.writeFileSync('./output.json', JSON.stringify(data, null, 2));
-}
+//   // write data to file, output.json
+//   fs.writeFileSync('./output.json', JSON.stringify(data, null, 2));
+// }
 
-testFetchInstagramData();
+// testFetchInstagramData();
 
