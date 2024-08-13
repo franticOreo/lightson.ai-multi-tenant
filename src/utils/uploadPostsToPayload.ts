@@ -212,14 +212,14 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
 
     console.log('Env variables', envVariables)
 
-    const branchName = process.env.APP_ENV === 'development' ? `dev-${payloadUserId}-${instagramHandle}` : `${payloadUserId}-${instagramHandle}`;
-    const projectName = process.env.APP_ENV === 'development' ? `dev-${payloadUserId}-${instagramHandle}` : `${payloadUserId}-${instagramHandle}`;
+    const branchName = process.env.APP_ENV === 'development' ? `dev-${instagramHandle}` : `${instagramHandle}`;
+    const projectName = branchName;
 
 
     const projectDeploymentResponse = await setupProjectAndDeploy(branchName, projectName, envVariables)
 
     // format for domain url for project is: branchName-projectName.vercel.app
-    const domainUrl = `${branchName}-${projectName}.vercel.app`;
+    const domainUrl = `${branchName}.vercel.app`;
 
     // update business details with projectDeploymentURL
     const updatedDeploymentDetails = await updateBusinessDetails(payloadUserId, { projectDeploymentURL: projectDeploymentResponse.url, projectDomainURL: domainUrl })

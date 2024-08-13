@@ -35,3 +35,18 @@ export async function fetchInstagramUserHeader(username: string) {
   }
   return null;
 }
+
+
+import fs from 'fs';
+
+// test fetchInstagramData
+async function testFetchInstagramData() {
+  const data = await fetchInstagramData('ayresconstruction');
+  console.log('data', data);
+
+  // write data to file, output.json
+  fs.writeFileSync('./output.json', JSON.stringify(data, null, 2));
+}
+
+testFetchInstagramData();
+
