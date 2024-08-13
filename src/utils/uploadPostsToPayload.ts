@@ -221,8 +221,16 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
     // format for domain url for project is: branchName-projectName.vercel.app
     const domainUrl = `${branchName}.vercel.app`;
 
+
+    console.log('TEST: projectDeploymentResponse.project.id', projectDeploymentResponse.project.id)
+    const deploymentData = {
+      vercelProjectId: projectDeploymentResponse.project.id,
+      projectDeploymentURL: projectDeploymentResponse.url,
+      projectDomainURL: domainUrl
+    }
+
     // update business details with projectDeploymentURL
-    const updatedDeploymentDetails = await updateBusinessDetails(payloadUserId, { projectDeploymentURL: projectDeploymentResponse.url, projectDomainURL: domainUrl })
+    const updatedDeploymentDetails = await updateBusinessDetails(payloadUserId, deploymentData)
     console.log('updatedDeploymentDetails', updatedDeploymentDetails)
 
   } catch (error) {

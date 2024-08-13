@@ -138,6 +138,12 @@ export const Business: CollectionConfig = {
       type: "text",
       required: false,
     },
+    {
+      label: "Vercel Project ID",
+      name: "vercelProjectId",
+      type: "text",
+      required: false,
+    },
     tenant,
   ],
 };
