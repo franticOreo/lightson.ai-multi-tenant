@@ -4,7 +4,7 @@ import { createBusinessEntry } from './createBusinessDetails';
 import { createInstagramProfileEntry, loginUser} from './instagramFunctions'; 
 import uploadInitialPostsToPayload from './uploadPostsToPayload';
 
-import { io } from '../server';
+import { emitToSocket, getAllSocketIds } from '../socketio';
 
 export default async function startSignUp(req, res) {
     try {
@@ -12,7 +12,11 @@ export default async function startSignUp(req, res) {
       const createdUser = await createUser(email);
       const userId = createdUser.id;
 
-      io.emit('test', `User ${userId} signed up with email ${email}`);
+      // Emit to all connected sockets
+      const allSocketIds = getAllSocketIds();
+      allSocketIds.forEach(socketId => {
+        emitToSocket(socketId, 'test', `User ${userId} signed up with email ${email}`);
+      });
 
       // TODO: NOT USE ADMIN
       const loginResponse = await loginUser(null, null, true)
@@ -34,7 +38,7 @@ export default async function startSignUp(req, res) {
       
   
       const entryResponse = await createInstagramProfileEntry({
-        payloadUserId: userId,
+        payloadUserId: userId.toString(),
         instagramUserId: 'notNanny',
         instagramHandle: instagramHandle,
         accessToken: 'notNanny',
@@ -61,4 +65,3 @@ export default async function startSignUp(req, res) {
       res.status(500).send({ error: 'Signup failed' });
     }
   }
-

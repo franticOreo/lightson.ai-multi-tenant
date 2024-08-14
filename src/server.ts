@@ -5,7 +5,7 @@ import path from 'path'
 import startSignUp from './utils/startSignUp';
 
 import { createServer } from 'http'
-import { Server } from 'socket.io'
+import { initIO } from './socketio'
 
 
 dotenv.config();
@@ -19,13 +19,6 @@ const app = express()
 const PORT = process.env.PORT || 3000
 
 const httpServer = createServer(app)
-const io = new Server(httpServer, {
-    cors: {
-        origin: process.env.NEXT_PUBLIC_CLIENT_URL || "http://localhost:3000",
-        methods: ["GET", "POST"]
-    }
-})
-
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -101,21 +94,11 @@ const start = async (): Promise<void> => {
 
   nextApp.prepare().then(() => {
     payload.logger.info('Starting Next.js...')
+    const io = initIO(httpServer)
 
     io.on('connection', (socket) => {
       console.log('user connected', socket.id);
-    
-      socket.on('text', (msg) => {
-        console.log('message: ' + msg);
-      });
-    
-      socket.emit('test', 'Hello from server');
-    
-      io.emit('test', 'Hello from server using io.emit');
-    
-      socket.on('disconnect', () => {
-        console.log('user disconnected', socket.id);
-      });
+  
     })
 
     httpServer.listen(PORT, async () => {
@@ -126,4 +109,4 @@ const start = async (): Promise<void> => {
 
 start()
 
-export { io }
+export { app }
