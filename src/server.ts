@@ -19,26 +19,13 @@ const app = express()
 const PORT = process.env.PORT || 3000
 
 const httpServer = createServer(app)
-const io = new Server(httpServer)
-
-io.on('connection', (socket) => {
-  console.log('a user connected')
-  socket.on('disconnect', () => {
-    console.log('user disconnected')
-  })
-
-  socket.on('clientReady', () => {
-    console.log('clientReady')
-  });
-
-  socket.emit('test', 'Hello from server');
-
-  io.emit('test', 'Hello from server using io.emit');
-
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
+const io = new Server(httpServer, {
+    cors: {
+        origin: process.env.NEXT_PUBLIC_CLIENT_URL || "http://localhost:3000",
+        methods: ["GET", "POST"]
+    }
 })
+
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -115,6 +102,22 @@ const start = async (): Promise<void> => {
   nextApp.prepare().then(() => {
     payload.logger.info('Starting Next.js...')
 
+    io.on('connection', (socket) => {
+      console.log('user connected', socket.id);
+    
+      socket.on('text', (msg) => {
+        console.log('message: ' + msg);
+      });
+    
+      socket.emit('test', 'Hello from server');
+    
+      io.emit('test', 'Hello from server using io.emit');
+    
+      socket.on('disconnect', () => {
+        console.log('user disconnected', socket.id);
+      });
+    })
+
     httpServer.listen(PORT, async () => {
       payload.logger.info(`Next.js App URL: ${process.env.PAYLOAD_PUBLIC_SERVER_URL}`)
     })
@@ -124,4 +127,3 @@ const start = async (): Promise<void> => {
 start()
 
 export { io }
-
