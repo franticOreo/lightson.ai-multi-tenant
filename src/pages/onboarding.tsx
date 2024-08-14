@@ -11,41 +11,46 @@ const Onboarding = () => {
 
 
     useEffect(() => {
-        if (socket.connected) {
-            console.log('Socket connected at Onboarding')
-            onConnect();
-          }
-        
-          function onConnect() {
-            console.log('Onconnect called')
-            setIsConnected(true);
-            setTransport(socket.io.engine.transport.name);
-        
-            socket.io.engine.on("upgrade", (transport) => {
-              setTransport(transport.name);
-            });
-          }
-        
-          function onDisconnect() {
-            console.log('OnDisconnect called')
-            setIsConnected(false);
-            setTransport("N/A");
-          }
-            console.log('Setting up socket listener');
-            socket.on('test', (update) => {
-            console.log('Received update:', update);
-            setTest(update);
-        });
+      // Connect the socket when the component mounts
+      function onConnect() {
+          console.log('Socket connected');
+          setIsConnected(true);
+          setTransport(socket.io.engine.transport.name);
 
-        socket.on("connect", onConnect);
-        socket.on("disconnect", onDisconnect);
-    
-        return () => {
-            console.log('Cleaning up socket listener');
-            socket.off("connect", onConnect);
-            socket.off("disconnect", onDisconnect);
-        };
-    }, []);
+          socket.io.engine.on("upgrade", (transport) => {
+              setTransport(transport.name);
+          });
+
+          socket.emit('text', 'Message from the client')
+      }
+
+      function onDisconnect() {
+          console.log('Socket disconnected');
+          setIsConnected(false);
+          setTransport("N/A");
+      }
+
+      function onTest(message: string) {
+          console.log('Received test message:', message);
+          setTest(message);
+      }
+
+      // Properly attach event listeners
+      socket.on("connect", onConnect);
+      socket.on("disconnect", onDisconnect);
+      socket.on("test", onTest);
+
+      socket.connect()
+
+      // Clean up function
+      return () => {
+          console.log('Cleaning up socket listener');
+          socket.off("connect", onConnect);
+          socket.off("disconnect", onDisconnect);
+          socket.off("test", onTest);
+          socket.disconnect();
+      };
+  }, []);
 
     return (
         <div>
