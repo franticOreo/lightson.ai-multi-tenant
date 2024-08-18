@@ -53,7 +53,7 @@ export default async function startSignUp(req, res) {
   
       try {
         console.log('Beginning post creation pipeline.');
-        // const response = await uploadInitialPostsToPayload(userId, instagramHandle, 4)
+        const response = await uploadInitialPostsToPayload(userId, instagramHandle, 4)
         // console.log(response)
       } catch (error) {
         console.error('Error during additional processing:', error);
