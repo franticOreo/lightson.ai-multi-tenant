@@ -1,10 +1,8 @@
 import type { CollectionConfig } from "payload/types";
-
 import { tenant } from "../../fields/tenant";
-// import { loggedIn } from "./access/loggedIn";
 import { superAdmins } from '../../access/superAdmins'
 import { tenantAdmins } from "./access/tenantAdmins";
-import { isSuperOrPublic } from "../Users/utilities/isSuperOrPublic";
+import { tenants } from "./access/tenants";
 
 export const Business: CollectionConfig = {
   slug: "business",
@@ -13,7 +11,7 @@ export const Business: CollectionConfig = {
     defaultColumns: ["businessName", "updatedAt"],
   },
   access: {
-    read: isSuperOrPublic,
+    read: tenants,
     create: superAdmins,
     update: tenantAdmins,
     delete: tenantAdmins,
@@ -84,6 +82,9 @@ export const Business: CollectionConfig = {
       name: "languageStyle",
       type: "text",
       required: false,
+      admin: {
+        hidden: true,
+      },
     },
     {
       label: "Keywords",
@@ -111,8 +112,8 @@ export const Business: CollectionConfig = {
       relationTo: "users",
       required: true,
       admin: {
-        position: "sidebar"
-      }
+        hidden: true,
+      },
     },
     {
       label: "Primary Color",
@@ -131,18 +132,27 @@ export const Business: CollectionConfig = {
       name: "projectDeploymentURL",
       type: "text",
       required: false,
+      admin: {
+        hidden: true, // Hide this field
+      },
     },
     {
       label: "Project Domain URL",
       name: "projectDomainURL",
       type: "text",
       required: false,
+      admin: {
+        hidden: true, // Hide this field
+      },
     },
     {
       label: "Vercel Project ID",
       name: "vercelProjectId",
       type: "text",
       required: false,
+      admin: {
+        hidden: true, // Hide this field
+      },
     },
     tenant,
   ],

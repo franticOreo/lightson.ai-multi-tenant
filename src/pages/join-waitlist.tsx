@@ -59,7 +59,7 @@ const WaitlistForm: React.FC = () =>  {
     <div className="card ">
       <div className="form-container">
         <h1 className='unbounded'>lightson.ai</h1><br />
-        <h2 className='unbounded'>Use Your Instagram Content to Build a Business Website </h2>
+        <h2 className='unbounded'>Turn Your Instagram Posts Into a Stunning Portfolio Website</h2>
         <h3 className='unbounded'>Join Our Waitlist</h3>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Input name="email" label="Email" required register={register} error={errors.email} type="email" />

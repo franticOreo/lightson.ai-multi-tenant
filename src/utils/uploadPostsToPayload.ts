@@ -90,7 +90,6 @@ async function updateBusinessDetails(payloadUserId: string, newData: any) {
 
     if (business.docs.length > 0) {
       
-      
       const business = await payload.find({
         collection: 'business',
         where: {
@@ -139,7 +138,7 @@ async function handleTenantCreation(payloadUserId: string, instagramHandle: stri
   };
 }
 
-async function handleBusinessDetailsUpdate(payloadUserId: string, businessDetailsData: any, instagramHandle: string): Promise<any> {
+async function handleBusinessDetailsUpdate(payloadUserId: string, businessDetailsData: any, instagramHandle: string, tenantId: string): Promise<any> {
   console.log(businessDetailsData)
   const serviceArea = businessDetailsData.docs[0].serviceArea || 'No location provided';
 
@@ -148,6 +147,7 @@ async function handleBusinessDetailsUpdate(payloadUserId: string, businessDetail
 
   const keywords = remainingDetails.SEO_keywords;
   const newBusinessData = {
+    tenant: tenantId,
     instagramHandle,
     businessBio: remainingDetails.business_bio,
     languageStyle: remainingDetails.language_style,
@@ -185,11 +185,11 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
     const businessDetailsData = await getBusinessDetailsByUserId(payloadUserId);
 
     console.log('uploadInitialPostsToPayload')
-    // io.emit('test', 'herrro from uploadInitialPostsToPayload')
-
 
     const tenantDetails = await handleTenantCreation(payloadUserId, instagramHandle);
-    const updatedBusinessDetails = await handleBusinessDetailsUpdate(payloadUserId, businessDetailsData, instagramHandle);
+    const tenantId = tenantDetails.tenantId;
+
+    const updatedBusinessDetails = await handleBusinessDetailsUpdate(payloadUserId, businessDetailsData, instagramHandle, tenantId);
     const postCreationResponse = await handlePostCreation(nPosts, instagramHandle, updatedBusinessDetails, tenantDetails);
 
     console.log(updatedBusinessDetails)
