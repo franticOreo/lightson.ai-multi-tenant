@@ -26,7 +26,7 @@ const WaitlistForm: React.FC = () =>  {
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/waitlists`, {
+      const response = await fetch(`/api/waitlists`, {
         method: 'POST',
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' },
@@ -47,7 +47,7 @@ const WaitlistForm: React.FC = () =>  {
       <Gutter>
         <div className="card">
           <div className="form-container">
-            <h1 className='unbounded'>We will speak to you soon!</h1>
+            <h3 className='unbounded'>Exiting times!<br /> <br />We will speak to you soon!</h3>
           </div>
         </div>
       </Gutter>

@@ -24,7 +24,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.get('/', (req, res) => {
-  res.redirect('/signup');
+  res.redirect('/join-waitlist');
 });
 
 
