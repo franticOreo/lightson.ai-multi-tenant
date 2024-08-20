@@ -184,7 +184,7 @@ async function getInstagramPostsAndPostToPayload(nPosts: number, instagramHandle
 
 export default async function uploadInitialPostsToPayload(payloadUserId: string, instagramHandle: string, nPosts: number): Promise<void> {
   try {
-    // const instagramProfileData = await getInstagramProfileByUserId(payloadUserId);
+    ///
     const businessDetailsData = await getBusinessDetailsByUserId(payloadUserId);
 
     console.log('uploadInitialPostsToPayload')
@@ -205,7 +205,10 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
 
     console.log('added about page and service list to business details')
 
+    /// Using instagram data, transforms it with GPT and pushes the data to Payload cms
 
+
+    // We create .env file. This .env file is created for a next.js project. This project is a branch of a template website I have created (lightson_template)
     const envVariables = [
       // Fixed .env vars.
       { key: "SENDGRID_API_KEY", value: process.env.SENDGRID_API_KEY || '', target: ["production"], type: "sensitive" },
@@ -233,23 +236,25 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
     const branchName = process.env.APP_ENV === 'development' ? `dev-${instagramHandle}` : `${instagramHandle}`;
     const projectName = branchName;
 
-
+    // setup vercel project using a branch of the main branch from lightson_template
     const projectDeploymentResponse = await setupProjectAndDeploy(branchName, projectName, envVariables)
 
     // format for domain url for project is: branchName-projectName.vercel.app
     const domainUrl = `${branchName}.vercel.app`;
 
+    // Only set deployment data to business collection if running in production.
+    if (process.env.APP_ENV === 'production') {
+      console.log('TEST: projectDeploymentResponse.project.id', projectDeploymentResponse.project.id)
+      const deploymentData = {
+        vercelProjectId: projectDeploymentResponse.project.id,
+        projectDeploymentURL: projectDeploymentResponse.url,
+        projectDomainURL: domainUrl
+      } 
 
-    console.log('TEST: projectDeploymentResponse.project.id', projectDeploymentResponse.project.id)
-    const deploymentData = {
-      vercelProjectId: projectDeploymentResponse.project.id,
-      projectDeploymentURL: projectDeploymentResponse.url,
-      projectDomainURL: domainUrl
+      // update business details with projectDeploymentURL
+      const updatedDeploymentDetails = await updateBusinessDetails(payloadUserId, deploymentData)
+      console.log('updatedDeploymentDetails', updatedDeploymentDetails)
     }
-
-    // update business details with projectDeploymentURL
-    const updatedDeploymentDetails = await updateBusinessDetails(payloadUserId, deploymentData)
-    console.log('updatedDeploymentDetails', updatedDeploymentDetails)
 
   } catch (error) {
     console.error('Error in uploadInitialPostsToPayload:', error);
