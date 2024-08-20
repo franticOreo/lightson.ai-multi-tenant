@@ -132,7 +132,7 @@ async function handleTenantCreation(payloadUserId: string, instagramHandle: stri
   console.log('Creating Tenant');
   const createdTenant = await createTenant(instagramHandle);
   console.log('Assigning Tenant to User');
-  const createdUser = await assignTenantToUser(payloadUserId, createdTenant.id);
+  const createdUser = await assignTenantToUser(payloadUserId, createdTenant?.id.toString());
   return {
     tenantId: createdTenant.id,
     userId: createdUser.id
@@ -161,7 +161,7 @@ async function handleBusinessDetailsUpdate(payloadUserId: string, businessDetail
   return updatedBusinessObj.docs[0];
 }
 
-async function getInstagramPostsAndPostToPayload(nPosts: number, instagramHandle: string, updatedBusinessDetails: any, tenantDetails: any): Promise<any> {
+async function getInstagramPostsAndPostToPayload(nPosts: number, instagramHandle: string, updatedBusinessDetails: any, tenantDetails: any, payloadToken: string): Promise<any> {
   //// need to get posts with Hiker API.
   const posts = await getInstagramPosts(instagramHandle);
   const recentPosts = posts.slice(0, nPosts);
@@ -177,12 +177,13 @@ async function getInstagramPostsAndPostToPayload(nPosts: number, instagramHandle
     instagramHandle: updatedBusinessDetails.instagramHandle,
     userId: tenantDetails.userId,
     tenantId: tenantDetails.tenantId,
+    payloadToken
   });
 
   return postsResponse; 
 }
 
-export default async function uploadInitialPostsToPayload(payloadUserId: string, instagramHandle: string, nPosts: number): Promise<void> {
+export default async function uploadInitialPostsToPayload(payloadUserId: string, instagramHandle: string, nPosts: number, accessToken: string): Promise<void> {
   try {
     // const instagramProfileData = await getInstagramProfileByUserId(payloadUserId);
     const businessDetailsData = await getBusinessDetailsByUserId(payloadUserId);
@@ -193,7 +194,7 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
     const tenantId = tenantDetails.tenantId;
 
     const updatedBusinessDetails = await handleBusinessDetailsUpdate(payloadUserId, businessDetailsData, instagramHandle, tenantId);
-    const postCreationResponse = await getInstagramPostsAndPostToPayload(nPosts, instagramHandle, updatedBusinessDetails, tenantDetails);
+    const postCreationResponse = await getInstagramPostsAndPostToPayload(nPosts, instagramHandle, updatedBusinessDetails, tenantDetails, accessToken);
 
     const postUnderstandings = postCreationResponse.postUnderstandings;
     console.log('postUnderstandings', postUnderstandings)

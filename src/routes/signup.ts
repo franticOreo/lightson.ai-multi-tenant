@@ -1,20 +1,22 @@
-import { createUser } from './tenantUserManagement';
-import { createBusinessEntry } from './createBusinessDetails';   
+import { createUser } from '../utils/tenantUserManagement';
+import { createBusinessEntry } from '../utils/createBusinessDetails';   
 
-import { createInstagramProfileEntry, loginUser} from './instagramFunctions'; 
-import uploadInitialPostsToPayload from './uploadPostsToPayload';
+import { createInstagramProfileEntry, loginUser} from '../utils/instagramFunctions'; 
+import uploadInitialPostsToPayload from '../utils/uploadPostsToPayload';
 
 import { emitToSocket, getAllSocketIds } from '../socketio';
 
-export default async function startSignUp(req, res) {
+export async function signUpRoute(req, res) {
     try {
+      // const { email, password, instagramHandle } = req.body;
       const { email, instagramHandle } = req.body;
 
       // if instagramHanlde contains a . replace with _
       const sanitizedInstagramHandle = instagramHandle.replace('.', '_');
 
-      const createdUser = await createUser(email);
+      let createdUser = await createUser(email, 'testy');
       const userId = createdUser.id;
+
 
       // Emit to all connected sockets
       const allSocketIds = getAllSocketIds();
@@ -23,9 +25,12 @@ export default async function startSignUp(req, res) {
       });
 
       // TODO: NOT USE ADMIN
-      const loginResponse = await loginUser(null, null, true)
-      console.log(loginResponse)
+      const loginResponse = await loginUser(email, 'testy', false)
+      console.log('Login Response', loginResponse)
       const accessToken = loginResponse.token
+
+      createdUser.accessToken = accessToken
+      createdUser.instagramHandle = sanitizedInstagramHandle
 
       const businessDetails = {
           userId,
@@ -49,23 +54,28 @@ export default async function startSignUp(req, res) {
       })
   
       console.log('Created instagram profile entry:', entryResponse)
+
+      await uploadInitialPostsToPayload(userId.toString(), sanitizedInstagramHandle, 4, accessToken);
   
-      // Return the instagramHandle to the client
-      console.log('Redirecting to onboarding...');
-      // TODO: change this!
-      res.redirect(302, `/onboarding?userId=${userId}&accessToken=${accessToken}`);
-  
-      try {
-        console.log('Beginning post creation pipeline.');
-        const response = await uploadInitialPostsToPayload(userId, sanitizedInstagramHandle, 4)
-        // console.log(response)
-      } catch (error) {
-        console.error('Error during additional processing:', error);
-      }
+      // Return the necessary data to the client
+      res.status(200).json({ userId, accessToken, instagramHandle: sanitizedInstagramHandle });
   
   
     } catch (error) {
       console.error('Signup error:', error);
       res.status(500).send({ error: 'Signup failed' });
     }
-  }
+}
+
+export const onBoardingRoute = async(req, res)=>{
+    try {
+        const { userId, accessToken, instagramHandle } = req.body;
+        console.log('[--]', userId, instagramHandle)
+        
+        res.status(200).send({ message: 'Onboarding completed successfully' });
+
+    } catch (error) {
+        console.error('Onboarding error:', error);
+        res.status(500).send({ error: 'Onboarding failed' });
+    }
+}

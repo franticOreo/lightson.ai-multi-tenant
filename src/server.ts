@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import next from 'next'
 import nextBuild from 'next/dist/build'
 import path from 'path'
-import startSignUp from './utils/startSignUp';
+import { signUpRoute, onBoardingRoute } from './routes/signup';
 
 import { createServer } from 'http'
 import { initIO } from './socketio'
@@ -29,7 +29,8 @@ app.get('/', (req, res) => {
 
 
 // signup user to our CMS and input their form details into the business collection.
-app.post('/api/signup', startSignUp)
+app.post('/api/signup', signUpRoute)
+app.post('/api/onboarding', onBoardingRoute)
 
 
 const start = async (): Promise<void> => {
