@@ -9,6 +9,10 @@ import { emitToSocket, getAllSocketIds } from '../socketio';
 export default async function startSignUp(req, res) {
     try {
       const { email, instagramHandle } = req.body;
+
+      // if instagramHanlde contains a . replace with _
+      const sanitizedInstagramHandle = instagramHandle.replace('.', '_');
+
       const createdUser = await createUser(email);
       const userId = createdUser.id;
 
@@ -25,7 +29,7 @@ export default async function startSignUp(req, res) {
 
       const businessDetails = {
           userId,
-          instagramHandle,
+          instagramHandle: sanitizedInstagramHandle,
           email
       };
 
@@ -40,7 +44,7 @@ export default async function startSignUp(req, res) {
       const entryResponse = await createInstagramProfileEntry({
         payloadUserId: userId.toString(),
         instagramUserId: 'notNanny',
-        instagramHandle: instagramHandle,
+        instagramHandle: sanitizedInstagramHandle,
         accessToken: 'notNanny',
       })
   
@@ -53,7 +57,7 @@ export default async function startSignUp(req, res) {
   
       try {
         console.log('Beginning post creation pipeline.');
-        const response = await uploadInitialPostsToPayload(userId, instagramHandle, 4)
+        const response = await uploadInitialPostsToPayload(userId, sanitizedInstagramHandle, 4)
         // console.log(response)
       } catch (error) {
         console.error('Error during additional processing:', error);
