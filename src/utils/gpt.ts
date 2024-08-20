@@ -52,7 +52,7 @@ export async function profileToBioLanguageKw(bioLanguageKwPrompt: string): Promi
   
     while (retryCount < maxRetries) {
       const response = await aiClient.chat.completions.create({
-        model: "gpt-3.5-turbo-0125",
+        model: "gpt-4o",
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: "You are a helpful assistant designed to output JSON." },
@@ -131,7 +131,7 @@ export async function createPostFields(blogPrompt: string): Promise<any> {
 
   while (retryCount < maxRetries) {
     const response = await aiClient.chat.completions.create({
-      model: "gpt-3.5-turbo-0125",
+      model: "gpt-4o",
       messages: [
         {
           role: "system", 
@@ -167,3 +167,89 @@ export async function createPostFields(blogPrompt: string): Promise<any> {
 
   return blogFields;
 }  
+
+
+function makeAboutPagePrompt(businessDetails, postUnderstandings) {
+  return `Generate an About Page "aboutPage" and Services list "serviceList" for a business website using the following details:
+
+  Business Name: ${businessDetails.businessName}
+  Business Bio (from Instagram): ${businessDetails.businessBio}
+  SEO Keywords: ${businessDetails.keywords}
+  
+  The following image descriptions of the user's recent Instagram posts may be useful:
+  
+  1. Image 1 description: ${postUnderstandings[0]}
+  2. Image 2 description: ${postUnderstandings[1]}
+  3. Image 3 description: ${postUnderstandings[2]}
+  4. Image 4 description: ${postUnderstandings[3]}
+  
+  The tone should align with the following language style: ${businessDetails.languageStyle}.
+  Ensure that the page is optimized for SEO, using the keywords provided in a natural way.
+  
+  Output the data in the following JSON structure:
+  
+  {
+    "aboutPage": "Generated content here",
+    "serviceList": [
+      "Service 1",
+      "Service 2",
+      ...
+    ]
+  }`
+}
+
+export async function generateAboutPage(businessDetails, postUnderstandings) {
+  const prompt = makeAboutPagePrompt(businessDetails, postUnderstandings);
+  
+  const aiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  let maxRetries = 3;
+  let retryCount = 0;
+  let aboutPageFields: {
+    aboutPage: string; 
+    serviceList: { service: string }[];
+  } = {
+    aboutPage: "",
+    serviceList: [] 
+  };
+
+  console.log('Creating about page...')
+  while (retryCount < maxRetries) {
+    const response = await aiClient.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system", 
+          content: "You are a helpful assistant designed to output JSON."
+        },
+        {
+          role: "user",
+          content: prompt
+        },
+      ],
+      response_format: {"type": "json_object"},
+      max_tokens: 1024,
+      temperature: 0.9,
+    });
+
+    aboutPageFields = JSON.parse(response.choices[0].message.content || '{}');
+
+    if (['aboutPage', 'serviceList'].every(key => key in aboutPageFields)) {
+      break; // Exit the loop if all required keys are present
+    }
+
+    retryCount += 1;
+  }
+
+  // Transform serviceList from strings to objects
+  const transformedServiceList = aboutPageFields.serviceList.map(service => ({ service }));
+  
+  console.log(transformedServiceList)
+
+  console.log('About page created.')
+  return {
+    ...aboutPageFields,
+    serviceList: transformedServiceList // Return the transformed list
+  };
+}
+
+

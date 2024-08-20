@@ -154,6 +154,26 @@ export const Business: CollectionConfig = {
         hidden: true, // Hide this field
       },
     },
+    {
+      label: "About Page",
+      name: "aboutPage",
+      type: "textarea",
+      required: false,
+    },
+    {
+      label: "Service List",
+      name: "serviceList",
+      type: "array",
+      required: false,
+      index: true,
+      fields: [
+        {
+          name: "service",
+          type: "text",
+          required: false,
+        },
+      ],
+    },
     tenant,
   ],
 };

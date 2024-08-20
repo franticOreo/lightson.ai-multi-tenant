@@ -6,6 +6,7 @@ import payload from 'payload';
 import dotenv from 'dotenv';
 import path from 'path';
 import setupProjectAndDeploy from './gitHub';
+import { generateAboutPage } from './gpt';
 
 dotenv.config({
   path: path.resolve(__dirname, '../../.env'),
@@ -160,14 +161,14 @@ async function handleBusinessDetailsUpdate(payloadUserId: string, businessDetail
   return updatedBusinessObj.docs[0];
 }
 
-async function handlePostCreation(nPosts: number, instagramHandle: string, updatedBusinessDetails: any, tenantDetails: any): Promise<void> {
+async function getInstagramPostsAndPostToPayload(nPosts: number, instagramHandle: string, updatedBusinessDetails: any, tenantDetails: any): Promise<any> {
   //// need to get posts with Hiker API.
   const posts = await getInstagramPosts(instagramHandle);
   const recentPosts = posts.slice(0, nPosts);
 
   const updatedBusinessKeywordsString = updatedBusinessDetails.keywords.map((kw: { keyword: string }) => kw.keyword).join(', ');
 
-  const postsResponse = postsCreationPipeline({
+  const postsResponse = await postsCreationPipeline({
     posts: recentPosts,
     clientBusinessBio: updatedBusinessDetails.businessBio,
     clientLanguageStyle: updatedBusinessDetails.languageStyle,
@@ -177,6 +178,8 @@ async function handlePostCreation(nPosts: number, instagramHandle: string, updat
     userId: tenantDetails.userId,
     tenantId: tenantDetails.tenantId,
   });
+
+  return postsResponse; 
 }
 
 export default async function uploadInitialPostsToPayload(payloadUserId: string, instagramHandle: string, nPosts: number): Promise<void> {
@@ -190,9 +193,18 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
     const tenantId = tenantDetails.tenantId;
 
     const updatedBusinessDetails = await handleBusinessDetailsUpdate(payloadUserId, businessDetailsData, instagramHandle, tenantId);
-    const postCreationResponse = await handlePostCreation(nPosts, instagramHandle, updatedBusinessDetails, tenantDetails);
+    const postCreationResponse = await getInstagramPostsAndPostToPayload(nPosts, instagramHandle, updatedBusinessDetails, tenantDetails);
 
-    console.log(updatedBusinessDetails)
+    const postUnderstandings = postCreationResponse.postUnderstandings;
+    console.log('postUnderstandings', postUnderstandings)
+
+    const aboutPageServices = await generateAboutPage(updatedBusinessDetails, postUnderstandings);
+
+    // add aboutPage and serviceList
+    const updatedBusinessDetailsAgain = await updateBusinessDetails(payloadUserId, aboutPageServices)
+
+    console.log('added about page and service list to business details')
+
 
     const envVariables = [
       // Fixed .env vars.
@@ -203,7 +215,9 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
       // Variable .env vars.
       { key: "BUSINESS_NAME", value: updatedBusinessDetails.businessName || '', target: ["production"], type: "plain" },
       { key: "INSTAGRAM_HANDLE", value: instagramHandle, target: ["production"], type: "plain" },
-      { key: "BUSINESS_BIO", value: updatedBusinessDetails.businessBio || '', target: ["production"], type: "plain" },
+      // NEEDS TO BE CHANGED TO ABOUT PAGE.
+      { key: "BUSINESS_BIO", value: aboutPageServices.aboutPage || '', target: ["production"], type: "plain" },
+      { key: "BUSINESS_SERVICE_LIST", value: JSON.stringify(aboutPageServices.serviceList) || '', target: ["production"], type: "plain" },
       { key: "BUSINESS_ADDRESS", value: updatedBusinessDetails.businessAddress || '', target: ["production"], type: "plain" },
       { key: "BUSINESS_SERVICE_AREA", value: updatedBusinessDetails.serviceArea || '', target: ["production"], type: "plain" },
       { key: "BUSINESS_PHONE_NUMBER", value: updatedBusinessDetails.phoneNumber || '', target: ["production"], type: "plain" },

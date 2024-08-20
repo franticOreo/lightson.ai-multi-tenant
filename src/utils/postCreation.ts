@@ -84,12 +84,14 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
         clientKeywords
     };
 
+    const postUnderstandings = [];
     const postEntriesData = await Promise.all(posts.map(async (post) => {
         try {
             const postCaption = post.caption;
             const imageUrl = post.media_url;
             console.log(imageUrl);
             const postUnderstanding = await understandImage(imageUrl);
+            postUnderstandings.push(postUnderstanding);
 
             const blogPrompt = await makePostPrompt(postCaption, postUnderstanding, bioLanguageKwObj, clientServiceArea);
             const postFields = await createPostFields(blogPrompt);
@@ -106,6 +108,10 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
         return sendPostEntryDataToCollection(postEntryData, payloadToken, instagramHandle);
     }));
 
-    return responses.filter(response => response !== null);
+    return {
+        postUnderstandings,
+        postEntriesData,
+        responses
+    };
 }
 
