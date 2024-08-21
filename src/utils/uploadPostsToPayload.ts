@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import setupProjectAndDeploy from './gitHub';
 import { generateAboutPage } from './gpt';
+import { prepareEnvVariables } from './vercel';
 
 dotenv.config({
   path: path.resolve(__dirname, '../../.env'),
@@ -205,36 +206,11 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
 
     console.log('added about page and service list to business details')
 
-    /// Using instagram data, transforms it with GPT and pushes the data to Payload cms
-
-
-    // We create .env file. This .env file is created for a next.js project. This project is a branch of a template website I have created (lightson_template)
-    const envVariables = [
-      // Fixed .env vars.
-      { key: "SENDGRID_API_KEY", value: process.env.SENDGRID_API_KEY || '', target: ["production"], type: "sensitive" },
-      { key: "GOOGLE_MAPS_API_KEY", value: process.env.GOOGLE_MAPS_API_KEY || '', target: ["production"], type: "sensitive" },
-      { key: "NEXT_PUBLIC_DOMAIN", value: process.env.NEXT_PUBLIC_DOMAIN, target: ["production"], type: "plain" },
-      { key: "POSTS_API_KEY", value: process.env.POSTS_API_KEY || '', target: ["production"], type: "plain" },
-      // Variable .env vars.
-      { key: "BUSINESS_NAME", value: updatedBusinessDetails.businessName || '', target: ["production"], type: "plain" },
-      { key: "INSTAGRAM_HANDLE", value: instagramHandle, target: ["production"], type: "plain" },
-      // NEEDS TO BE CHANGED TO ABOUT PAGE.
-      { key: "BUSINESS_BIO", value: aboutPageServices.aboutPage || '', target: ["production"], type: "plain" },
-      { key: "BUSINESS_SERVICE_LIST", value: JSON.stringify(aboutPageServices.serviceList) || '', target: ["production"], type: "plain" },
-      { key: "BUSINESS_ADDRESS", value: updatedBusinessDetails.businessAddress || '', target: ["production"], type: "plain" },
-      { key: "BUSINESS_SERVICE_AREA", value: updatedBusinessDetails.serviceArea || '', target: ["production"], type: "plain" },
-      { key: "BUSINESS_PHONE_NUMBER", value: updatedBusinessDetails.phoneNumber || '', target: ["production"], type: "plain" },
-      { key: "BUSINESS_EMAIL", value: updatedBusinessDetails.email || '', target: ["production"], type: "plain" },
-      { key: "BUSINESS_OPERATING_HOURS", value: updatedBusinessDetails.operatingHours || '', target: ["production"], type: "plain" },
-      { key: "PRIMARY_COLOR", value: updatedBusinessDetails.primaryColor || '', target: ["production"], type: "plain" },
-      { key: "SECONDARY_COLOR", value: updatedBusinessDetails.secondaryColor || '', target: ["production"], type: "plain" },
-      { key: "AUTHOR_ID", value: payloadUserId, target: ["production"], type: "plain" },
-    ];
-
-    console.log('Env variables', envVariables)
-
-    const branchName = process.env.APP_ENV === 'development' ? `dev-${instagramHandle}` : `${instagramHandle}`;
+    const branchName = process.env.APP_ENV === 'development' ? `de\v-${instagramHandle}` : `${instagramHandle}`;
     const projectName = branchName;
+
+    const envVariables = prepareEnvVariables(updatedBusinessDetailsAgain)
+    console.log('Env variables', envVariables)
 
     // setup vercel project using a branch of the main branch from lightson_template
     const projectDeploymentResponse = await setupProjectAndDeploy(branchName, projectName, envVariables)

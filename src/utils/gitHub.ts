@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 import fs from 'fs';
 import path from 'path';
+import { createDeployment, setEnvironmentVariables } from './vercel';
 
 dotenv.config()
 
@@ -51,7 +52,7 @@ export const createBranch = async (branchName, sourceBranch = 'main') => {
     return createResponseJson;
   };
   
-  async function updateBranchFromMain(mainBranch, featureBranch) {
+export async function updateBranchFromMain(mainBranch, featureBranch) {
     const gitToken = process.env.GITHUB_TOKEN
     // Fetch the latest commit from main branch
     const mainSha = await getLatestCommitSha(gitToken, mainBranch);
@@ -94,63 +95,6 @@ export const createBranch = async (branchName, sourceBranch = 'main') => {
     return true;
   }
 
-  
-export const createDeployment = async (token, vercelProjectName, gitBranchName) => {
-  const apiUrl = `https://api.vercel.com/v12/now/deployments`;
-
-  const response = await fetch(apiUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      name: vercelProjectName,
-      projectSettings: {
-        framework: 'nextjs',
-        installCommand: 'npm install', // Default install command
-        buildCommand: 'npm run build', // Default build command for Next.js
-      },
-      target: 'production', // or 'preview'
-      gitSource: {
-        type: 'github',
-        ref: gitBranchName,
-        repoId: '775700951'
-      },
-    })
-  });
-
-  if (!response.ok) {
-    console.error('Failed to create deployment:', response.status, await response.text());
-    return null;
-  }
-
-  const jsonResponse = await response.json();
-  return jsonResponse;
-};
-
-export const setEnvironmentVariables = async (token, projectId, envVariables) => {
-  const apiUrl = `https://api.vercel.com/v10/projects/${projectId}/env`;
-
-  const response = await fetch(apiUrl, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(envVariables)
-  });
-
-  if (!response.ok) {
-    console.error('Failed to set environment variables:', response.status, await response.text());
-    return null;
-  }
-
-  const jsonResponse = await response.json();
-  console.log('Environment variables set:', jsonResponse);
-  return jsonResponse;
-};
-
 export default async function setupProjectAndDeploy(projectName, branchName, envVariables) {
 
   // Create either production branch or a dev branch
@@ -182,24 +126,6 @@ export default async function setupProjectAndDeploy(projectName, branchName, env
   } else {
     console.log('Not in production, skipping Vercel deployment')
   }
-}
-
-async function updateBranchAndRedeployExistingProject() {
-    
-  const vercelToken = process.env.VERCEL_TOKEN;
-  const projectName = 'djh_electrical'
-  const branchName = 'djh_electrical'
-
-  const updateResult = await updateBranchFromMain('main', branchName);
-  console.log(updateResult)
-
-  if (!updateResult) {
-    console.error('Failed to update branch with latest main changes');
-    return;
-  }
-
-  const finalDeployment = await createDeployment(vercelToken, projectName, branchName);
-  console.log('Deployment created:', finalDeployment);
 }
 
 
