@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import setupProjectAndDeploy from './gitHub';
 import { generateAboutPage } from './gpt';
+import { prepareEnvVariables } from './vercel';
 
 dotenv.config({
   path: path.resolve(__dirname, '../../.env'),

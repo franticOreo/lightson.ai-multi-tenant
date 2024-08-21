@@ -63,7 +63,6 @@ const Onboarding = () => {
         console.error('Onboarding failed:', errorText);
       } else {
         const { data } = await response.json() as { data: any };
-        console.log(data)
         updateStates(data)
         console.log('Onboarding completed successfully');
       }
@@ -115,7 +114,6 @@ const Onboarding = () => {
         });
         if (response.ok){
             const { message, data } = await response.json()
-            console.log(data)
             const { domainUrl, ...update} = data
             setSiteUrl(domainUrl)
             updateStates(update)
