@@ -71,57 +71,33 @@ async function getBusinessDetailsByUserId(payloadUserId: string) {
   }
 }
 
-async function updateBusinessDetails(payloadUserId: string, newData: any) {
+export async function updateCollection(collectionName: string, documentId: string, newData: any) {
   try {
-
-    // Find the business entry by userId
-    const business = await payload.find({
-      collection: 'business',
+    const updatedDocument = await payload.update({
+      collection: collectionName,
       where: {
-        userId: {
-          equals: payloadUserId
+        id: {
+          equals: documentId
         }
       },
-      limit: 1 // Assuming there's only one business per user
+      data: newData
     });
 
-    console.log('Found business', business)
-    const businessId = business.docs[0].id;
-    console.log('Business ID:', businessId);
+    console.log(`Updated ${collectionName} document:`, updatedDocument);
+    return updatedDocument.docs[0];
+  } catch (error) {
+    console.error(`Error updating ${collectionName} document:`, error);
+    throw error;
+  }
+}
 
-    if (business.docs.length > 0) {
-      
-      const business = await payload.find({
-        collection: 'business',
-        where: {
-          id: {
-            equals: businessId
-          }
-        },
-        limit: 1 // Assuming there's only one business per user
-      });
+export async function updateBusinessDetails(businessId: string, newData: any) {
+  if (Object.keys(newData).includes('keywords')){
+    newData.keywords = Array.isArray(newData.keywords) ? newData.keywords.map(keyword => ({ keyword })) : typeof newData.keywords === 'string' ? newData.keywords.split(', ').map(keyword => ({ keyword })) : []
+  }
+  try {
+    return await updateCollection('business', businessId, newData);
 
-      console.log('finding business with id: ', businessId)
-   
-
-      // Update the business entry with new data
-      const updatedBusiness = await payload.update({
-        collection: 'business',
-        where: {
-          id: {
-            equals: businessId
-          }
-        },
-        data: newData,
-        user: {
-          id: payloadUserId
-        }
-      });
-
-      return updatedBusiness;
-    } else {
-      throw new Error('No business found for the given user ID');
-    }
   } catch (error) {
     console.error('Error updating business details:', error);
     throw error;
@@ -139,7 +115,7 @@ async function handleTenantCreation(payloadUserId: string, instagramHandle: stri
   };
 }
 
-async function handleBusinessDetailsUpdate(payloadUserId: string, businessDetailsData: any, instagramHandle: string, tenantId: string): Promise<any> {
+async function handleBusinessDetailsUpdate(businessId: string, businessDetailsData: any, instagramHandle: string, tenantId: string): Promise<any> {
   console.log(businessDetailsData)
   const serviceArea = businessDetailsData.docs[0].serviceArea || 'No location provided';
 
@@ -157,11 +133,11 @@ async function handleBusinessDetailsUpdate(payloadUserId: string, businessDetail
     secondaryColor: remainingDetails.SECONDARY_COLOR
   };
 
-  const updatedBusinessObj = await updateBusinessDetails(payloadUserId, newBusinessData);
-  return updatedBusinessObj.docs[0];
+  const updatedBusinessObj = await updateBusinessDetails(businessId, newBusinessData);
+  return updatedBusinessObj;
 }
 
-async function getInstagramPostsAndPostToPayload(nPosts: number, instagramHandle: string, updatedBusinessDetails: any, tenantDetails: any, payloadToken: string): Promise<any> {
+export async function getInstagramPostsAndPostToPayload(nPosts: number, instagramHandle: string, updatedBusinessDetails: any, tenantDetails: any, payloadToken: string): Promise<any> {
   //// need to get posts with Hiker API.
   const posts = await getInstagramPosts(instagramHandle);
   const recentPosts = posts.slice(0, nPosts);
@@ -183,17 +159,71 @@ async function getInstagramPostsAndPostToPayload(nPosts: number, instagramHandle
   return postsResponse; 
 }
 
+export const getEnvVariables = (userId, instagramHandle, aboutPageServices, businessDetails)=>{
+  return [
+    // Fixed .env vars.
+    { key: "SENDGRID_API_KEY", value: process.env.SENDGRID_API_KEY || '', target: ["production"], type: "sensitive" },
+    { key: "GOOGLE_MAPS_API_KEY", value: process.env.GOOGLE_MAPS_API_KEY || '', target: ["production"], type: "sensitive" },
+    { key: "NEXT_PUBLIC_DOMAIN", value: process.env.NEXT_PUBLIC_DOMAIN, target: ["production"], type: "plain" },
+    { key: "POSTS_API_KEY", value: process.env.POSTS_API_KEY || '', target: ["production"], type: "plain" },
+    // Variable .env vars.
+    { key: "BUSINESS_NAME", value: businessDetails.businessName || '', target: ["production"], type: "plain" },
+    { key: "INSTAGRAM_HANDLE", value: instagramHandle, target: ["production"], type: "plain" },
+    // NEEDS TO BE CHANGED TO ABOUT PAGE.
+    { key: "BUSINESS_BIO", value: aboutPageServices.aboutPage || '', target: ["production"], type: "plain" },
+    { key: "BUSINESS_SERVICE_LIST", value: JSON.stringify(aboutPageServices.serviceList) || '', target: ["production"], type: "plain" },
+    { key: "BUSINESS_ADDRESS", value: businessDetails.businessAddress || '', target: ["production"], type: "plain" },
+    { key: "BUSINESS_SERVICE_AREA", value: businessDetails.serviceArea || '', target: ["production"], type: "plain" },
+    { key: "BUSINESS_PHONE_NUMBER", value: businessDetails.phoneNumber || '', target: ["production"], type: "plain" },
+    { key: "BUSINESS_EMAIL", value: businessDetails.email || '', target: ["production"], type: "plain" },
+    { key: "BUSINESS_OPERATING_HOURS", value: businessDetails.operatingHours || '', target: ["production"], type: "plain" },
+    { key: "PRIMARY_COLOR", value: businessDetails.primaryColor || '', target: ["production"], type: "plain" },
+    { key: "SECONDARY_COLOR", value: businessDetails.secondaryColor || '', target: ["production"], type: "plain" },
+    { key: "AUTHOR_ID", value: userId, target: ["production"], type: "plain" },
+  ];
+}
+
+export const startDeployment = async (userId: string, instagramHandle: string, aboutPageServices: any, businessDetails: any) => {
+  // We create .env file. This .env file is created for a next.js project. This project is a branch of a template website I have created (lightson_template)
+  const envVariables = getEnvVariables(userId, instagramHandle, aboutPageServices, businessDetails)
+
+  const branchName = process.env.APP_ENV === 'development' ? `dev-${instagramHandle}` : `${instagramHandle}`;
+  const projectName = branchName;
+
+  // setup vercel project using a branch of the main branch from lightson_template
+  const projectDeploymentResponse = await setupProjectAndDeploy(branchName, projectName, envVariables)
+
+  // format for domain url for project is: branchName-projectName.vercel.app
+  const domainUrl = `${branchName}.vercel.app`;
+
+  // Only set deployment data to business collection if running in production.
+  if (process.env.APP_ENV === 'production') {
+    console.log('TEST: projectDeploymentResponse.project.id', projectDeploymentResponse.project.id)
+    const deploymentData = {
+      vercelProjectId: projectDeploymentResponse.project.id,
+      projectDeploymentURL: projectDeploymentResponse.url,
+      projectDomainURL: domainUrl
+    } 
+
+    // update business details with projectDeploymentURL
+    const updatedDeploymentDetails = await updateBusinessDetails(businessDetails.id, deploymentData)
+    console.log('updatedDeploymentDetails', updatedDeploymentDetails)
+  }
+
+  return domainUrl;
+}
+
 export default async function uploadInitialPostsToPayload(payloadUserId: string, instagramHandle: string, nPosts: number, accessToken: string): Promise<void> {
   try {
     ///
-    const businessDetailsData = await getBusinessDetailsByUserId(payloadUserId);
+    const businessDetailsData: any = await getBusinessDetailsByUserId(payloadUserId);
 
     console.log('uploadInitialPostsToPayload')
 
     const tenantDetails = await handleTenantCreation(payloadUserId, instagramHandle);
     const tenantId = tenantDetails.tenantId;
 
-    const updatedBusinessDetails = await handleBusinessDetailsUpdate(payloadUserId, businessDetailsData, instagramHandle, tenantId);
+    const updatedBusinessDetails = await handleBusinessDetailsUpdate(businessDetailsData.id, businessDetailsData, instagramHandle, tenantId);
     const postCreationResponse = await getInstagramPostsAndPostToPayload(nPosts, instagramHandle, updatedBusinessDetails, tenantDetails, accessToken);
 
     const postUnderstandings = postCreationResponse.postUnderstandings;
@@ -202,60 +232,15 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
     const aboutPageServices = await generateAboutPage(updatedBusinessDetails, postUnderstandings);
 
     // add aboutPage and serviceList
-    const updatedBusinessDetailsAgain = await updateBusinessDetails(payloadUserId, aboutPageServices)
+    const updatedBusinessDetailsAgain = await updateBusinessDetails(businessDetailsData.id, aboutPageServices)
 
     console.log('added about page and service list to business details')
 
     /// Using instagram data, transforms it with GPT and pushes the data to Payload cms
 
-
-    // We create .env file. This .env file is created for a next.js project. This project is a branch of a template website I have created (lightson_template)
-    const envVariables = [
-      // Fixed .env vars.
-      { key: "SENDGRID_API_KEY", value: process.env.SENDGRID_API_KEY || '', target: ["production"], type: "sensitive" },
-      { key: "GOOGLE_MAPS_API_KEY", value: process.env.GOOGLE_MAPS_API_KEY || '', target: ["production"], type: "sensitive" },
-      { key: "NEXT_PUBLIC_DOMAIN", value: process.env.NEXT_PUBLIC_DOMAIN, target: ["production"], type: "plain" },
-      { key: "POSTS_API_KEY", value: process.env.POSTS_API_KEY || '', target: ["production"], type: "plain" },
-      // Variable .env vars.
-      { key: "BUSINESS_NAME", value: updatedBusinessDetails.businessName || '', target: ["production"], type: "plain" },
-      { key: "INSTAGRAM_HANDLE", value: instagramHandle, target: ["production"], type: "plain" },
-      // NEEDS TO BE CHANGED TO ABOUT PAGE.
-      { key: "BUSINESS_BIO", value: aboutPageServices.aboutPage || '', target: ["production"], type: "plain" },
-      { key: "BUSINESS_SERVICE_LIST", value: JSON.stringify(aboutPageServices.serviceList) || '', target: ["production"], type: "plain" },
-      { key: "BUSINESS_ADDRESS", value: updatedBusinessDetails.businessAddress || '', target: ["production"], type: "plain" },
-      { key: "BUSINESS_SERVICE_AREA", value: updatedBusinessDetails.serviceArea || '', target: ["production"], type: "plain" },
-      { key: "BUSINESS_PHONE_NUMBER", value: updatedBusinessDetails.phoneNumber || '', target: ["production"], type: "plain" },
-      { key: "BUSINESS_EMAIL", value: updatedBusinessDetails.email || '', target: ["production"], type: "plain" },
-      { key: "BUSINESS_OPERATING_HOURS", value: updatedBusinessDetails.operatingHours || '', target: ["production"], type: "plain" },
-      { key: "PRIMARY_COLOR", value: updatedBusinessDetails.primaryColor || '', target: ["production"], type: "plain" },
-      { key: "SECONDARY_COLOR", value: updatedBusinessDetails.secondaryColor || '', target: ["production"], type: "plain" },
-      { key: "AUTHOR_ID", value: payloadUserId, target: ["production"], type: "plain" },
-    ];
-
-    console.log('Env variables', envVariables)
-
-    const branchName = process.env.APP_ENV === 'development' ? `dev-${instagramHandle}` : `${instagramHandle}`;
-    const projectName = branchName;
-
-    // setup vercel project using a branch of the main branch from lightson_template
-    const projectDeploymentResponse = await setupProjectAndDeploy(branchName, projectName, envVariables)
-
-    // format for domain url for project is: branchName-projectName.vercel.app
-    const domainUrl = `${branchName}.vercel.app`;
-
-    // Only set deployment data to business collection if running in production.
-    if (process.env.APP_ENV === 'production') {
-      console.log('TEST: projectDeploymentResponse.project.id', projectDeploymentResponse.project.id)
-      const deploymentData = {
-        vercelProjectId: projectDeploymentResponse.project.id,
-        projectDeploymentURL: projectDeploymentResponse.url,
-        projectDomainURL: domainUrl
-      } 
-
-      // update business details with projectDeploymentURL
-      const updatedDeploymentDetails = await updateBusinessDetails(payloadUserId, deploymentData)
-      console.log('updatedDeploymentDetails', updatedDeploymentDetails)
-    }
+    const domainUrl = await startDeployment(payloadUserId, instagramHandle, aboutPageServices, updatedBusinessDetailsAgain);
+    console.log('domainUrl', domainUrl)
+    
 
   } catch (error) {
     console.error('Error in uploadInitialPostsToPayload:', error);

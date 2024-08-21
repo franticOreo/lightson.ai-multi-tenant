@@ -2,9 +2,10 @@ import { createUser } from '../utils/tenantUserManagement';
 import { createBusinessEntry } from '../utils/createBusinessDetails';   
 
 import { createInstagramProfileEntry, loginUser} from '../utils/instagramFunctions'; 
-import uploadInitialPostsToPayload from '../utils/uploadPostsToPayload';
+import uploadInitialPostsToPayload, { updateBusinessDetails, getInstagramPostsAndPostToPayload, startDeployment } from '../utils/uploadPostsToPayload';
 
 import { emitToSocket, getAllSocketIds } from '../socketio';
+import { generateAboutPage } from '../utils/gpt';
 import payload from 'payload';
 
 export async function signUpRoute(req, res) {
@@ -70,7 +71,7 @@ export async function signUpRoute(req, res) {
 
 export const onBoardingRoute = async(req, res)=>{
     try {
-        const { userId, accessToken, instagramHandle } = req.body;
+        const { userId, accessToken, instagramHandle } = req.query;
         
         const response = await payload.find({
             collection: 'business',
@@ -87,6 +88,45 @@ export const onBoardingRoute = async(req, res)=>{
         }
         
         res.status(200).send({ message: 'Onboarding completed successfully', data });
+
+    } catch (error) {
+        console.error('Onboarding error:', error);
+        res.status(500).send({ error: 'Onboarding failed' });
+    }
+}
+
+export const regenerateAboutPage = async(req, res)=>{
+    try {
+        const { userId, businessId, accessToken, instagramHandle, ...data } = req.body;
+
+        const updatedBusiness: any = await updateBusinessDetails(businessId, data)
+        
+        console.log('new update', updatedBusiness)
+        
+        
+        const tenantDetails = {
+          tenantId: updatedBusiness.tenant.id,
+          userId: userId
+        }
+
+        const postCreationResponse = await getInstagramPostsAndPostToPayload(4, instagramHandle, updatedBusiness, tenantDetails, accessToken);
+
+        const postUnderstandings = postCreationResponse.postUnderstandings;
+        console.log('postUnderstandings', postUnderstandings)
+        
+        const aboutPageServices = await generateAboutPage(updatedBusiness, postUnderstandings);
+        const { aboutPage } = aboutPageServices
+
+        const updatedBusinessDetailsAgain = await updateBusinessDetails(updatedBusiness.id, {aboutPage})
+
+        console.log('added about page and service list to business details')
+
+        const domainUrl = await startDeployment(userId, instagramHandle, aboutPageServices, updatedBusinessDetailsAgain);
+        console.log('domainUrl', domainUrl)
+
+        updatedBusiness.domainUrl = domainUrl
+        
+        res.status(200).send({ message: 'Onboarding completed successfully', data: updatedBusiness });
 
     } catch (error) {
         console.error('Onboarding error:', error);
