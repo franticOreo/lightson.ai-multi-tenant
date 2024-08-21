@@ -183,3 +183,25 @@ export default async function setupProjectAndDeploy(projectName, branchName, env
     console.log('Not in production, skipping Vercel deployment')
   }
 }
+
+async function updateBranchAndRedeployExistingProject() {
+    
+  const vercelToken = process.env.VERCEL_TOKEN;
+  const projectName = 'djh_electrical'
+  const branchName = 'djh_electrical'
+
+  const updateResult = await updateBranchFromMain('main', branchName);
+  console.log(updateResult)
+
+  if (!updateResult) {
+    console.error('Failed to update branch with latest main changes');
+    return;
+  }
+
+  const finalDeployment = await createDeployment(vercelToken, projectName, branchName);
+  console.log('Deployment created:', finalDeployment);
+}
+
+
+
+

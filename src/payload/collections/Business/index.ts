@@ -3,6 +3,7 @@ import { tenant } from "../../fields/tenant";
 import { superAdmins } from '../../access/superAdmins'
 import { tenantAdmins } from "./access/tenantAdmins";
 import { tenants } from "./access/tenants";
+import { redeployProjectWithNewEnvVars } from "./hooks/redeployProjectWithNewEnvVars";
 
 export const Business: CollectionConfig = {
   slug: "business",
@@ -28,6 +29,9 @@ export const Business: CollectionConfig = {
       name: "instagramHandle",
       type: "text",
       required: false,
+      admin: {
+        hidden: true,
+      },
     },
     {
       label: "Phone Number",
@@ -56,7 +60,7 @@ export const Business: CollectionConfig = {
       type: "textarea",
       required: false,
       admin: {
-        position: "sidebar",
+        hidden: true,
       },
     },
     {
@@ -151,7 +155,7 @@ export const Business: CollectionConfig = {
       type: "text",
       required: false,
       admin: {
-        hidden: true, // Hide this field
+        hidden: false, // Hide this field
       },
     },
     {
@@ -176,4 +180,7 @@ export const Business: CollectionConfig = {
     },
     tenant,
   ],
+  hooks: {
+    afterChange: [redeployProjectWithNewEnvVars]
+  }
 };
