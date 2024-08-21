@@ -5,6 +5,7 @@ import { createInstagramProfileEntry, loginUser} from '../utils/instagramFunctio
 import uploadInitialPostsToPayload from '../utils/uploadPostsToPayload';
 
 import { emitToSocket, getAllSocketIds } from '../socketio';
+import payload from 'payload';
 
 export async function signUpRoute(req, res) {
     try {
@@ -70,9 +71,22 @@ export async function signUpRoute(req, res) {
 export const onBoardingRoute = async(req, res)=>{
     try {
         const { userId, accessToken, instagramHandle } = req.body;
-        console.log('[--]', userId, instagramHandle)
         
-        res.status(200).send({ message: 'Onboarding completed successfully' });
+        const response = await payload.find({
+            collection: 'business',
+            where: {
+                userId: {
+                    equals: userId
+                }
+            }
+        })
+
+        let data = {}
+        if (response.docs.length > 0) {
+          data = response.docs[0]
+        }
+        
+        res.status(200).send({ message: 'Onboarding completed successfully', data });
 
     } catch (error) {
         console.error('Onboarding error:', error);
