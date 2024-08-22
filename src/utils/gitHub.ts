@@ -99,10 +99,8 @@ export default async function setupProjectAndDeploy(projectName, branchName, env
 
   // Create either production branch or a dev branch
   const createBranchResult = await createBranch(branchName)
-
   // Fetch and merge updates from 'main' to 'ayres-construction' before deploying
   const updateResult = await updateBranchFromMain('main', branchName);
-  console.log(updateResult)
 
   if (!updateResult) {
     console.error('Failed to update branch with latest main changes');
@@ -112,16 +110,16 @@ export default async function setupProjectAndDeploy(projectName, branchName, env
   if (process.env.APP_ENV === 'production') {
     const vercelToken = process.env.VERCEL_TOKEN;
     // Create deployment and get project ID
-    const deployment = await createDeployment(vercelToken, projectName, branchName);
+    const deployment = await createDeployment(projectName, branchName);
     if (!deployment) return;
 
     const projectId = deployment.projectId; // Assuming the response contains projectId
 
-    await setEnvironmentVariables(vercelToken, projectId, envVariables);
+    await setEnvironmentVariables(projectId, envVariables);
 
     // Optionally trigger a new deployment if the initial one was just for setup
-    const finalDeployment = await createDeployment(vercelToken, projectName, branchName);
-    console.log('Deployment created:', finalDeployment);
+    const finalDeployment = await createDeployment(projectName, branchName);
+
     return finalDeployment;
   } else {
     console.log('Not in production, skipping Vercel deployment')
