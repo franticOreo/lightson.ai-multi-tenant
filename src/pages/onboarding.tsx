@@ -98,7 +98,7 @@ const Onboarding = () => {
         primaryColor,
         secondaryColor,
         aboutPage,
-        keywords,
+        keywords: keywords.map(keyword => ({ keyword })),
         serviceList: serviceList.map(service => ({ service }))
     }
 
@@ -337,6 +337,15 @@ const Onboarding = () => {
                     <div className='keywords-container'>
                         {keywords.map((keyword, index) => (
                             <InputItem key={index} name={keyword} disabled={true}/>
+                        ))}
+                    </div>
+                </div>
+                <hr />
+                <div>
+                    <strong>Service Lists</strong>
+                    <div className='keywords-container'>
+                        {serviceList.map((service, index) => (
+                            <InputItem key={index} name={service} disabled={true}/>
                         ))}
                     </div>
                 </div>

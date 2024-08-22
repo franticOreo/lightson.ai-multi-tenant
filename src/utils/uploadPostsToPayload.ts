@@ -73,6 +73,7 @@ async function getBusinessDetailsByUserId(payloadUserId: string) {
 }
 
 export async function updateCollection(collectionName: string, documentId: string, newData: any) {
+  console.log(`Updating ${collectionName} document:`, documentId, newData);
   try {
     const updatedDocument = await payload.update({
       collection: collectionName,
@@ -93,9 +94,9 @@ export async function updateCollection(collectionName: string, documentId: strin
 }
 
 export async function updateBusinessDetails(businessId: string, newData: any) {
-  if (Object.keys(newData).includes('keywords')){
-    newData.keywords = Array.isArray(newData.keywords) ? newData.keywords.map(keyword => ({ keyword })) : typeof newData.keywords === 'string' ? newData.keywords.split(', ').map(keyword => ({ keyword })) : []
-  }
+  // if (Object.keys(newData).includes('keywords')){
+  //   newData.keywords = Array.isArray(newData.keywords) ? newData.keywords.map(keyword => ({ keyword })) : typeof newData.keywords === 'string' ? newData.keywords.split(', ').map(keyword => ({ keyword })) : []
+  // }
   try {
     return await updateCollection('business', businessId, newData);
 
@@ -117,11 +118,9 @@ async function handleTenantCreation(payloadUserId: string, instagramHandle: stri
 }
 
 async function handleBusinessDetailsUpdate(businessId: string, businessDetailsData: any, instagramHandle: string, tenantId: string): Promise<any> {
-  console.log(businessDetailsData)
-  const serviceArea = businessDetailsData.docs[0].serviceArea || 'No location provided';
+  const serviceArea = businessDetailsData.serviceArea || 'No location provided';
 
   const remainingDetails = await generateRemainingBusinessDetails(instagramHandle, serviceArea);
-  console.log('remainingDetails', remainingDetails);
 
   const keywords = remainingDetails.SEO_keywords;
   const newBusinessData = {
@@ -135,6 +134,7 @@ async function handleBusinessDetailsUpdate(businessId: string, businessDetailsDa
   };
 
   const updatedBusinessObj = await updateBusinessDetails(businessId, newBusinessData);
+
   return updatedBusinessObj;
 }
 
@@ -208,7 +208,6 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
 
     // update business details with projectDeploymentURL
     const updatedDeploymentDetails = await updateBusinessDetails(businessDetails.id, deploymentData)
-    console.log('updatedDeploymentDetails', updatedDeploymentDetails)
   }
 
   return domainUrl;
@@ -216,10 +215,10 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
 
 export default async function uploadInitialPostsToPayload(payloadUserId: string, instagramHandle: string, nPosts: number, accessToken: string): Promise<void> {
   try {
-    ///
-    const businessDetailsData: any = await getBusinessDetailsByUserId(payloadUserId);
-
-    console.log('uploadInitialPostsToPayload')
+    
+    const result: any = await getBusinessDetailsByUserId(payloadUserId);
+    
+    const businessDetailsData = result.docs[0];
 
     const tenantDetails = await handleTenantCreation(payloadUserId, instagramHandle);
     const tenantId = tenantDetails.tenantId;
