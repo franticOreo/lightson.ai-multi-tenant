@@ -37,6 +37,7 @@
     "openai": "^4.38.2",
     "payload": "latest",
     "react": "^18",
+    "react-color": "^2.19.3",
     "react-dom": "^18",
     "react-hook-form": "^7.51.3",
     "sass": "^1.76.0",

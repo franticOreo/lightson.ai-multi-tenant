@@ -24,22 +24,22 @@ export async function createTenant(clientInstagramHandle: string) {
 
 import crypto from 'crypto';
 
-export async function createUser(clientEmail: string, password?: string) {
-  console.log(`Creating user with email: ${clientEmail}`);
+export async function createUser(email: string, password: string) {
+  console.log(`Creating user with email: ${email}`);
 
   // Generate a random password if none is provided
-  if (!password) {
-    // TODO: FOR PRODUCTION
-    // password = crypto.randomBytes(16).toString('hex');
-    password = 'testy'
-    console.log(`Generated password for ${clientEmail}: ${password}`);
-  }
+  // if (!password) {
+  //   // TODO: FOR PRODUCTION
+  //   // password = crypto.randomBytes(16).toString('hex');
+  //   password = 'testy'
+  //   console.log(`Generated password for ${email}: ${password}`);
+  // }
 
   const existingUser = await payload.find({
     collection: "users",
     where: {
       email: {
-        equals: clientEmail
+        equals: email
       }
     }
   });
@@ -52,8 +52,8 @@ export async function createUser(clientEmail: string, password?: string) {
     const result = await payload.create({
       collection: "users",
       data: {
-        email: clientEmail,
-        password: password,
+        email,
+        password,
         roles: ["user"],
       },
     });

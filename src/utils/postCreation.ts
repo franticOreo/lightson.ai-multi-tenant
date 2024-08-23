@@ -64,6 +64,7 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
     instagramHandle,
     userId,
     tenantId,
+    payloadToken
   }: {
     posts: any,
     clientBusinessBio: string,
@@ -73,10 +74,8 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
     instagramHandle: string,
     userId: string,
     tenantId: string,
+    payloadToken: string
   }) {
-    const loginResponse = await loginUser(null, null, true);
-    const payloadToken = loginResponse.token;
-
     const bioLanguageKwObj = {
         clientBusinessBio,
         clientLanguageStyle,
