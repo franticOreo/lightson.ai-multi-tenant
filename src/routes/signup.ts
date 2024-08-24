@@ -57,11 +57,11 @@ export async function signUpRoute(req, res) {
   
       console.log('Created instagram profile entry:', entryResponse)
 
-      await uploadInitialPostsToPayload(userId.toString(), sanitizedInstagramHandle, 4, accessToken);
-  
+      
       // Return the necessary data to the client
       res.status(200).json({ userId, accessToken, instagramHandle: sanitizedInstagramHandle });
-  
+      
+      await uploadInitialPostsToPayload(userId.toString(), sanitizedInstagramHandle, 4, accessToken);
   
     } catch (error) {
       console.error('Signup error:', error);

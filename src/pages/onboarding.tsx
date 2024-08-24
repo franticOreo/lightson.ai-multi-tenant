@@ -8,10 +8,12 @@ import { Button } from '../app/_components/Button';
 import { InputItem, MultiInput } from '../app/_components/MultiInput';
 
 import '../app/_css/onboarding.scss';
+import { ZoomingCircleLoaderWithStyles } from '../app/_components/LoadingShimmer/PageLoader';
 
 const Onboarding = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [pageLoaded, setPageLoaded] = useState(false);
   const { socket, isConnected, sendMessage } = useSocket();
   const { userId, accessToken, instagramHandle } = router.query;
   const [businessId, setBusinessId] = useState(null)
@@ -27,16 +29,52 @@ const Onboarding = () => {
   const [aboutPageChoice, setAboutPageChoice] = useState<'happy' | 'custom' | null>('happy');
   const [servicesChoice, setServicesChoice] = useState<'happy' | 'custom' | null>('happy');
 
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(5);
+
   useEffect(() => {
+    let intervalId: any;
+
     if (socket) {
       sendMessage('text', 'Message from the client');
     }
 
+    const handleOnboarding = async (userId, accessToken) => {
+      try {
+          const params = new URLSearchParams({
+              userId: userId,
+              accessToken: accessToken,
+              primaryColor: primaryColor,
+              secondaryColor: secondaryColor,
+              keywords: JSON.stringify(keywords),
+          });
+        const response = await fetch(`/api/onboarding?${params.toString()}`);
+  
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Onboarding failed:', errorText);
+        } else {
+          const { data } = await response.json() as { data: any };
+          updateStates(data)
+
+          if (data.primaryColor && data.secondaryColor && data.keywords.length && data.serviceList.length) {
+            setPageLoaded(true);
+            clearInterval(intervalId);
+            console.log('Onboarding completed successfully');
+          }
+        }
+      } catch (error) {
+        console.error('Onboarding failed:', error);
+      }
+    };
+
     if (userId && accessToken) {
       handleOnboarding(userId, accessToken);
+      intervalId = setInterval(() => {
+        handleOnboarding(userId, accessToken);
+      }, 2000);
     }
   }, [socket, userId, accessToken]);
+
 
   const updateStates = (data: any)=>{
     setBusinessId(data.id)
@@ -46,35 +84,6 @@ const Onboarding = () => {
     setServiceList(data.serviceList.map(service => service.service) || []);
     setAboutPage(data.aboutPage || '')
   }
-
-  const handleOnboarding = async (userId, accessToken) => {
-    try {
-        const params = new URLSearchParams({
-            userId: userId,
-            accessToken: accessToken,
-            primaryColor: primaryColor,
-            secondaryColor: secondaryColor,
-            keywords: JSON.stringify(keywords),
-        });
-      const response = await fetch(`/api/onboarding?${params.toString()}`);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Onboarding failed:', errorText);
-      } else {
-        const { data } = await response.json() as { data: any };
-        updateStates(data)
-        console.log('Onboarding completed successfully');
-      }
-    } catch (error) {
-      console.error('Onboarding failed:', error);
-    }
-  };
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    handleOnboarding(userId, accessToken);
-  };
 
 
   const handleNextStep = () => {
@@ -131,6 +140,10 @@ const Onboarding = () => {
         <div className="form-container">
           {currentStep === 1 && (
             <>
+              {(primaryColor === '#fff' && secondaryColor === '#fff') ?
+              <ZoomingCircleLoaderWithStyles />
+              : null
+              }
               <h2 className="onboarding-title">Your Color Pallete</h2>
               {colorChoice === 'happy' ? (
                 <div className="color-prompt">
@@ -146,20 +159,23 @@ const Onboarding = () => {
                     </div>
                   </div>
                   <p>What do you think?</p>
-                  <div className="color-choice-buttons">
-                    <Button
-                      type="button"
-                      label="Happy with them"
-                      onClick={() => { handleNextStep(); }}
-                      appearance="primary"
-                    />
-                    <Button
-                      type="button"
-                      label="I'll pick my own"
-                      onClick={() => setColorChoice('custom')}
-                      appearance="secondary"
-                    />
-                  </div>
+                  {(primaryColor !== '#fff' && secondaryColor !== '#fff') ?
+                    <div className="color-choice-buttons">
+                      <Button
+                        type="button"
+                        label="Happy with them"
+                        onClick={() => { handleNextStep(); }}
+                        appearance="primary"
+                      />
+                      <Button
+                        type="button"
+                        label="I'll pick my own"
+                        onClick={() => setColorChoice('custom')}
+                        appearance="secondary"
+                      />
+                    </div>
+                  : null
+                  }
                 </div>
               )
               : (
@@ -187,6 +203,10 @@ const Onboarding = () => {
           )}
           {currentStep === 2 && (
             <>
+            {!keywords.length ?
+              <ZoomingCircleLoaderWithStyles />
+              : null
+              }
             <h2 className="onboarding-title">Your Keywords</h2>
             {keywordsChoice === 'happy' ? (
               <div className="color-prompt">
@@ -197,24 +217,28 @@ const Onboarding = () => {
                   ))}
                 </div>
                 <p>What do you think?</p>
-                <div className="color-choice-buttons">
-                  <Button
-                    type="button"
-                    label="Happy with them"
-                    onClick={() => { handleNextStep(); }}
-                    appearance="primary"
-                  />
-                  <Button
-                    type="button"
-                    label="I'll pick my own"
-                    onClick={() => setKeywordsChoice('custom')}
-                    appearance="secondary"
-                  />
-                </div>
+                {keywords.length ?
+                  <div className="color-choice-buttons">
+                    <Button
+                      type="button"
+                      label="Happy with them"
+                      onClick={() => { handleNextStep(); }}
+                      appearance="primary"
+                    />
+                    <Button
+                      type="button"
+                      label="I'll pick my own"
+                      onClick={() => setKeywordsChoice('custom')}
+                      appearance="secondary"
+                    />
+                  </div>
+                : null
+                }
+                
               </div>
             )
             : (
-            <form onSubmit={handleSubmit}>
+            <form>
               <MultiInput keywords={keywords} onChange={setKeywords} />
               <div className="button-group">
                 <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary" className="previous-button" />
@@ -226,6 +250,10 @@ const Onboarding = () => {
           )}
           {currentStep === 3 && ( 
             <>
+            {!aboutPage?
+              <ZoomingCircleLoaderWithStyles />
+              : null
+              }
             <h2 className="onboarding-title">About Your Business</h2>
             {aboutPageChoice === 'happy' ? (
               <div className="color-prompt">
@@ -239,24 +267,27 @@ const Onboarding = () => {
                     />
                 </div>
                 <p>What do you think of the generated about?</p>
-                <div className="color-choice-buttons">
-                  <Button
-                    type="button"
-                    label="Happy with them"
-                    onClick={() => { handleNextStep(); }}
-                    appearance="primary"
-                  />
-                  <Button
-                    type="button"
-                    label="I'll write my own"
-                    onClick={() => setAboutPageChoice('custom')}
-                    appearance="secondary"
-                  />
-                </div>
+                {aboutPage?
+                  <div className="color-choice-buttons">
+                    <Button
+                      type="button"
+                      label="Happy with them"
+                      onClick={() => { handleNextStep(); }}
+                      appearance="primary"
+                    />
+                    <Button
+                      type="button"
+                      label="I'll write my own"
+                      onClick={() => setAboutPageChoice('custom')}
+                      appearance="secondary"
+                    />
+                  </div>
+                : null
+                }
               </div>
             )
             : (
-            <form onSubmit={handleSubmit}>
+            <form>
               <div className="about-section"> 
                 <label htmlFor="about">Enter text below</label>
                 <textarea
@@ -278,6 +309,10 @@ const Onboarding = () => {
           )}
           {currentStep === 4 && (
             <>
+            {!serviceList.length ?
+              <ZoomingCircleLoaderWithStyles />
+              : null
+              }
             <h2 className="onboarding-title">Service Lists</h2>
             {servicesChoice === 'happy' ? (
               <div className="color-prompt">
@@ -288,24 +323,28 @@ const Onboarding = () => {
                   ))}
                 </div>
                 <p>What do you think?</p>
-                <div className="color-choice-buttons">
-                  <Button
-                    type="button"
-                    label="Happy with them"
-                    onClick={() => { handleNextStep(); }}
-                    appearance="primary"
-                  />
-                  <Button
-                    type="button"
-                    label="I'll write my own"
-                    onClick={() => setServicesChoice('custom')}
-                    appearance="secondary"
-                  />
-                </div>
+                {serviceList.length ?
+                  <div className="color-choice-buttons">
+                    <Button
+                      type="button"
+                      label="Happy with them"
+                      onClick={() => { handleNextStep(); }}
+                      appearance="primary"
+                    />
+                    <Button
+                      type="button"
+                      label="I'll write my own"
+                      onClick={() => setServicesChoice('custom')}
+                      appearance="secondary"
+                    />
+                  </div>
+                : null
+                }
+                
               </div>
             )
             : (
-            <form onSubmit={handleSubmit}>
+            <form>
               <MultiInput keywords={serviceList} onChange={setServiceList} />
               <div className="button-group">
                 <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary" className="previous-button" />
@@ -364,16 +403,21 @@ const Onboarding = () => {
                 </div>
                 <div className="button-group">
                     <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary" className="previous-button" />
-                    <Button type="button" label={loading ? "Generating..." : "Generate Site"} disabled={loading} appearance="primary" className="next-button" onClick={generateAboutPage} />
+                    <Button type="button" label={loading ? "Updating..." : "Update"} disabled={loading} appearance="primary" className="next-button" onClick={generateAboutPage} />
                 </div>
             </div>
           )}
           {currentStep === 6 && (
+            <>
+            {!pageLoaded ?
             <div className="color-prompt">
                 <h2 className="onboarding-title">Success</h2>
                 <p>Changes have been save successfully!</p>
                 <p>Your site is ready on <a href={siteUrl} target='_blank'>{siteUrl}</a></p>
             </div>
+          : null
+            }
+          </>
           )}
         </div>
       </div>

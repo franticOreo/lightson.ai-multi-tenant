@@ -98,11 +98,6 @@ const start = async (): Promise<void> => {
     payload.logger.info('Starting Next.js...')
     const io = initIO(httpServer)
 
-    io.on('connection', (socket) => {
-      console.log('user connected', socket.id);
-  
-    })
-
     httpServer.listen(PORT, async () => {
       payload.logger.info(`Next.js App URL: ${process.env.PAYLOAD_PUBLIC_SERVER_URL}`)
     })

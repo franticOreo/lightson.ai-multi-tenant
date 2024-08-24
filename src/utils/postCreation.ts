@@ -3,25 +3,25 @@ import { downloadImageToMemory, uploadImageToCollection, loginUser } from './ins
 import { makePostPrompt, createPostFields, understandImage } from './gpt';
 
 async function sendPostEntryDataToCollection(postEntryData: any, accessToken: string, client_instagram_handle: string) {
-    // we 
-    const protocol = process.env.APP_ENV === 'production' ? 'https' : 'http';
-    try {
-      const response = await axios({
-        method: 'post',
-        url: `${protocol}://${client_instagram_handle}.${process.env.PAYLOAD_PUBLIC_SERVER_BASE}/api/posts`, // Adjust this URL to your post creation endpoint
-        data: postEntryData,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`, // Ensure accessToken is passed correctly
-        },
-      });
+    // This will be worked on later
+    // const protocol = process.env.APP_ENV === 'production' ? 'https' : 'http';
+    // try {
+    //   const response = await axios({
+    //     method: 'post',
+    //     url: `${protocol}://${client_instagram_handle}.${process.env.PAYLOAD_PUBLIC_SERVER_BASE}/api/posts`, // Adjust this URL to your post creation endpoint
+    //     data: postEntryData,
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Authorization': `Bearer ${accessToken}`, // Ensure accessToken is passed correctly
+    //     },
+    //   });
   
-      console.log('Post created successfully:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error('Failed to create post:', error.response ? error.response.data : error.message);
-      throw error;
-    }
+    //   console.log('Post created successfully:', response.data);
+    //   return response.data;
+    // } catch (error) {
+    //   console.error('Failed to create post:', error.response ? error.response.data : error.message);
+    //   throw error;
+    // }
   }
   
   export async function createPostEntry(instagramHandle: string, userId: string, tenantId: string, payloadToken: string,
@@ -92,7 +92,7 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
             const postUnderstanding = await understandImage(imageUrl);
             postUnderstandings.push(postUnderstanding);
 
-            const blogPrompt = await makePostPrompt(postCaption, postUnderstanding, bioLanguageKwObj, clientServiceArea);
+            const blogPrompt = makePostPrompt(postCaption, postUnderstanding, bioLanguageKwObj, clientServiceArea);
             const postFields = await createPostFields(blogPrompt);
 
             const postEntryData = await createPostEntry(instagramHandle, userId, tenantId, payloadToken, post, postFields);
@@ -103,9 +103,18 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
         }
     }));
 
-    const responses = await Promise.all(postEntriesData.filter(postEntry => postEntry !== null).map(async (postEntryData) => {
-        return sendPostEntryDataToCollection(postEntryData, payloadToken, instagramHandle);
-    }));
+    let responses: any = [] 
+
+    // This will be worked on later
+
+    // try {
+      
+    //   responses = await Promise.all(postEntriesData.filter(postEntry => postEntry !== null).map(async (postEntryData) => {
+    //       return sendPostEntryDataToCollection(postEntryData, payloadToken, instagramHandle);
+    //   }));
+    // } catch (error) {
+    //   throw error
+    // }
 
     return {
         postUnderstandings,

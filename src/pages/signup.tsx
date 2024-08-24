@@ -37,7 +37,7 @@ const SignupForm: React.FC = () =>  {
                 setError('An error occurred during signup: ' + errorText);
             } else {
                 const data = await response.json();
-                console.log('Signup successful:', data);
+
                 const { userId, accessToken, instagramHandle } = data;
                 router.push(`/onboarding?userId=${userId}&instagramHandle=${instagramHandle}&accessToken=${accessToken}`);
             }
