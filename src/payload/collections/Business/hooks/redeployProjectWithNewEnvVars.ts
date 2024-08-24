@@ -6,10 +6,15 @@ import isEqual from 'lodash/isEqual';
  * @param {Object} param0.doc - The current document.
  * @param {Object} param0.previousDoc - The previous document.
  */
-export async function redeployProjectWithNewEnvVars({ doc, previousDoc }) {
+export async function redeployProjectWithNewEnvVars({ doc, previousDoc, req }) {
   const fieldsToWatch = ['businessName', 'aboutPage', 'businessAddress',
     'serviceArea', 'phoneNumber', 'operatingHours', 'primaryColor', 'secondaryColor', 'serviceList'];
   const newEnvVars = [];
+
+  if (req?.isSignupOrOnboarding) {
+    console.log('Skipping redeployment (redeployProjectWithNewEnvVars) due to onboarding flow. ');
+    return;
+  }
 
   for (const field of fieldsToWatch) {
     if (!isEqual(doc[field], previousDoc[field])) {

@@ -29,8 +29,15 @@ app.get('/', (req, res) => {
 
 
 // signup user to our CMS and input their form details into the business collection.
-app.post('/api/signup', signUpRoute)
-app.get('/api/onboarding', onBoardingRoute)
+app.post('/api/signup', (req, res) => {
+  req.isSignupOrOnboarding = true;
+  signUpRoute(req, res);
+});
+
+app.post('/api/onboarding', (req, res) => {
+  req.isSignupOrOnboarding = true;
+  regenerateAboutPage(req, res);
+});
 app.post('/api/onboarding', regenerateAboutPage)
 
 
