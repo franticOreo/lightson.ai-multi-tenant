@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Input } from '../app/_components/Input'; 
 import { Gutter } from '../app/_components/Gutter';
@@ -50,7 +49,7 @@ const SignupForm: React.FC = () =>  {
 
     return (
         <Gutter>
-            <div className="card ">
+            <div className="card">
                 <div className="form-container">
                     <h1 className='unbounded'>lightson.ai</h1><br />
                     <h2 className='unbounded'>Generate a Website Using Your Content </h2>
@@ -58,7 +57,7 @@ const SignupForm: React.FC = () =>  {
                         <Input name="instagramHandle" label="Instagram Handle" required register={register} error={errors.instagramHandle} type="text" />
                         <Input name="email" label="Email" required register={register} error={errors.email} type="email" />
                         {/* <Input name="password" label="Password" required register={register} error={errors.password} type="password" /> */}
-                        <Button type="submit" label={loading ? 'Generating...' : 'Generate Site'} disabled={loading} appearance="primary" className="button mt-40" />
+                        <Button type="submit" label={loading ? 'Generating...' : 'Generate Site'} disabled={loading} appearance="positive" className="button mt-40" />
                     </form>
                 </div>
             </div>

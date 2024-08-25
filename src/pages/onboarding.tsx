@@ -29,7 +29,7 @@ const Onboarding = () => {
   const [aboutPageChoice, setAboutPageChoice] = useState<'happy' | 'custom' | null>('happy');
   const [servicesChoice, setServicesChoice] = useState<'happy' | 'custom' | null>('happy');
 
-  const [currentStep, setCurrentStep] = useState(5);
+  const [currentStep, setCurrentStep] = useState(1);
 
   useEffect(() => {
     let intervalId: any;
@@ -133,7 +133,6 @@ const Onboarding = () => {
     } finally {
         setLoading(false);}
   }
-
   return (
     <Gutter>
       <div className="onboarding-card">
@@ -144,10 +143,9 @@ const Onboarding = () => {
               <ZoomingCircleLoaderWithStyles />
               : null
               }
-              <h2 className="onboarding-title">Your Color Pallete</h2>
+              <h2 className="onboarding-title">We've picked you out some theme colours</h2>
               {colorChoice === 'happy' ? (
                 <div className="color-prompt">
-                  <p>We've looked at your profile and have picked these colors:</p>
                   <div className="color-preview-container">
                     <div className='color-item'>
                         <div className="color-preview" style={{ backgroundColor: primaryColor }}></div>
@@ -158,14 +156,13 @@ const Onboarding = () => {
                         <span>Secondary Color</span>
                     </div>
                   </div>
-                  <p>What do you think?</p>
                   {(primaryColor !== '#fff' && secondaryColor !== '#fff') ?
                     <div className="color-choice-buttons">
                       <Button
                         type="button"
                         label="Happy with them"
                         onClick={() => { handleNextStep(); }}
-                        appearance="primary"
+                        appearance="positive"
                       />
                       <Button
                         type="button"
@@ -183,14 +180,14 @@ const Onboarding = () => {
                     <div className="color-picker-container">
                         <div>
                         <label className="color-label">
-                            Primary Color:
+                            Primary
                             <div className="color-preview" style={{ backgroundColor: primaryColor }}></div>
                         </label>
                         <ChromePicker color={primaryColor} onChange={updatedColor => setPrimaryColor(updatedColor.hex)} />
                         </div>
                         <div>
                         <label className="color-label">
-                            Secondary Color:
+                            Secondary
                             <div className="color-preview" style={{ backgroundColor: secondaryColor }}></div>
                         </label>
                         <ChromePicker color={secondaryColor} onChange={updatedColor => setSecondaryColor(updatedColor.hex)} />
@@ -207,10 +204,10 @@ const Onboarding = () => {
               <ZoomingCircleLoaderWithStyles />
               : null
               }
-            <h2 className="onboarding-title">Your Keywords</h2>
+            <h2 className="onboarding-title">Keywords</h2>
             {keywordsChoice === 'happy' ? (
               <div className="color-prompt">
-                <p>We have selected out these keywords for your content</p>
+                <p>We want people to be able to find your site. We have selected out some keywords. We will try to use these in your content.</p>
                 <div className='keywords-container'>
                   {keywords.map((keyword, index) => (
                     <InputItem key={index} name={keyword} disabled={true}/>
@@ -223,7 +220,7 @@ const Onboarding = () => {
                       type="button"
                       label="Happy with them"
                       onClick={() => { handleNextStep(); }}
-                      appearance="primary"
+                      appearance="positive"
                     />
                     <Button
                       type="button"
@@ -241,8 +238,8 @@ const Onboarding = () => {
             <form>
               <MultiInput keywords={keywords} onChange={setKeywords} />
               <div className="button-group">
-                <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary" className="previous-button" />
-                <Button type="button" label="Next" appearance="primary" className="next-button" onClick={handleNextStep}/>
+                <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary" />
+                <Button type="button" label="Next" appearance="neutral" onClick={handleNextStep}/>
               </div>
             </form>
             )}
@@ -255,6 +252,7 @@ const Onboarding = () => {
               : null
               }
             <h2 className="onboarding-title">About Your Business</h2>
+            <p>We have generated an introduction for your site, have a look and see if you like it.</p>
             {aboutPageChoice === 'happy' ? (
               <div className="color-prompt">
                 <div className="about-section"> 
@@ -266,14 +264,14 @@ const Onboarding = () => {
                     disabled
                     />
                 </div>
-                <p>What do you think of the generated about?</p>
+                <p></p>
                 {aboutPage?
                   <div className="color-choice-buttons">
                     <Button
                       type="button"
                       label="Happy with them"
                       onClick={() => { handleNextStep(); }}
-                      appearance="primary"
+                      appearance="positive"
                     />
                     <Button
                       type="button"
@@ -300,8 +298,8 @@ const Onboarding = () => {
                 />
               </div>
               <div className="button-group">
-                <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary" className="previous-button" />
-                <Button type="button" label="Next" appearance="primary" className="next-button" onClick={handleNextStep}/>
+                <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary"/>
+                <Button type="button" label="Next" appearance="neutral" onClick={handleNextStep}/>
               </div>
             </form>
             )}
@@ -313,10 +311,10 @@ const Onboarding = () => {
               <ZoomingCircleLoaderWithStyles />
               : null
               }
-            <h2 className="onboarding-title">Service Lists</h2>
+            <h2 className="onboarding-title">Services you provide</h2>
             {servicesChoice === 'happy' ? (
               <div className="color-prompt">
-                <p>We have generated some service lists for your content</p>
+                <p>We've picked out services you provide, have a look and see if they are correct.</p>
                 <div className='keywords-container'>
                   {serviceList.map((service, index) => (
                     <InputItem key={index} name={service} disabled={true}/>
@@ -329,7 +327,7 @@ const Onboarding = () => {
                       type="button"
                       label="Happy with them"
                       onClick={() => { handleNextStep(); }}
-                      appearance="primary"
+                      appearance="positive"
                     />
                     <Button
                       type="button"
@@ -347,8 +345,8 @@ const Onboarding = () => {
             <form>
               <MultiInput keywords={serviceList} onChange={setServiceList} />
               <div className="button-group">
-                <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary" className="previous-button" />
-                <Button type="button" label="Next" appearance="primary" className="next-button" onClick={handleNextStep}/>
+                <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary"/>
+                <Button type="button" label="Next" appearance="neutral" onClick={handleNextStep}/>
               </div>
             </form>
             )}
@@ -381,7 +379,7 @@ const Onboarding = () => {
                 </div>
                 <hr />
                 <div>
-                    <strong>Service Lists</strong>
+                    <strong>Services</strong>
                     <div className='keywords-container'>
                         {serviceList.map((service, index) => (
                             <InputItem key={index} name={service} disabled={true}/>
@@ -402,22 +400,23 @@ const Onboarding = () => {
                     </div>
                 </div>
                 <div className="button-group">
-                    <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary" className="previous-button" />
-                    <Button type="button" label={loading ? "Updating..." : "Update"} disabled={loading} appearance="primary" className="next-button" onClick={generateAboutPage} />
+                    <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary"/>
+                    <Button type="button" label={loading ? "Updating..." : "Update"} disabled={loading} appearance="neutral" onClick={generateAboutPage} />
                 </div>
             </div>
           )}
           {currentStep === 6 && (
             <>
-            {!pageLoaded ?
+            {!siteUrl ?
+              <ZoomingCircleLoaderWithStyles />
+              : null
+              }
             <div className="color-prompt">
                 <h2 className="onboarding-title">Success</h2>
                 <p>Changes have been save successfully!</p>
                 <p>Your site is ready on <a href={siteUrl} target='_blank'>{siteUrl}</a></p>
             </div>
-          : null
-            }
-          </>
+            </>
           )}
         </div>
       </div>
