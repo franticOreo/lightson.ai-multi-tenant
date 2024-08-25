@@ -3,9 +3,11 @@
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 30px;
+  padding-bottom: var(--space-40);
 }
 
 .onboarding-title {
+  font-family: 'Unbounded', sans-serif;
   text-align: center;
   font-size: 24px;
   margin-bottom: 20px;
@@ -66,19 +68,20 @@ form {
   margin-block-start: 20px;
 }
 
-.next-button {
-  display: flex;
-  align-self: center;
-}
+// .next-button {
+//   display: flex;
+//   align-self: center;
+// }
 
 .button-group {
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
 }
 
 .color-prompt {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 60px;
 }
 
 .prompt-header {
@@ -126,7 +129,8 @@ form {
 
 .color-choice-buttons {
   display: flex;
-  justify-content: center;
+  flex-direction: column; // Stack buttons vertically
+  gap: 10px; // Add gap between buttons
 }
 
 .choice-button {

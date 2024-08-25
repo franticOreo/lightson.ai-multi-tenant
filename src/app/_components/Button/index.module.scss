@@ -1,23 +1,19 @@
 @import '../../_css/type.scss';
 
 .button {
-  border: 3px solid rgb(0, 0, 0);
+  border: 2px solid rgb(0, 0, 0);
+  border-radius: 10px;
   cursor: pointer;
   display: inline-flex;
   justify-content: center;
   background-color: transparent;
   text-decoration: none;
   display: inline-flex;
-  padding: 24px 48px;
+  padding: 24px 6px;
   font-family: inherit;
   line-height: inherit;
   font-size: inherit;
   box-shadow: 2px 2px 0px rgb(0, 0, 0);
-
-  &:hover {
-  background-color: #ff9500;
-  box-shadow: 0.3s;
-  }
 }
 
 .signup-button {
@@ -40,7 +36,7 @@
 }
 
 .label {
-  @extend %label;
+  // @extend %label;
   font-size: 1.5rem;
   color:rgb(0, 0, 0);
   text-align: center;
@@ -51,11 +47,41 @@
 .appearance--primary {
   background-color: orange;
   color: #fff;
+
+  &:hover {
+    background-color: #ff9500;
+    box-shadow: 0.3s;
+    }
+}
+
+.appearance--positive {
+  background-color: rgb(141, 255, 141);
+  color: #fff;
+
+  &:hover {
+    background-color: rgb(77, 249, 77);
+    box-shadow: 0.3s;
+    }
+}
+
+.appearance--neutral {
+  background-color: rgb(145, 141, 255);
+  color: #fff;
+
+  &:hover {
+    background-color: rgb(97, 77, 249);
+    box-shadow: 0.3s;
+    }
 }
 
 .appearance--secondary {
   background-color: transparent;
   box-shadow: inset 0 0 0 1px var(--theme-elevation-1000);
+
+  &:hover {
+    background-color: rgb(202, 202, 202);
+    box-shadow: 0.3s;
+    }
 }
 
 .primary--invert {

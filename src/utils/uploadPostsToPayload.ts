@@ -76,7 +76,7 @@ export async function updateCollection(collectionName: string, documentId: strin
   console.log(`Updating ${collectionName} document:`, documentId, newData);
   try {
     const updatedDocument = await payload.update({
-      collection: collectionName,
+      collection: collectionName as 'business' | 'users' | 'tenants' | 'posts' | 'media' | 'waitlists' | 'instagramProfiles' | 'payload-preferences' | 'payload-migrations',
       where: {
         id: {
           equals: documentId
@@ -237,10 +237,8 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
     console.log('added about page and service list to business details')
 
     /// Using instagram data, transforms it with GPT and pushes the data to Payload cms
-
     const domainUrl = await startDeployment(payloadUserId, instagramHandle, aboutPageServices, updatedBusinessDetailsAgain);
     console.log('domainUrl', domainUrl)
-    
 
   } catch (error) {
     console.error('Error in uploadInitialPostsToPayload:', error);
