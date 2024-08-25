@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import setupProjectAndDeploy from './gitHub';
 import { generateAboutPage } from './gpt';
-import { prepareEnvVariables } from './vercel';
+import getVercelProjectUrlWhenReady from './vercel';
 
 dotenv.config({
   path: path.resolve(__dirname, '../../.env'),
@@ -184,7 +184,7 @@ export const getEnvVariables = (userId, instagramHandle, aboutPageServices, busi
   ];
 }
 
-export const startDeployment = async (userId: string, instagramHandle: string, aboutPageServices: any, businessDetails: any) => {
+export const startDeployment = async (userId: string, instagramHandle: string, aboutPageServices: any, businessDetails: any): Promise<string | void> => {
   // We create .env file. This .env file is created for a next.js project. This project is a branch of a template website I have created (lightson_template)
   const envVariables = getEnvVariables(userId, instagramHandle, aboutPageServices, businessDetails)
 
@@ -194,26 +194,28 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
   // setup vercel project using a branch of the main branch from lightson_template
   const projectDeploymentResponse = await setupProjectAndDeploy(branchName, projectName, envVariables)
 
-  // format for domain url for project is: branchName-projectName.vercel.app
-  const domainUrl = `${branchName}.vercel.app`;
-
   // Only set deployment data to business collection if running in production.
   if (process.env.APP_ENV === 'production') {
-    console.log('TEST: projectDeploymentResponse.project.id', projectDeploymentResponse.project.id)
+
     const deploymentData = {
       vercelProjectId: projectDeploymentResponse.project.id,
       projectDeploymentURL: projectDeploymentResponse.url,
-      projectDomainURL: domainUrl
+      projectDomainURL: 'TODO'
     } 
-
     // update business details with projectDeploymentURL
     const updatedDeploymentDetails = await updateBusinessDetails(businessDetails.id, deploymentData)
-  }
 
-  return domainUrl;
+    const projectId = projectDeploymentResponse.project.id;
+    const projectUrl = await getVercelProjectUrlWhenReady(projectId)
+
+    return `${projectDeploymentResponse.name}-elis-projects-202fc330.vercel.app`;
+    }
+
+  return 'Project Not Deployed: Currently in local development mode.'
 }
 
-export default async function uploadInitialPostsToPayload(payloadUserId: string, instagramHandle: string, nPosts: number, accessToken: string): Promise<void> {
+
+export default async function uploadInitialPostsToPayload(payloadUserId: string, instagramHandle: string, nPosts: number, accessToken: string): Promise<string | void> {
   try {
     
     const result: any = await getBusinessDetailsByUserId(payloadUserId);
@@ -237,8 +239,11 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
     console.log('added about page and service list to business details')
 
     /// Using instagram data, transforms it with GPT and pushes the data to Payload cms
-    const domainUrl = await startDeployment(payloadUserId, instagramHandle, aboutPageServices, updatedBusinessDetailsAgain);
-    console.log('domainUrl', domainUrl)
+    const projectUrl = await startDeployment(payloadUserId, instagramHandle, aboutPageServices, updatedBusinessDetailsAgain);
+
+
+    return projectUrl;
+    
 
   } catch (error) {
     console.error('Error in uploadInitialPostsToPayload:', error);
