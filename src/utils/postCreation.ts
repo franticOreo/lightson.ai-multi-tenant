@@ -105,16 +105,14 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
 
     let responses: any = [] 
 
-    // This will be worked on later
-
-    // try {
+    try {
       
-    //   responses = await Promise.all(postEntriesData.filter(postEntry => postEntry !== null).map(async (postEntryData) => {
-    //       return sendPostEntryDataToCollection(postEntryData, payloadToken, instagramHandle);
-    //   }));
-    // } catch (error) {
-    //   throw error
-    // }
+      responses = await Promise.all(postEntriesData.filter(postEntry => postEntry !== null).map(async (postEntryData) => {
+          return sendPostEntryDataToCollection(postEntryData, payloadToken, instagramHandle);
+      }));
+    } catch (error) {
+      throw error
+    }
 
     return {
         postUnderstandings,

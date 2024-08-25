@@ -31,9 +31,6 @@ export async function signUpRoute(req, res) {
       console.log('Login Response', loginResponse)
       const accessToken = loginResponse.token
 
-      // createdUser.accessToken = accessToken
-      // createdUser.instagramHandle = sanitizedInstagramHandle
-
       const businessDetails = {
           userId,
           instagramHandle: sanitizedInstagramHandle,
