@@ -28,44 +28,43 @@ const Onboarding = () => {
   const [keywordsChoice, setKeywordsChoice] = useState<'happy' | 'custom' | null>('happy');
   const [aboutPageChoice, setAboutPageChoice] = useState<'happy' | 'custom' | null>('happy');
   const [servicesChoice, setServicesChoice] = useState<'happy' | 'custom' | null>('happy');
-
   const [currentStep, setCurrentStep] = useState(1);
 
-  useEffect(() => {
-    let intervalId: any;
+  let intervalId: any;
 
+  const handleOnboarding = async (userId, accessToken) => {
+    try {
+        const params = new URLSearchParams({
+            userId: userId,
+            accessToken: accessToken,
+            primaryColor: primaryColor,
+            secondaryColor: secondaryColor,
+            keywords: JSON.stringify(keywords),
+        });
+      const response = await fetch(`/api/onboarding?${params.toString()}`);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Onboarding failed:', errorText);
+      } else {
+        const { data } = await response.json() as { data: any };
+        updateStates(data)
+
+        if (data.primaryColor && data.secondaryColor && data.keywords.length && data.serviceList.length) {
+          setPageLoaded(true);
+          clearInterval(intervalId);
+          console.log('Onboarding completed successfully');
+        }
+      }
+    } catch (error) {
+      console.error('Onboarding failed:', error);
+    }
+  };
+
+  useEffect(() => {
     if (socket) {
       sendMessage('text', 'Message from the client');
     }
-
-    const handleOnboarding = async (userId, accessToken) => {
-      try {
-          const params = new URLSearchParams({
-              userId: userId,
-              accessToken: accessToken,
-              primaryColor: primaryColor,
-              secondaryColor: secondaryColor,
-              keywords: JSON.stringify(keywords),
-          });
-        const response = await fetch(`/api/onboarding?${params.toString()}`);
-  
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Onboarding failed:', errorText);
-        } else {
-          const { data } = await response.json() as { data: any };
-          updateStates(data)
-
-          if (data.primaryColor && data.secondaryColor && data.keywords.length && data.serviceList.length) {
-            setPageLoaded(true);
-            clearInterval(intervalId);
-            console.log('Onboarding completed successfully');
-          }
-        }
-      } catch (error) {
-        console.error('Onboarding failed:', error);
-      }
-    };
 
     if (userId && accessToken) {
       handleOnboarding(userId, accessToken);
@@ -407,15 +406,17 @@ const Onboarding = () => {
           )}
           {currentStep === 6 && (
             <>
-            {!siteUrl ?
-              <ZoomingCircleLoaderWithStyles />
-              : null
-              }
-            <div className="color-prompt">
-                <h2 className="onboarding-title">Success</h2>
-                <p>Changes have been save successfully!</p>
-                <p>Your site is ready on <a href={siteUrl} target='_blank'>{siteUrl}</a></p>
-            </div>
+              {!pageLoaded ? (
+                <ZoomingCircleLoaderWithStyles />
+              ) : (
+                <div className="color-prompt">
+                  <h2 className="onboarding-title">Success</h2>
+                  <p>Changes have been saved successfully!</p>
+                  <p>Your site is ready on 
+                    <a href={`https://${siteUrl}`} target='_blank'>{siteUrl}</a>
+                  </p>
+                </div>
+              )}
             </>
           )}
         </div>

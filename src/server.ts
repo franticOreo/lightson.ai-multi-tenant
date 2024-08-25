@@ -34,10 +34,11 @@ app.post('/api/signup', (req, res) => {
   signUpRoute(req, res);
 });
 
-app.post('/api/onboarding', (req, res) => {
+app.get('/api/onboarding', (req, res) => {
   req.isSignupOrOnboarding = true;
-  regenerateAboutPage(req, res);
+  onBoardingRoute(req, res);
 });
+
 app.post('/api/onboarding', regenerateAboutPage)
 
 
