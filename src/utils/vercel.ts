@@ -203,7 +203,7 @@ export const payloadFieldToEnvVarMap = {
     };
   
     while (true) {
-      const response = await fetch(`https://api.vercel.com/v9/projects/deployments?projectId=${projectId}`, { headers });
+      const response = await fetch(`https://api.vercel.com/v9/projects?projectId=${projectId}`, { headers });
       const data = await response.json();
   
       if (!response.ok) {
