@@ -118,15 +118,14 @@ export const regenerateAboutPage = async(req, res)=>{
 
         console.log('added about page and service list to business details')
 
-        const domainUrl = await startDeployment(userId, instagramHandle, aboutPageServices, updatedBusinessDetailsAgain);
-        console.log('domainUrl', domainUrl)
-
-        updatedBusiness.domainUrl = domainUrl
+        const businessDetailsWithDeployment = await startDeployment(userId, instagramHandle, aboutPageServices, updatedBusinessDetailsAgain);
+        console.log('businessDetailsWithDeployment', businessDetailsWithDeployment)
         
-        res.status(200).send({ message: 'Onboarding completed successfully', data: updatedBusiness });
+        res.status(200).send({ message: 'Onboarding completed successfully', data: businessDetailsWithDeployment });
 
     } catch (error) {
         console.error('Onboarding error:', error);
+
         res.status(500).send({ error: 'Onboarding failed' });
     }
 }

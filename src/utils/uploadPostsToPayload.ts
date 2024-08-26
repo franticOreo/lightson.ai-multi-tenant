@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import setupProjectAndDeploy from './gitHub';
 import { generateAboutPage } from './gpt';
-import getVercelProjectUrlWhenReady from './vercel';
+import { getProjectProductionURL } from './vercel';
 
 dotenv.config({
   path: path.resolve(__dirname, '../../.env'),
@@ -184,7 +184,7 @@ export const getEnvVariables = (userId, instagramHandle, aboutPageServices, busi
   ];
 }
 
-export const startDeployment = async (userId: string, instagramHandle: string, aboutPageServices: any, businessDetails: any): Promise<string | void> => {
+export const startDeployment = async (userId: string, instagramHandle: string, aboutPageServices: any, businessDetails: any): Promise<any | void> => {
   // We create .env file. This .env file is created for a next.js project. This project is a branch of a template website I have created (lightson_template)
   const envVariables = getEnvVariables(userId, instagramHandle, aboutPageServices, businessDetails)
 
@@ -197,18 +197,19 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
   // Only set deployment data to business collection if running in production.
   if (process.env.APP_ENV === 'production') {
 
+    const projectId = projectDeploymentResponse.project.id;
+    const productionURL = await getProjectProductionURL(projectId)
+
     const deploymentData = {
       vercelProjectId: projectDeploymentResponse.project.id,
-      projectDeploymentURL: projectDeploymentResponse.url,
-      projectDomainURL: 'TODO'
+      vercelProductionURL: productionURL
     } 
     // update business details with projectDeploymentURL
-    const updatedDeploymentDetails = await updateBusinessDetails(businessDetails.id, deploymentData)
+    const businessDetailsWithDeployment = await updateBusinessDetails(businessDetails.id, deploymentData)
 
-    const projectId = projectDeploymentResponse.project.id;
-    const projectUrl = await getVercelProjectUrlWhenReady(projectId)
-
-    return `${projectDeploymentResponse.name}-elis-projects-202fc330.vercel.app`;
+    if (productionURL) {
+      return businessDetailsWithDeployment;
+    }
     }
 
   return 'Project Not Deployed: Currently in local development mode.'
@@ -240,7 +241,6 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
 
     /// Using instagram data, transforms it with GPT and pushes the data to Payload cms
     const projectUrl = await startDeployment(payloadUserId, instagramHandle, aboutPageServices, updatedBusinessDetailsAgain);
-
 
     return projectUrl;
     

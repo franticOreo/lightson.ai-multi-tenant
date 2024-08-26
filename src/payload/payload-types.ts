@@ -131,9 +131,15 @@ export interface Business {
   userId: string | User;
   primaryColor?: string | null;
   secondaryColor?: string | null;
-  projectDeploymentURL?: string | null;
-  projectDomainURL?: string | null;
+  vercelProductionURL?: string | null;
   vercelProjectId?: string | null;
+  aboutPage?: string | null;
+  serviceList?:
+    | {
+        service?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   tenant?: (string | null) | Tenant;
   updatedAt: string;
   createdAt: string;

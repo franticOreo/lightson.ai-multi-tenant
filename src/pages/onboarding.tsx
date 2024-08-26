@@ -138,62 +138,67 @@ const Onboarding = () => {
         <div className="form-container">
           {currentStep === 1 && (
             <>
-              {(primaryColor === '#fff' && secondaryColor === '#fff') ?
-              <ZoomingCircleLoaderWithStyles />
-              : null
-              }
-              <h2 className="onboarding-title">We've picked you out some theme colours</h2>
-              {colorChoice === 'happy' ? (
-                <div className="color-prompt">
-                  <div className="color-preview-container">
-                    <div className='color-item'>
-                        <div className="color-preview" style={{ backgroundColor: primaryColor }}></div>
-                        <span>Primary Color</span>
-                    </div>
-                    <div className='color-item'>
-                        <div className="color-preview" style={{ backgroundColor: secondaryColor }}></div>
-                        <span>Secondary Color</span>
-                    </div>
-                  </div>
-                  {(primaryColor !== '#fff' && secondaryColor !== '#fff') ?
-                    <div className="color-choice-buttons">
-                      <Button
-                        type="button"
-                        label="Happy with them"
-                        onClick={() => { handleNextStep(); }}
-                        appearance="positive"
-                      />
-                      <Button
-                        type="button"
-                        label="I'll pick my own"
-                        onClick={() => setColorChoice('custom')}
-                        appearance="secondary"
-                      />
-                    </div>
-                  : null
-                  }
-                </div>
-              )
-              : (
-                <form>
-                    <div className="color-picker-container">
-                        <div>
-                        <label className="color-label">
-                            Primary
+              {(primaryColor === '#fff' && secondaryColor === '#fff') ? (
+                <>
+                  <ZoomingCircleLoaderWithStyles />
+                  <p>We are scoping out your profile to suggest some colours...</p>
+                </>
+              ) : (
+                <>
+                  <h2 className="onboarding-title">Cool, this is what we picked, what do you think?</h2>
+                  {colorChoice === 'happy' ? (
+                    <div className="color-prompt">
+                      <div className="color-preview-container">
+                        <div className='color-item'>
                             <div className="color-preview" style={{ backgroundColor: primaryColor }}></div>
-                        </label>
-                        <ChromePicker color={primaryColor} onChange={updatedColor => setPrimaryColor(updatedColor.hex)} />
+                            <span>Primary Color</span>
                         </div>
-                        <div>
-                        <label className="color-label">
-                            Secondary
+                        <div className='color-item'>
                             <div className="color-preview" style={{ backgroundColor: secondaryColor }}></div>
-                        </label>
-                        <ChromePicker color={secondaryColor} onChange={updatedColor => setSecondaryColor(updatedColor.hex)} />
+                            <span>Secondary Color</span>
                         </div>
+                      </div>
+                      {(primaryColor !== '#fff' && secondaryColor !== '#fff') ?
+                        <div className="color-choice-buttons">
+                          <Button
+                            type="button"
+                            label="Happy with them"
+                            onClick={() => { handleNextStep(); }}
+                            appearance="positive"
+                          />
+                          <Button
+                            type="button"
+                            label="I'll pick my own"
+                            onClick={() => setColorChoice('custom')}
+                            appearance="secondary"
+                          />
+                        </div>
+                      : null
+                      }
                     </div>
-                    <Button type="button" label="Next" appearance="primary" className="next-button" onClick={handleNextStep}/>
-                </form>
+                  )
+                  : (
+                    <form>
+                        <div className="color-picker-container">
+                            <div>
+                            <label className="color-label">
+                                Primary
+                                <div className="color-preview" style={{ backgroundColor: primaryColor }}></div>
+                            </label>
+                            <ChromePicker color={primaryColor} onChange={updatedColor => setPrimaryColor(updatedColor.hex)} />
+                            </div>
+                            <div>
+                            <label className="color-label">
+                                Secondary
+                                <div className="color-preview" style={{ backgroundColor: secondaryColor }}></div>
+                            </label>
+                            <ChromePicker color={secondaryColor} onChange={updatedColor => setSecondaryColor(updatedColor.hex)} />
+                            </div>
+                        </div>
+                        <Button type="button" label="Next" appearance="primary" className="next-button" onClick={handleNextStep}/>
+                    </form>
+                  )}
+                </>
               )}
             </>
           )}

@@ -196,29 +196,26 @@ export const payloadFieldToEnvVarMap = {
     console.log('Environment variables updated successfully');
   }
 
-  async function getVercelProjectUrlWhenReady(projectId: string, states: string[] = ['BUILDING', 'READY']): Promise<string> {
+export async function getProjectProductionURL(projectId: string): Promise<string> {
     const headers = {
       'Authorization': `Bearer ${process.env.VERCEL_TOKEN}`,
       'Content-Type': 'application/json'
     };
   
-    while (true) {
-      const response = await fetch(`https://api.vercel.com/v9/projects?projectId=${projectId}`, { headers });
-      const data = await response.json();
+    const response = await fetch(`https://api.vercel.com/v9/projects/${projectId}/deployments`, { headers });
+    const data = await response.json();
   
-      if (!response.ok) {
-        throw new Error(`Error fetching deployments: ${data.error.message}`);
-      }
-  
-      const deployment = data.deployments.find((deployment: any) => states.includes(deployment.state));
-  
-      if (deployment) {
-        return deployment.url;
-      }
-  
-      // Wait for a few seconds before polling again
-      await new Promise(resolve => setTimeout(resolve, 5000));
+    if (!response.ok) {
+      throw new Error(`Error fetching deployments: ${data.error.message}`);
     }
+  
+    const productionDeployment = data.latestDeployments.find((deployment: any) => deployment.target === 'production' && deployment.readyState === 'READY');
+  
+    if (!productionDeployment) {
+      throw new Error('No production deployment found');
+    }
+  
+    return productionDeployment.url;
   }
   
   export default getVercelProjectUrlWhenReady;

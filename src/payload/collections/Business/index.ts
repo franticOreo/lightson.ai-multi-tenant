@@ -132,17 +132,8 @@ export const Business: CollectionConfig = {
       required: false,
     },
     {
-      label: "Project Deployment URL",
-      name: "projectDeploymentURL",
-      type: "text",
-      required: false,
-      admin: {
-        hidden: true, // Hide this field
-      },
-    },
-    {
-      label: "Project Domain URL",
-      name: "projectDomainURL",
+      label: "Vercel Production URL",
+      name: "vercelProductionURL",
       type: "text",
       required: false,
       admin: {
