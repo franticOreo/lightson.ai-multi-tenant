@@ -1,123 +1,18 @@
 import { getInstagramPosts } from './instagramFunctions'; 
 import { generateRemainingBusinessDetails } from './createBusinessDetails';
 import { postsCreationPipeline } from './postCreation';
-import { createTenant, assignTenantToUser } from './tenantUserManagement';
-import payload from 'payload';
 import dotenv from 'dotenv';
 import path from 'path';
 import setupProjectAndDeploy from './gitHub';
 import { generateAboutPage } from './gpt';
 import { getProjectProductionURL } from './vercel';
+import { updateBusinessDetails, getBusinessDetailsByUserId, handleTenantCreation } from './payload';
 
 dotenv.config({
   path: path.resolve(__dirname, '../../.env'),
 });
 
-const PAYLOAD_SECRET = process.env.PAYLOAD_SECRET as string;
-
-
-// create function to get user entry from user collection by user id
-async function getUserByUserId(userId: string) {
-  try {
-    const result = await payload.find({
-      collection: 'users',
-      where: {
-        id: {
-          equals: userId
-        }
-      },
-      limit: 1 // Assuming there's only one business per user
-    });
-    return result;
-  } catch (error) {
-    console.error('Error fetching user details:', error);
-    throw error;
-  }
-}
-
-
-async function getInstagramProfileByUserId(payloadUserId: string) {
-  try {
-    const result = await payload.find({
-      collection: 'instagramProfiles',
-      where: {
-        'payloadUserId': { // Assuming the relationship field is named 'user'
-          equals: payloadUserId
-        }
-      },
-      depth: 1 // Adjust depth as needed to fetch related documents
-    });
-    return result;
-  } catch (error) {
-    console.error('Error fetching user details:', error);
-    throw error;
-  }
-}
-
-async function getBusinessDetailsByUserId(payloadUserId: string) {
-  try {
-    const result = await payload.find({
-      collection: 'business',
-      where: {
-        'userId': { // Assuming the relationship field is named 'user'
-          equals: payloadUserId
-        }
-      },
-      depth: 1 // Adjust depth as needed to fetch related documents
-    });
-    return result;
-  } catch (error) {
-    console.error('Error fetching user details:', error);
-    throw error;
-  }
-}
-
-export async function updateCollection(collectionName: string, documentId: string, newData: any) {
-  console.log(`Updating ${collectionName} document:`, documentId, newData);
-  try {
-    const updatedDocument = await payload.update({
-      collection: collectionName as 'business' | 'users' | 'tenants' | 'posts' | 'media' | 'waitlists' | 'instagramProfiles' | 'payload-preferences' | 'payload-migrations',
-      where: {
-        id: {
-          equals: documentId
-        }
-      },
-      data: newData
-    });
-
-    console.log(`Updated ${collectionName} document:`, updatedDocument);
-    return updatedDocument.docs[0];
-  } catch (error) {
-    console.error(`Error updating ${collectionName} document:`, error);
-    throw error;
-  }
-}
-
-export async function updateBusinessDetails(businessId: string, newData: any) {
-  // if (Object.keys(newData).includes('keywords')){
-  //   newData.keywords = Array.isArray(newData.keywords) ? newData.keywords.map(keyword => ({ keyword })) : typeof newData.keywords === 'string' ? newData.keywords.split(', ').map(keyword => ({ keyword })) : []
-  // }
-  try {
-    return await updateCollection('business', businessId, newData);
-
-  } catch (error) {
-    console.error('Error updating business details:', error);
-    throw error;
-  }
-}
-
-async function handleTenantCreation(payloadUserId: string, instagramHandle: string): Promise<any> {
-  console.log('Creating Tenant');
-  const createdTenant = await createTenant(instagramHandle);
-  console.log('Assigning Tenant to User');
-  const createdUser = await assignTenantToUser(payloadUserId, createdTenant?.id.toString());
-  return {
-    tenantId: createdTenant.id,
-    userId: createdUser.id
-  };
-}
-
-async function handleBusinessDetailsUpdate(businessId: string, businessDetailsData: any, instagramHandle: string, tenantId: string): Promise<any> {
+export async function handleBusinessDetailsUpdate(businessId: string, businessDetailsData: any, instagramHandle: string, tenantId: string): Promise<any> {
   const serviceArea = businessDetailsData.serviceArea || 'No location provided';
 
   const remainingDetails = await generateRemainingBusinessDetails(instagramHandle, serviceArea);
@@ -216,7 +111,9 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
 }
 
 
-export default async function uploadInitialPostsToPayload(payloadUserId: string, instagramHandle: string, nPosts: number, accessToken: string): Promise<string | void> {
+export async function setUpBusinessDetailsAndPosts(payloadUserId: string, instagramHandle: string, nPosts: number, accessToken: string): Promise<string | void> {
+  // Perform the first generations of the users business details.
+  // These are placeholders that could be altered in the onboarding process.
   try {
     
     const result: any = await getBusinessDetailsByUserId(payloadUserId);
@@ -236,17 +133,10 @@ export default async function uploadInitialPostsToPayload(payloadUserId: string,
 
     // add aboutPage and serviceList
     const updatedBusinessDetailsAgain = await updateBusinessDetails(businessDetailsData.id, aboutPageServices)
-
-    console.log('added about page and service list to business details')
-
-    /// Using instagram data, transforms it with GPT and pushes the data to Payload cms
-    const projectUrl = await startDeployment(payloadUserId, instagramHandle, aboutPageServices, updatedBusinessDetailsAgain);
-
-    return projectUrl;
-    
+    console.log('added about page and service list to business details')    
 
   } catch (error) {
-    console.error('Error in uploadInitialPostsToPayload:', error);
+    console.error('Error in firstPassBusinessDetails:', error);
     throw error;
   }
 }

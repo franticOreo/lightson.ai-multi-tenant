@@ -17,7 +17,7 @@ const Onboarding = () => {
   const { socket, isConnected, sendMessage } = useSocket();
   const { userId, accessToken, instagramHandle } = router.query;
   const [businessId, setBusinessId] = useState(null)
-  const [siteUrl, setSiteUrl] = useState(null);
+  const [productionURL, setProductionURL] = useState(null);
 
   const [primaryColor, setPrimaryColor] = useState('#fff');
   const [secondaryColor, setSecondaryColor] = useState('#fff');
@@ -31,6 +31,7 @@ const Onboarding = () => {
   const [currentStep, setCurrentStep] = useState(1);
 
   let intervalId: any;
+  
 
   const handleOnboarding = async (userId, accessToken) => {
     try {
@@ -122,8 +123,8 @@ const Onboarding = () => {
         });
         if (response.ok){
             const { message, data } = await response.json()
-            const { domainUrl, ...update} = data
-            setSiteUrl(domainUrl)
+            const { vercelProductionURL, ...update} = data
+            setProductionURL(vercelProductionURL)
             updateStates(update)
             handleNextStep()
         }
@@ -138,67 +139,62 @@ const Onboarding = () => {
         <div className="form-container">
           {currentStep === 1 && (
             <>
-              {(primaryColor === '#fff' && secondaryColor === '#fff') ? (
-                <>
-                  <ZoomingCircleLoaderWithStyles />
-                  <p>We are scoping out your profile to suggest some colours...</p>
-                </>
-              ) : (
-                <>
-                  <h2 className="onboarding-title">Cool, this is what we picked, what do you think?</h2>
-                  {colorChoice === 'happy' ? (
-                    <div className="color-prompt">
-                      <div className="color-preview-container">
-                        <div className='color-item'>
-                            <div className="color-preview" style={{ backgroundColor: primaryColor }}></div>
-                            <span>Primary Color</span>
-                        </div>
-                        <div className='color-item'>
-                            <div className="color-preview" style={{ backgroundColor: secondaryColor }}></div>
-                            <span>Secondary Color</span>
-                        </div>
-                      </div>
-                      {(primaryColor !== '#fff' && secondaryColor !== '#fff') ?
-                        <div className="color-choice-buttons">
-                          <Button
-                            type="button"
-                            label="Happy with them"
-                            onClick={() => { handleNextStep(); }}
-                            appearance="positive"
-                          />
-                          <Button
-                            type="button"
-                            label="I'll pick my own"
-                            onClick={() => setColorChoice('custom')}
-                            appearance="secondary"
-                          />
-                        </div>
-                      : null
-                      }
+              {(primaryColor === '#fff' && secondaryColor === '#fff') ?
+              <ZoomingCircleLoaderWithStyles />
+              : null
+              }
+              <h2 className="onboarding-title">We've picked you out some theme colours</h2>
+              {colorChoice === 'happy' ? (
+                <div className="color-prompt">
+                  <div className="color-preview-container">
+                    <div className='color-item'>
+                        <div className="color-preview" style={{ backgroundColor: primaryColor }}></div>
+                        <span>Primary Color</span>
                     </div>
-                  )
-                  : (
-                    <form>
-                        <div className="color-picker-container">
-                            <div>
-                            <label className="color-label">
-                                Primary
-                                <div className="color-preview" style={{ backgroundColor: primaryColor }}></div>
-                            </label>
-                            <ChromePicker color={primaryColor} onChange={updatedColor => setPrimaryColor(updatedColor.hex)} />
-                            </div>
-                            <div>
-                            <label className="color-label">
-                                Secondary
-                                <div className="color-preview" style={{ backgroundColor: secondaryColor }}></div>
-                            </label>
-                            <ChromePicker color={secondaryColor} onChange={updatedColor => setSecondaryColor(updatedColor.hex)} />
-                            </div>
+                    <div className='color-item'>
+                        <div className="color-preview" style={{ backgroundColor: secondaryColor }}></div>
+                        <span>Secondary Color</span>
+                    </div>
+                  </div>
+                  {(primaryColor !== '#fff' && secondaryColor !== '#fff') ?
+                    <div className="color-choice-buttons">
+                      <Button
+                        type="button"
+                        label="Happy with them"
+                        onClick={() => { handleNextStep(); }}
+                        appearance="positive"
+                      />
+                      <Button
+                        type="button"
+                        label="I'll pick my own"
+                        onClick={() => setColorChoice('custom')}
+                        appearance="secondary"
+                      />
+                    </div>
+                  : null
+                  }
+                </div>
+              )
+              : (
+                <form>
+                    <div className="color-picker-container">
+                        <div>
+                        <label className="color-label">
+                            Primary
+                            <div className="color-preview" style={{ backgroundColor: primaryColor }}></div>
+                        </label>
+                        <ChromePicker color={primaryColor} onChange={updatedColor => setPrimaryColor(updatedColor.hex)} />
                         </div>
-                        <Button type="button" label="Next" appearance="primary" className="next-button" onClick={handleNextStep}/>
-                    </form>
-                  )}
-                </>
+                        <div>
+                        <label className="color-label">
+                            Secondary
+                            <div className="color-preview" style={{ backgroundColor: secondaryColor }}></div>
+                        </label>
+                        <ChromePicker color={secondaryColor} onChange={updatedColor => setSecondaryColor(updatedColor.hex)} />
+                        </div>
+                    </div>
+                    <Button type="button" label="Next" appearance="primary" className="next-button" onClick={handleNextStep}/>
+                </form>
               )}
             </>
           )}
@@ -409,21 +405,18 @@ const Onboarding = () => {
                 </div>
             </div>
           )}
-          {currentStep === 6 && (
-            <>
-              {!pageLoaded ? (
-                <ZoomingCircleLoaderWithStyles />
-              ) : (
-                <div className="color-prompt">
-                  <h2 className="onboarding-title">Success</h2>
-                  <p>Changes have been saved successfully!</p>
-                  <p>Your site is ready on 
-                    <a href={`https://${siteUrl}`} target='_blank'>{siteUrl}</a>
-                  </p>
-                </div>
-              )}
-            </>
-          )}
+        </div>
+      </div>
+      <div className="onboarding-card">
+        <div className="form-container">
+          {productionURL ? (
+            <ZoomingCircleLoaderWithStyles />
+          ) : productionURL ? (
+            <div>
+              <h2 className="onboarding-title">Your Site is Ready!</h2>
+              <p>Visit your site at: <a href={productionURL} target="_blank" rel="noopener noreferrer">{productionURL}</a></p>
+            </div>
+          ) : null}
         </div>
       </div>
     </Gutter>

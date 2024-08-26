@@ -1,12 +1,12 @@
-import { createUser } from '../utils/tenantUserManagement';
+import { createUser } from '../utils/payload';
 import { createBusinessEntry } from '../utils/createBusinessDetails';   
-
+import payload from 'payload';
 import { createInstagramProfileEntry, loginUser} from '../utils/instagramFunctions'; 
-import uploadInitialPostsToPayload, { updateBusinessDetails, getInstagramPostsAndPostToPayload, startDeployment } from '../utils/uploadPostsToPayload';
-
+import { getInstagramPostsAndPostToPayload, startDeployment, setUpBusinessDetailsAndPosts } from '../utils/onboarding';
+import { updateBusinessDetails } from '../utils/payload';
 import { emitToSocket, getAllSocketIds } from '../socketio';
 import { generateAboutPage } from '../utils/gpt';
-import payload from 'payload';
+
 
 export async function signUpRoute(req, res) {
     try {
@@ -14,7 +14,7 @@ export async function signUpRoute(req, res) {
       const { email, instagramHandle } = req.body;
 
       // if instagramHanlde contains a . replace with _
-      const sanitizedInstagramHandle = instagramHandle.replace('.', '_');
+      const sanitizedInstagramHandle = instagramHandle.replace('.', '_').replace('@', '').toLowerCase().trim();
 
       let createdUser = await createUser(email, 'testy');
       const userId = createdUser.id;
@@ -58,7 +58,7 @@ export async function signUpRoute(req, res) {
       // Return the necessary data to the client
       res.status(200).json({ userId, accessToken, instagramHandle: sanitizedInstagramHandle });
       
-      await uploadInitialPostsToPayload(userId.toString(), sanitizedInstagramHandle, 4, accessToken);
+      await setUpBusinessDetailsAndPosts(userId.toString(), sanitizedInstagramHandle, 4, accessToken);
   
     } catch (error) {
       console.error('Signup error:', error);
@@ -68,7 +68,7 @@ export async function signUpRoute(req, res) {
 
 export const onBoardingRoute = async(req, res)=>{
     try {
-        const { userId, accessToken, instagramHandle } = req.query;
+        const { userId } = req.query;
         
         const response = await payload.find({
             collection: 'business',
@@ -120,6 +120,8 @@ export const regenerateAboutPage = async(req, res)=>{
 
         const businessDetailsWithDeployment = await startDeployment(userId, instagramHandle, aboutPageServices, updatedBusinessDetailsAgain);
         console.log('businessDetailsWithDeployment', businessDetailsWithDeployment)
+
+        
         
         res.status(200).send({ message: 'Onboarding completed successfully', data: businessDetailsWithDeployment });
 
