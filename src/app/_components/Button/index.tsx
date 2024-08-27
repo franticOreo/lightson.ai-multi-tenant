@@ -23,7 +23,7 @@ export const Button: React.FC<Props> = ({
   label,
   newTab,
   href,
-  appearance,
+  appearance = 'primary',
   className: classNameFromProps,
   onClick,
   type = 'button',
@@ -31,7 +31,7 @@ export const Button: React.FC<Props> = ({
   invert,
 }) => {
   let el = elFromProps
-
+  
   const newTabProps = newTab ? { target: '_blank', rel: 'noopener noreferrer' } : {}
 
   const className = [

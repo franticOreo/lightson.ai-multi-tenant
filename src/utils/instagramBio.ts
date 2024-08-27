@@ -17,7 +17,7 @@ export async function fetchInstagramData(username: string) {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching user profile:', error);
+    console.error('Error fetching instagram profile:', error?.message);
     return null;
   }
 }

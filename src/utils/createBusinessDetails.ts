@@ -11,9 +11,6 @@ require('dotenv').config();
 
 
 export async function createBusinessEntry(businessDetails: any) {
-console.log("createBusinessEntry called with:", businessDetails);
-  console.log(businessDetails)
-
     // Set businessName to instagramHandle if not provided
     if (!businessDetails.businessName) {
         businessDetails.businessName = businessDetails.instagramHandle;

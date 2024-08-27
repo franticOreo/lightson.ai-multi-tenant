@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export async function understandImage(imageUrl: string, prompt: string = "What's in this image?", responseFormat: "text" | "json_object" = "text"): Promise<string> {
-    console.log('GPT is analysing image...')
     const aiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const response = await aiClient.chat.completions.create({
       model: "gpt-4o",
@@ -147,9 +146,6 @@ export async function createPostFields(blogPrompt: string): Promise<any> {
       temperature: 0.9,
     });
 
-  
-    console.log(response.choices[0].message.content)
-
     blogFields = JSON.parse(response.choices[0].message.content || '{}');
 
     if (['title', 'content', 'excerpt', 'slug'].every(key => key in blogFields)) {
@@ -212,7 +208,6 @@ export async function generateAboutPage(businessDetails, postUnderstandings) {
     serviceList: [] 
   };
 
-  console.log('Creating about page...')
   while (retryCount < maxRetries) {
     const response = await aiClient.chat.completions.create({
       model: "gpt-4o",
@@ -242,10 +237,7 @@ export async function generateAboutPage(businessDetails, postUnderstandings) {
 
   // Transform serviceList from strings to objects
   const transformedServiceList = aboutPageFields.serviceList.map(service => ({ service }));
-  
-  console.log(transformedServiceList)
 
-  console.log('About page created.')
   return {
     ...aboutPageFields,
     serviceList: transformedServiceList // Return the transformed list

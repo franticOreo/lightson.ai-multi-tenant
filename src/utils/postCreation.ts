@@ -19,7 +19,8 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
       return response.data;
     } catch (error) {
       console.error('Failed to create post:', error.response ? error.response.data : error.message);
-      throw error;
+      // throw error;
+      return []
     }
   }
   
@@ -83,40 +84,55 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
     };
 
     const postUnderstandings = [];
-    const postEntriesData = await Promise.all(posts.map(async (post) => {
+
+    await Promise.all(posts.map(async (post) => {
         try {
-            const postCaption = post.caption;
             const imageUrl = post.media_url;
             console.log(imageUrl);
+            
             const postUnderstanding = await understandImage(imageUrl);
             postUnderstandings.push(postUnderstanding);
-
-            const blogPrompt = makePostPrompt(postCaption, postUnderstanding, bioLanguageKwObj, clientServiceArea);
-            const postFields = await createPostFields(blogPrompt);
-
-            const postEntryData = await createPostEntry(instagramHandle, userId, tenantId, payloadToken, post, postFields);
-            return postEntryData;
-        } catch (error) {
-            console.error('Error processing post:', error);
-            return null; // Or handle the error as appropriate
+        }
+        catch(error){
+          console.log("Error:", error)
         }
     }));
 
-    let responses: any = [] 
-
-    try {
-      
-      responses = await Promise.all(postEntriesData.filter(postEntry => postEntry !== null).map(async (postEntryData) => {
+    // Define the job logic as a separate function
+    const processPostsAndSend = async () => {
+      const postEntriesData = await Promise.all(posts.map(async (post) => {
+          try {
+              const postCaption = post.caption;
+              const imageUrl = post.media_url;
+              console.log(imageUrl);
+              
+              const postUnderstanding = await understandImage(imageUrl);
+              postUnderstandings.push(postUnderstanding);
+  
+              const blogPrompt = makePostPrompt(postCaption, postUnderstanding, bioLanguageKwObj, clientServiceArea);
+              const postFields = await createPostFields(blogPrompt);
+  
+              const postEntryData = await createPostEntry(instagramHandle, userId, tenantId, payloadToken, post, postFields);
+              return postEntryData;
+          } catch (error) {
+              console.error('Error processing post:', error);
+              return null; // Or handle the error as appropriate
+          }
+      }));
+  
+      await Promise.all(postEntriesData.filter(postEntry => postEntry !== null).map(async (postEntryData) => {
           return sendPostEntryDataToCollection(postEntryData, payloadToken, instagramHandle);
       }));
-    } catch (error) {
-      throw error
-    }
+    };
+
+    Promise.resolve().then(() => {
+      processPostsAndSend().catch(error => {
+        console.error('Background process error:', error);
+      });
+    });
 
     return {
-        postUnderstandings,
-        postEntriesData,
-        responses
+        postUnderstandings
     };
 }
 

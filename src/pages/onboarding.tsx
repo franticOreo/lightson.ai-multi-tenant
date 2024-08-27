@@ -6,6 +6,7 @@ import { ChromePicker } from 'react-color';
 import { Gutter } from '../app/_components/Gutter';
 import { Button } from '../app/_components/Button';
 import { InputItem, MultiInput } from '../app/_components/MultiInput';
+import { Timeline } from '../app/_components/Timeline/Timeline';
 
 import '../app/_css/onboarding.scss';
 import { ZoomingCircleLoaderWithStyles } from '../app/_components/LoadingShimmer/PageLoader';
@@ -32,7 +33,6 @@ const Onboarding = () => {
 
   let intervalId: any;
   
-
   const handleOnboarding = async (userId, accessToken) => {
     try {
         const params = new URLSearchParams({
@@ -69,7 +69,10 @@ const Onboarding = () => {
 
     if (userId && accessToken) {
       handleOnboarding(userId, accessToken);
+      let count = 1
       intervalId = setInterval(() => {
+        count += 2;
+        console.log(count)
         handleOnboarding(userId, accessToken);
       }, 2000);
     }
@@ -80,8 +83,8 @@ const Onboarding = () => {
     setBusinessId(data.id)
     setPrimaryColor(data.primaryColor || '#fff'); // Prepopulate primary color
     setSecondaryColor(data.secondaryColor || '#fff'); // Prepopulate secondary color
-    setKeywords(data.keywords.map(keyword => keyword.keyword) || []);
-    setServiceList(data.serviceList.map(service => service.service) || []);
+    setKeywords(data.keywords?.map(keyword => keyword.keyword) || []);
+    setServiceList(data.serviceList?.map(service => service.service) || []);
     setAboutPage(data.aboutPage || '')
   }
 
@@ -99,6 +102,7 @@ const Onboarding = () => {
   };
 
   const generateAboutPage = async() => {
+    handleNextStep();
     const updateData = {
         userId,
         accessToken,
@@ -111,7 +115,6 @@ const Onboarding = () => {
         serviceList: serviceList.map(service => ({ service }))
     }
 
-    console.log(updateData)
     try {
         setLoading(true);
         const response = await fetch('/api/onboarding', {
@@ -133,8 +136,17 @@ const Onboarding = () => {
     } finally {
         setLoading(false);}
   }
+  const steps = [
+    'Theme Colors',
+    'Keywords',
+    'About Your Business',
+    'Services',
+    'Preview Changes'
+  ];
+
   return (
     <Gutter>
+      <Timeline steps={steps} currentStep={currentStep} />
       <div className="onboarding-card">
         <div className="form-container">
           {currentStep === 1 && (
@@ -157,7 +169,7 @@ const Onboarding = () => {
                     </div>
                   </div>
                   {(primaryColor !== '#fff' && secondaryColor !== '#fff') ?
-                    <div className="color-choice-buttons">
+                    <div className="button-group">
                       <Button
                         type="button"
                         label="Happy with them"
@@ -176,7 +188,7 @@ const Onboarding = () => {
                 </div>
               )
               : (
-                <form>
+                <div className="form">
                     <div className="color-picker-container">
                         <div>
                         <label className="color-label">
@@ -194,7 +206,7 @@ const Onboarding = () => {
                         </div>
                     </div>
                     <Button type="button" label="Next" appearance="primary" className="next-button" onClick={handleNextStep}/>
-                </form>
+                </div>
               )}
             </>
           )}
@@ -215,7 +227,7 @@ const Onboarding = () => {
                 </div>
                 <p>What do you think?</p>
                 {keywords.length ?
-                  <div className="color-choice-buttons">
+                  <div className="button-group">
                     <Button
                       type="button"
                       label="Happy with them"
@@ -235,13 +247,13 @@ const Onboarding = () => {
               </div>
             )
             : (
-            <form>
+            <div className="form">
               <MultiInput keywords={keywords} onChange={setKeywords} />
               <div className="button-group">
                 <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary" />
-                <Button type="button" label="Next" appearance="neutral" onClick={handleNextStep}/>
+                <Button type="button" label="Next" appearance="primary" onClick={handleNextStep}/>
               </div>
-            </form>
+            </div>
             )}
             </>
           )}
@@ -266,7 +278,7 @@ const Onboarding = () => {
                 </div>
                 <p></p>
                 {aboutPage?
-                  <div className="color-choice-buttons">
+                  <div className="button-group">
                     <Button
                       type="button"
                       label="Happy with them"
@@ -285,9 +297,9 @@ const Onboarding = () => {
               </div>
             )
             : (
-            <form>
+            <div className="form">
               <div className="about-section"> 
-                <label htmlFor="about">Enter text below</label>
+                <label htmlFor="about" className='about-label'>Enter text below</label>
                 <textarea
                   id="about"
                   className="about-textarea"
@@ -299,9 +311,9 @@ const Onboarding = () => {
               </div>
               <div className="button-group">
                 <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary"/>
-                <Button type="button" label="Next" appearance="neutral" onClick={handleNextStep}/>
+                <Button type="button" label="Next" appearance="primary" onClick={handleNextStep}/>
               </div>
-            </form>
+            </div>
             )}
             </>
           )}
@@ -317,12 +329,12 @@ const Onboarding = () => {
                 <p>We've picked out services you provide, have a look and see if they are correct.</p>
                 <div className='keywords-container'>
                   {serviceList.map((service, index) => (
-                    <InputItem key={index} name={service} disabled={true}/>
+                    <InputItem key={index} name={service}/>
                   ))}
                 </div>
                 <p>What do you think?</p>
                 {serviceList.length ?
-                  <div className="color-choice-buttons">
+                  <div className="button-group">
                     <Button
                       type="button"
                       label="Happy with them"
@@ -342,13 +354,13 @@ const Onboarding = () => {
               </div>
             )
             : (
-            <form>
+            <div className="form">
               <MultiInput keywords={serviceList} onChange={setServiceList} />
               <div className="button-group">
                 <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary"/>
-                <Button type="button" label="Next" appearance="neutral" onClick={handleNextStep}/>
+                <Button type="button" label="Next" appearance="primary" onClick={handleNextStep}/>
               </div>
-            </form>
+            </div>
             )}
             </>
           )}
@@ -401,22 +413,25 @@ const Onboarding = () => {
                 </div>
                 <div className="button-group">
                     <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary"/>
-                    <Button type="button" label={loading ? "Updating..." : "Update"} disabled={loading} appearance="neutral" onClick={generateAboutPage} />
+                    <Button type="button" label={"Regenerate Site"} disabled={loading} appearance="primary" onClick={generateAboutPage} />
                 </div>
             </div>
           )}
-        </div>
-      </div>
-      <div className="onboarding-card">
-        <div className="form-container">
-          {productionURL ? (
-            <ZoomingCircleLoaderWithStyles />
-          ) : productionURL ? (
+          {currentStep === 6 && (
             <div>
-              <h2 className="onboarding-title">Your Site is Ready!</h2>
-              <p>Visit your site at: <a href={productionURL} target="_blank" rel="noopener noreferrer">{productionURL}</a></p>
+              {productionURL ? (
+                <div>
+                  <h2 className="onboarding-title">Your Site is Ready!</h2>
+                  <p>Visit your site at: <a href={productionURL} target="_blank" rel="noopener noreferrer">{productionURL}</a></p>
+                </div>
+              ) : 
+              <div>
+                <h2 className="onboarding-title">Deploying your website...</h2>
+                <ZoomingCircleLoaderWithStyles />
+              </div>
+              }
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </Gutter>

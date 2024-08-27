@@ -34,7 +34,7 @@ export const MultiInput: React.FC<MultiInputProps> = ({ keywords, onChange }) =>
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         const target = e.target as HTMLInputElement; // Cast to HTMLInputElement
         
-        if (e.key === ',') {
+        if (e.key === 'Enter') {
           onChange([...keywords, currentInput])
         }
     };
@@ -42,7 +42,7 @@ export const MultiInput: React.FC<MultiInputProps> = ({ keywords, onChange }) =>
     const handleKeyUP = (e: React.KeyboardEvent<HTMLInputElement>) => {
         const target = e.target as HTMLInputElement; // Cast to HTMLInputElement
         
-        if (e.key === ',') {
+        if (e.key === 'Enter') {
           setCurrentInput('')
         }
     };
@@ -68,7 +68,7 @@ export const MultiInput: React.FC<MultiInputProps> = ({ keywords, onChange }) =>
             onChange={(e) => setCurrentInput(e.target.value)}
             onKeyDown={handleKeyDown}
             onKeyUp={handleKeyUP}
-            placeholder="Enter keywords separated by commas"
+            placeholder="Add item and press enter"
         />
       </div>
     </div>

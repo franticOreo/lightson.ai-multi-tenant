@@ -1,0 +1,58 @@
+.timeline {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.timelineStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    right: -50%;
+    width: 100%;
+    height: 2px;
+    background-color: #ccc;
+    z-index: 1;
+  }
+
+  &.completed::after {
+    background-color: #ff9500;
+  }
+}
+
+.timelineStepNumber {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #ccc;
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  z-index: 2;
+}
+
+.timelineStep.active .timelineStepNumber,
+.timelineStep.completed .timelineStepNumber {
+  background-color: #ff9500;
+}
+
+.timelineStepLabel {
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.timelineStep.active .timelineStepLabel {
+  font-weight: bold;
+}

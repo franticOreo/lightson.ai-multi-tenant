@@ -2,7 +2,6 @@ import payload from 'payload';
 import crypto from 'crypto';
 
 export async function createTenant(clientInstagramHandle: string) {
-  console.log(`Creating tenant for Instagram handle: ${clientInstagramHandle}`);
   
   // Replace '.' and '_' with '-' in the clientInstagramHandle
   const sanitizedHandle = clientInstagramHandle.replace(/[._]/g, '');
@@ -15,7 +14,7 @@ export async function createTenant(clientInstagramHandle: string) {
         domains: [{ domain: `${sanitizedHandle}.${process.env.PAYLOAD_PUBLIC_SERVER_BASE}` }],
       },
     });
-    console.log(`Tenant created successfully: ${JSON.stringify(result)}`);
+    
     return result;
   } catch (error) {
     console.error(`Error creating tenant: ${error}`);
@@ -26,7 +25,6 @@ export async function createTenant(clientInstagramHandle: string) {
 
 
 export async function createUser(email: string, password: string) {
-  console.log(`Creating user with email: ${email}`);
 
   // Generate a random password if none is provided
   // if (!password) {
@@ -58,7 +56,7 @@ export async function createUser(email: string, password: string) {
         roles: ["user"],
       },
     });
-    console.log(`User created successfully: ${JSON.stringify(result)}`);
+
     return result;
   } catch (error) {
     console.error(`Error creating user: ${error}`);
@@ -67,7 +65,7 @@ export async function createUser(email: string, password: string) {
 }
 
 export async function assignTenantToUser(userId: string, tenantId: string) {
-  console.log(`Assigning tenant ${tenantId} to user ${userId}`);
+  
   try {
     const result = await payload.update({
       collection: 'users',
@@ -81,7 +79,7 @@ export async function assignTenantToUser(userId: string, tenantId: string) {
         ],
       },
     });
-    console.log(`Tenant assigned successfully: ${JSON.stringify(result)}`);
+    
     return result;
   } catch (error) {
     console.error(`Error assigning tenant to user: ${error}`);
@@ -164,7 +162,7 @@ export async function getBusinessDetailsByUserId(payloadUserId: string) {
 }
 
 export async function updateCollection(collectionName: string, documentId: string, newData: any) {
-  console.log(`Updating ${collectionName} document:`, documentId, newData);
+  
   try {
     const updatedDocument = await payload.update({
       collection: collectionName as 'business' | 'users' | 'tenants' | 'posts' | 'media' | 'waitlists' | 'instagramProfiles' | 'payload-preferences' | 'payload-migrations',
@@ -176,7 +174,6 @@ export async function updateCollection(collectionName: string, documentId: strin
       data: newData
     });
 
-    console.log(`Updated ${collectionName} document:`, updatedDocument);
     return updatedDocument.docs[0];
   } catch (error) {
     console.error(`Error updating ${collectionName} document:`, error);
@@ -198,9 +195,7 @@ export async function updateBusinessDetails(businessId: string, newData: any) {
 }
 
 export async function handleTenantCreation(payloadUserId: string, instagramHandle: string): Promise<any> {
-  console.log('Creating Tenant');
   const createdTenant = await createTenant(instagramHandle);
-  console.log('Assigning Tenant to User');
   const createdUser = await assignTenantToUser(payloadUserId, createdTenant?.id.toString());
   return {
     tenantId: createdTenant.id,

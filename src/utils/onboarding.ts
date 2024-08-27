@@ -91,7 +91,6 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
 
   // Only set deployment data to business collection if running in production.
   if (process.env.APP_ENV === 'production') {
-
     const projectId = projectDeploymentResponse.project.id;
     const productionURL = await getProjectProductionURL(projectId)
 
@@ -105,7 +104,7 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
     if (productionURL) {
       return businessDetailsWithDeployment;
     }
-    }
+  }
 
   return 'Project Not Deployed: Currently in local development mode.'
 }

@@ -1,87 +1,67 @@
-@import '../../_css/type.scss';
-
 .button {
-  border: 2px solid rgb(0, 0, 0);
+  width: 100%;
+  padding: 12px 16px;
+  font-weight: bold;
+  font-size: 1.125rem;
   border-radius: 10px;
+  border: 4px solid black;
+  transition: background-color 300ms, box-shadow 300ms;
   cursor: pointer;
-  display: inline-flex;
-  justify-content: center;
-  background-color: transparent;
-  text-decoration: none;
-  display: inline-flex;
-  padding: 24px 6px;
-  font-family: inherit;
-  line-height: inherit;
-  font-size: inherit;
-  box-shadow: 2px 2px 0px rgb(0, 0, 0);
-}
+  
+  &:hover {
+    box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 1);
+    transition: background-color 0.3s;
+  }
 
-.signup-button {
-  @extend .button;
-  margin-top: 2rem; // Adds vertical space above the button
-}
+  &:active {
+    box-shadow: none;
+  }
 
+  &--none {
+    background-color: transparent;
+    color: black;
 
-
-.content {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-
-  svg {
-    margin-right: calc(var(--base) / 2);
-    width: var(--base);
-    height: var(--base);
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
   }
 }
 
-.label {
-  // @extend %label;
-  font-size: 1.5rem;
-  color:rgb(0, 0, 0);
-  text-align: center;
-  display: flex;
-  align-items: center;
-}
+.appearance {
+  &--primary {
+    background-color: orange;
+    color: black;
 
-.appearance--primary {
-  background-color: orange;
-  color: #fff;
-
-  &:hover {
-    background-color: #ff9500;
-    box-shadow: 0.3s;
+    &:hover {
+      background-color: #ff9500;
     }
-}
+  }
 
-.appearance--positive {
-  background-color: rgb(141, 255, 141);
-  color: #fff;
+  &--positive {
+    background-color: rgb(141, 255, 141);
+    color: black;
 
-  &:hover {
-    background-color: rgb(77, 249, 77);
-    box-shadow: 0.3s;
+    &:hover {
+      background-color: rgb(77, 249, 77);
     }
-}
+  }
 
-.appearance--neutral {
-  background-color: rgb(145, 141, 255);
-  color: #fff;
+  &--neutral {
+    background-color: rgb(145, 141, 255);
+    color: #fff;
 
-  &:hover {
-    background-color: rgb(97, 77, 249);
-    box-shadow: 0.3s;
+    &:hover {
+      background-color: rgb(97, 77, 249);
     }
-}
+  }
 
-.appearance--secondary {
-  background-color: transparent;
-  box-shadow: inset 0 0 0 1px var(--theme-elevation-1000);
+  &--secondary {
+    background-color: transparent;
 
-  &:hover {
-    background-color: rgb(202, 202, 202);
-    box-shadow: 0.3s;
+    &:hover {
+      background-color: rgb(202, 202, 202);
     }
+  }
 }
 
 .primary--invert {
@@ -95,12 +75,12 @@
 }
 
 .appearance--default {
-  padding: 0;
+  // padding: 0;
   color: var(--theme-text);
 }
 
 .appearance--none {
-  padding: 0;
+  // padding: 0;
   color: var(--theme-text);
 
   &:local() {

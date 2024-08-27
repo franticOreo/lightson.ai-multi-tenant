@@ -19,7 +19,9 @@ export async function getInstagramHandle(accessToken: string) {
         return data;
     } catch (error) {
         console.error('Error fetching user profile:', error);
-        throw error;
+        return null;
+        // throw error;
+
     }
 }
 
@@ -118,7 +120,6 @@ export async function loginUser(email: string, password: string, admin: boolean 
       // Optionally, delete the temporary file after upload
       fs.unlinkSync(tempImagePath);
   
-      console.log('Media uploaded successfully:', response.data);
       return response.data;
     } catch (error) {
       console.error('Failed to upload media:', error);
@@ -141,7 +142,7 @@ export async function createInstagramProfileEntry(profileData: InstagramProfileD
       collection: 'instagramProfiles',
       data: profileData,
     });
-    console.log('New Instagram Profile created:', newProfile);
+
     return newProfile;
   } catch (error) {
     console.error('Error creating Instagram Profile:', error);

@@ -1,7 +1,7 @@
 import React from 'react'
 import { FieldValues, UseFormRegister, Validate } from 'react-hook-form'
 
-import classes from './index.module.scss'
+import styles from './index.module.scss';
 
 type Props = {
   name: string
@@ -25,13 +25,13 @@ export const Input: React.FC<Props> = ({
   disabled,
 }) => {
   return (
-    <div className={classes.inputWrap}>
-      <label htmlFor="name" className={classes.label}>
+    <div>
+      <label htmlFor={name} className={styles.formLabel}>
         {label}
-        {required ? <span className={classes.asterisk}>&nbsp;*</span> : ''}
+        {required ? <span>&nbsp;*</span> : ''}
       </label>
       <input
-        className={[classes.input, error && classes.error].filter(Boolean).join(' ')}
+        className={`${styles.formInput} ${error ? styles.error : ''}`}
         {...{ type }}
         {...register(name, {
           required,
@@ -48,7 +48,7 @@ export const Input: React.FC<Props> = ({
         disabled={disabled}
       />
       {error && (
-        <div className={classes.errorMessage}>
+        <div className={styles.errorMessage}>
           {!error?.message && error?.type === 'required'
             ? 'This field is required'
             : error?.message}
