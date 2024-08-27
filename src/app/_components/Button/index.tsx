@@ -7,7 +7,7 @@ import classes from './index.module.scss'
 
 export type Props = {
   label?: string
-  appearance?: 'default' | 'primary' | 'secondary' | 'none'
+  appearance?: 'default' | 'primary' | 'secondary' | 'positive' | 'neutral' | 'none'
   el?: 'button' | 'link' | 'a'
   onClick?: () => void
   href?: string
