@@ -2,8 +2,7 @@ import axios from 'axios';
 import { downloadImageToMemory, uploadImageToCollection, loginUser } from './instagramFunctions';
 import { makePostPrompt, createPostFields, understandImage } from './gpt';
 
-async function sendPostEntryDataToCollection(postEntryData: any, accessToken: string, client_instagram_handle: string) {
-    // we 
+async function sendPostEntryDataToCollection(postEntryData: any, accessToken: string, client_instagram_handle: string) {    // This will be worked on later
     const protocol = process.env.APP_ENV === 'production' ? 'https' : 'http';
     try {
       const response = await axios({
@@ -64,6 +63,7 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
     instagramHandle,
     userId,
     tenantId,
+    payloadToken
   }: {
     posts: any,
     clientBusinessBio: string,
@@ -73,10 +73,8 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
     instagramHandle: string,
     userId: string,
     tenantId: string,
+    payloadToken: string
   }) {
-    const loginResponse = await loginUser(null, null, true);
-    const payloadToken = loginResponse.token;
-
     const bioLanguageKwObj = {
         clientBusinessBio,
         clientLanguageStyle,
@@ -93,7 +91,7 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
             const postUnderstanding = await understandImage(imageUrl);
             postUnderstandings.push(postUnderstanding);
 
-            const blogPrompt = await makePostPrompt(postCaption, postUnderstanding, bioLanguageKwObj, clientServiceArea);
+            const blogPrompt = makePostPrompt(postCaption, postUnderstanding, bioLanguageKwObj, clientServiceArea);
             const postFields = await createPostFields(blogPrompt);
 
             const postEntryData = await createPostEntry(instagramHandle, userId, tenantId, payloadToken, post, postFields);
@@ -104,9 +102,16 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
         }
     }));
 
-    const responses = await Promise.all(postEntriesData.filter(postEntry => postEntry !== null).map(async (postEntryData) => {
-        return sendPostEntryDataToCollection(postEntryData, payloadToken, instagramHandle);
-    }));
+    let responses: any = [] 
+
+    try {
+      
+      responses = await Promise.all(postEntriesData.filter(postEntry => postEntry !== null).map(async (postEntryData) => {
+          return sendPostEntryDataToCollection(postEntryData, payloadToken, instagramHandle);
+      }));
+    } catch (error) {
+      throw error
+    }
 
     return {
         postUnderstandings,

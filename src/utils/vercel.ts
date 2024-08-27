@@ -24,9 +24,10 @@ export function prepareEnvVariables(businessDetails: any) {
     ];
   }
 
-export const createDeployment = async (token, vercelProjectName, gitBranchName) => {
+export const createDeployment = async (vercelProjectName, gitBranchName) => {
     const apiUrl = `https://api.vercel.com/v12/now/deployments`;
-  
+    const token = process.env.VERCEL_TOKEN
+
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
@@ -55,11 +56,19 @@ export const createDeployment = async (token, vercelProjectName, gitBranchName) 
     }
   
     const jsonResponse = await response.json();
+
+    console.log('Deployment created:', {
+        id: jsonResponse.id,
+        url: jsonResponse.url,
+        state: jsonResponse.state
+    });
+
     return jsonResponse;
   };
   
-  export const setEnvironmentVariables = async (token, projectId, envVariables) => {
+  export const setEnvironmentVariables = async (projectId, envVariables) => {
     const apiUrl = `https://api.vercel.com/v10/projects/${projectId}/env`;
+    const token = process.env.VERCEL_TOKEN
   
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -89,6 +98,122 @@ export const createDeployment = async (token, vercelProjectName, gitBranchName) 
       return;
     }
   
-    const finalDeployment = await createDeployment(vercelToken, projectName, branchName);
-    console.log('Deployment created:', finalDeployment);
+    const finalDeployment = await createDeployment(projectName, branchName);
+  }
+
+// Mapping of payload fields to environment variable names
+export const payloadFieldToEnvVarMap = {
+    businessName: "BUSINESS_NAME",
+    instagramHandle: "INSTAGRAM_HANDLE",
+    aboutPage: "BUSINESS_BIO",
+    serviceList: "BUSINESS_SERVICE_LIST",
+    businessAddress: "BUSINESS_ADDRESS",
+    serviceArea: "BUSINESS_SERVICE_AREA",
+    phoneNumber: "BUSINESS_PHONE_NUMBER",
+    email: "BUSINESS_EMAIL",
+    operatingHours: "BUSINESS_OPERATING_HOURS",
+    primaryColor: "PRIMARY_COLOR",
+    secondaryColor: "SECONDARY_COLOR",
+  };
+  
+  /**
+   * Fetches the environment variables for a given Vercel project.
+   * @param {string} projectId - The ID of the Vercel project.
+   * @returns {Promise<Object>} - The environment variables of the project.
+   */
+  async function fetchEnvVars(projectId: string) {
+    const accessToken = process.env.VERCEL_TOKEN;
+    console.log(accessToken)
+    console.log(`https://api.vercel.com/v9/projects/${projectId}/env`)
+    const response = await fetch(`https://api.vercel.com/v9/projects/${projectId}/env`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  
+    if (!response.ok) {
+      throw new Error(`Failed to retrieve environment variables: ${response.statusText}`);
+    }
+  
+    return response.json();
+  }
+  
+  /**
+   * Updates a specific environment variable for a given Vercel project.
+   * @param {string} projectId - The ID of the Vercel project.
+   * @param {string} envId - The ID of the environment variable.
+   * @param {string} value - The new value for the environment variable.
+   * @param {string[]} target - The target environments (e.g., ["production"]).
+   */
+  async function updateEnvVar(projectId: string, envId: string, value: string, target: string[]) {
+    const accessToken = process.env.VERCEL_TOKEN;
+    const response = await fetch(`https://api.vercel.com/v9/projects/${projectId}/env/${envId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        value,
+        target
+      })
+    });
+  
+    if (!response.ok) {
+      throw new Error(`Failed to update environment variable: ${response.statusText}`);
+    }
+  }
+  
+  /**
+   * Updates multiple environment variables for a given Vercel project.
+   * @param {string} projectId - The ID of the Vercel project.
+   * @param {Object[]} newEnvVars - An array of new environment variables to update.
+   */
+  export async function updateEnvVars(projectId: string, newEnvVars: { key: string, value: string }[]) {
+    const existingEnvs = await fetchEnvVars(projectId);
+  
+    for (const newEnvVar of newEnvVars) {
+      const existingEnv = existingEnvs.envs.find(e => e.key === newEnvVar.key);
+      if (existingEnv) {
+        await updateEnvVar(projectId, existingEnv.id, newEnvVar.value, existingEnv.target);
+        console.log(`Environment variable ${newEnvVar.key} updated successfully`);
+      } else {
+        console.warn(`Environment variable ${newEnvVar.key} not found`);
+  
+        const newEnvVarFullFormat = [{
+          key: newEnvVar.key,
+          value: newEnvVar.value,
+          target: ["production"],
+          type: "plain"
+        }]
+  
+        setEnvironmentVariables(projectId, newEnvVarFullFormat)
+      }
+    }
+  
+    console.log('Environment variables updated successfully');
+  }
+
+export async function getProjectProductionURL(projectId: string): Promise<string> {
+    const headers = {
+      'Authorization': `Bearer ${process.env.VERCEL_TOKEN}`,
+      'Content-Type': 'application/json'
+    };
+  
+    const response = await fetch(`https://api.vercel.com/v9/projects/${projectId}/deployments`, { headers });
+    const data = await response.json();
+  
+    if (!response.ok) {
+      throw new Error(`Error fetching deployments: ${data.error.message}`);
+    }
+  
+    const productionDeployment = data.latestDeployments.find((deployment: any) => deployment.target === 'production' && deployment.readyState === 'READY');
+  
+    if (!productionDeployment) {
+      throw new Error('No production deployment found');
+    }
+  
+    return productionDeployment.url;
   }

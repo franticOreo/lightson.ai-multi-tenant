@@ -5,10 +5,10 @@
 }
 
 .footer {
-  padding: calc(var(--base) * 4) 0;
+  padding: calc(var(--base) * 1) 0;
   background-color: var(--theme-elevation-1000);
   color: var(--theme-elevation-0);
-  border-bottom: 3px solid black;
+  border-bottom: 1px solid black;
   margin-bottom: 20px; 
 
   @include small-break {

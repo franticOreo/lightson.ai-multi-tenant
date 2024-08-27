@@ -3,7 +3,7 @@ import { tenant } from "../../fields/tenant";
 import { superAdmins } from '../../access/superAdmins'
 import { tenantAdmins } from "./access/tenantAdmins";
 import { tenants } from "./access/tenants";
-import { redeployProjectWithNewEnvVars } from "./hooks/redeployProjectWithNewEnvVars";
+// import { redeployProjectWithNewEnvVars } from "./hooks/redeployProjectWithNewEnvVars";
 
 export const Business: CollectionConfig = {
   slug: "business",
@@ -132,17 +132,8 @@ export const Business: CollectionConfig = {
       required: false,
     },
     {
-      label: "Project Deployment URL",
-      name: "projectDeploymentURL",
-      type: "text",
-      required: false,
-      admin: {
-        hidden: true, // Hide this field
-      },
-    },
-    {
-      label: "Project Domain URL",
-      name: "projectDomainURL",
+      label: "Vercel Production URL",
+      name: "vercelProductionURL",
       type: "text",
       required: false,
       admin: {
@@ -181,6 +172,6 @@ export const Business: CollectionConfig = {
     tenant,
   ],
   hooks: {
-    afterChange: [redeployProjectWithNewEnvVars]
+    // afterChange: [redeployProjectWithNewEnvVars]
   }
 };

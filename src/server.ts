@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import next from 'next'
 import nextBuild from 'next/dist/build'
 import path from 'path'
-import startSignUp from './utils/startSignUp';
+import { signUpRoute, onBoardingRoute, regenerateAboutPage } from './routes/signup';
 
 import { createServer } from 'http'
 import { initIO } from './socketio'
@@ -29,7 +29,17 @@ app.get('/', (req, res) => {
 
 
 // signup user to our CMS and input their form details into the business collection.
-app.post('/api/signup', startSignUp)
+app.post('/api/signup', (req, res) => {
+  req.isSignupOrOnboarding = true;
+  signUpRoute(req, res);
+});
+
+app.get('/api/onboarding', (req, res) => {
+  req.isSignupOrOnboarding = true;
+  onBoardingRoute(req, res);
+});
+
+app.post('/api/onboarding', regenerateAboutPage)
 
 
 const start = async (): Promise<void> => {
@@ -95,11 +105,6 @@ const start = async (): Promise<void> => {
   nextApp.prepare().then(() => {
     payload.logger.info('Starting Next.js...')
     const io = initIO(httpServer)
-
-    io.on('connection', (socket) => {
-      console.log('user connected', socket.id);
-  
-    })
 
     httpServer.listen(PORT, async () => {
       payload.logger.info(`Next.js App URL: ${process.env.PAYLOAD_PUBLIC_SERVER_URL}`)
