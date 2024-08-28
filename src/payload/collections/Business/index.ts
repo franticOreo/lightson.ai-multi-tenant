@@ -3,7 +3,7 @@ import { tenant } from "../../fields/tenant";
 import { superAdmins } from '../../access/superAdmins'
 import { tenantAdmins } from "./access/tenantAdmins";
 import { tenants } from "./access/tenants";
-// import { redeployProjectWithNewEnvVars } from "./hooks/redeployProjectWithNewEnvVars";
+import { redeployProjectWithNewEnvVars } from "./hooks/redeployProjectWithNewEnvVars";
 
 export const Business: CollectionConfig = {
   slug: "business",
@@ -172,6 +172,6 @@ export const Business: CollectionConfig = {
     tenant,
   ],
   hooks: {
-    // afterChange: [redeployProjectWithNewEnvVars]
+    afterChange: [redeployProjectWithNewEnvVars]
   }
 };
