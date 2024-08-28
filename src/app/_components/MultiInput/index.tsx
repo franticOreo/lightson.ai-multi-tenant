@@ -54,7 +54,6 @@ export const MultiInput: React.FC<MultiInputProps> = ({ keywords, onChange }) =>
   return (
     <div className="multi-input-container">
       <label htmlFor="keywords" className="multi-input-label">
-        SEO Keywords:
       </label>
       <div className="keywords-container">
         {keywords.map((keyword, index)=>(
