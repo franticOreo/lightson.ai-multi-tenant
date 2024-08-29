@@ -120,7 +120,7 @@ export const onBoardingRoute = async(req, res)=>{
 
 export const regenerateAboutPage = async(req, res)=>{
     try {
-        const { userId, businessId, accessToken, instagramHandle, ...data } = req.body;
+        let { userId, businessId, accessToken, instagramHandle, renewPosts, ...data } = req.body;
         const updatedBusiness: any = await updateBusinessDetails(businessId, data)
         
         const tenantDetails = {
@@ -128,7 +128,7 @@ export const regenerateAboutPage = async(req, res)=>{
           userId: userId
         }
 
-        const postCreationResponse = await getInstagramPostsAndPostToPayload(4, instagramHandle, updatedBusiness, tenantDetails, accessToken);
+        const postCreationResponse = await getInstagramPostsAndPostToPayload(4, instagramHandle, updatedBusiness, tenantDetails, accessToken, renewPosts);
 
         const postUnderstandings = postCreationResponse.postUnderstandings;
         

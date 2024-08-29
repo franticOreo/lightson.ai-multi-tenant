@@ -10,12 +10,12 @@ import { Timeline } from '../app/_components/Timeline/Timeline';
 
 import '../app/_css/onboarding.scss';
 import { ZoomingCircleLoaderWithStyles } from '../app/_components/LoadingShimmer/PageLoader';
+import TipsAndFactsComponent from '../app/_components/TipsAndFacts';
 
 const Onboarding = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [pageLoaded, setPageLoaded] = useState(false);
-  const { socket, isConnected, sendMessage } = useSocket();
+  const { socket, sendMessage } = useSocket();
   const { userId, accessToken, instagramHandle } = router.query;
   const [businessId, setBusinessId] = useState(null)
   const [productionURL, setProductionURL] = useState(null);
@@ -30,6 +30,7 @@ const Onboarding = () => {
   const [aboutPageChoice, setAboutPageChoice] = useState<'happy' | 'custom' | null>('happy');
   const [servicesChoice, setServicesChoice] = useState<'happy' | 'custom' | null>('happy');
   const [currentStep, setCurrentStep] = useState(1);
+  const [currentFactIndex, setCurrentFactIndex] = useState(0);
 
   let intervalId: any;
   
@@ -52,9 +53,7 @@ const Onboarding = () => {
         updateStates(data)
 
         if (data.primaryColor && data.secondaryColor && data.keywords.length && data.serviceList.length) {
-          setPageLoaded(true);
           clearInterval(intervalId);
-          console.log('Onboarding completed successfully');
         }
       }
     } catch (error) {
@@ -77,6 +76,14 @@ const Onboarding = () => {
       }, 2000);
     }
   }, [socket, userId, accessToken]);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentFactIndex((prevIndex) => (prevIndex + 1) % facts.length);
+    }, 5000);
+  
+    return () => clearInterval(interval);
+  }, []);
 
 
   const updateStates = (data: any)=>{
@@ -112,12 +119,13 @@ const Onboarding = () => {
         secondaryColor,
         aboutPage,
         keywords: keywords.map(keyword => ({ keyword })),
-        serviceList: serviceList.map(service => ({ service }))
+        serviceList: serviceList.map(service => ({ service })),
+        renewPosts: false
     }
 
     try {
         setLoading(true);
-        const response = await fetch('/api/onboarding', {
+        const response = await fetch('/api/pages', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -126,6 +134,7 @@ const Onboarding = () => {
         });
         if (response.ok){
             const { message, data } = await response.json()
+            console.log(data)
             const { vercelProductionURL, ...update} = data
             setProductionURL(vercelProductionURL)
             updateStates(update)
@@ -142,6 +151,12 @@ const Onboarding = () => {
     'About Your Business',
     'Services',
     'Preview Changes'
+  ];
+
+  const facts = [
+    ['Your selected keywords', keywords.join(', ') || 'No keywords selected'],
+    ['Services you provide', serviceList.join(', ') || 'No services listed'],
+    ['About your business', aboutPage || 'No description provided'],
   ];
 
   return (
@@ -329,7 +344,7 @@ const Onboarding = () => {
                 <p>We've picked out services you provide, have a look and see if they are correct.</p>
                 <div className='keywords-container'>
                   {serviceList.map((service, index) => (
-                    <InputItem key={index} name={service}/>
+                    <InputItem key={index} name={service} disabled={true}/>
                   ))}
                 </div>
                 <p>What do you think?</p>
@@ -419,15 +434,16 @@ const Onboarding = () => {
           )}
           {currentStep === 6 && (
             <div>
-              {productionURL ? (
+              {!loading ? (
                 <div>
                   <h2 className="onboarding-title">Your Site is Ready!</h2>
                   <p>Visit your site at: <a href={productionURL} target="_blank" rel="noopener noreferrer">{productionURL}</a></p>
                 </div>
               ) : 
               <div>
-                <h2 className="onboarding-title">Deploying your website...</h2>
+                <h2 className="onboarding-title">Hang tight! Your site is being deployed.</h2>
                 <ZoomingCircleLoaderWithStyles />
+                <TipsAndFactsComponent tipsAndFacts={facts} />
               </div>
               }
             </div>

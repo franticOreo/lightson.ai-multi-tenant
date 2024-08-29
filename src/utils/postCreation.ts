@@ -4,6 +4,7 @@ import { makePostPrompt, createPostFields, understandImage } from './gpt';
 
 async function sendPostEntryDataToCollection(postEntryData: any, accessToken: string, client_instagram_handle: string) {    // This will be worked on later
     const protocol = process.env.APP_ENV === 'production' ? 'https' : 'http';
+    // const protocol = 'http';
     try {
       const response = await axios({
         method: 'post',
@@ -18,6 +19,7 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
       console.log('Post created successfully:', response.data);
       return response.data;
     } catch (error) {
+      console.log('Access token:', accessToken);
       console.error('Failed to create post:', error.response ? error.response.data : error.message);
       // throw error;
       return []
@@ -55,6 +57,24 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
   
   }
 
+  export const getPostsUnderstandings = async (posts: any) => {
+    const postUnderstandings = [];
+    await Promise.all(posts.map(async (post) => {
+        try {
+            const imageUrl = post.media_url;
+            console.log(imageUrl);
+            
+            const postUnderstanding = await understandImage(imageUrl);
+            postUnderstandings.push(postUnderstanding);
+        }
+        catch(error){
+          console.log("Error:", error)
+        }
+    }));
+
+    return postUnderstandings;
+  }
+
   export async function postsCreationPipeline({
     posts,
     clientBusinessBio,
@@ -83,28 +103,13 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
         clientKeywords
     };
 
-    const postUnderstandings = [];
+    const postUnderstandings = await getPostsUnderstandings(posts);
 
-    await Promise.all(posts.map(async (post) => {
-        try {
-            const imageUrl = post.media_url;
-            console.log(imageUrl);
-            
-            const postUnderstanding = await understandImage(imageUrl);
-            postUnderstandings.push(postUnderstanding);
-        }
-        catch(error){
-          console.log("Error:", error)
-        }
-    }));
-
-    // Define the job logic as a separate function
     const processPostsAndSend = async () => {
       const postEntriesData = await Promise.all(posts.map(async (post) => {
           try {
               const postCaption = post.caption;
               const imageUrl = post.media_url;
-              console.log(imageUrl);
               
               const postUnderstanding = await understandImage(imageUrl);
               postUnderstandings.push(postUnderstanding);

@@ -1,6 +1,6 @@
 import { getInstagramPosts } from './instagramFunctions'; 
 import { generateRemainingBusinessDetails } from './createBusinessDetails';
-import { postsCreationPipeline } from './postCreation';
+import { getPostsUnderstandings, postsCreationPipeline } from './postCreation';
 import dotenv from 'dotenv';
 import path from 'path';
 import setupProjectAndDeploy from './gitHub';
@@ -33,24 +33,28 @@ export async function handleBusinessDetailsUpdate(businessId: string, businessDe
   return updatedBusinessObj;
 }
 
-export async function getInstagramPostsAndPostToPayload(nPosts: number, instagramHandle: string, updatedBusinessDetails: any, tenantDetails: any, payloadToken: string): Promise<any> {
+export async function getInstagramPostsAndPostToPayload(nPosts: number, instagramHandle: string, updatedBusinessDetails: any, tenantDetails: any, payloadToken: string, renewPosts: boolean = true): Promise<any> {
   //// need to get posts with Hiker API.
   const posts = await getInstagramPosts(instagramHandle);
   const recentPosts = posts.slice(0, nPosts);
+  let postsResponse: any = {}
+  postsResponse.postUnderstandings = await getPostsUnderstandings(recentPosts)
+  
+  if (renewPosts) {
+    const updatedBusinessKeywordsString = updatedBusinessDetails.keywords.map((kw: { keyword: string }) => kw.keyword).join(', ');
 
-  const updatedBusinessKeywordsString = updatedBusinessDetails.keywords.map((kw: { keyword: string }) => kw.keyword).join(', ');
-
-  const postsResponse = await postsCreationPipeline({
-    posts: recentPosts,
-    clientBusinessBio: updatedBusinessDetails.businessBio,
-    clientLanguageStyle: updatedBusinessDetails.languageStyle,
-    clientServiceArea: updatedBusinessDetails.serviceArea,
-    clientKeywords: updatedBusinessKeywordsString,
-    instagramHandle: updatedBusinessDetails.instagramHandle,
-    userId: tenantDetails.userId,
-    tenantId: tenantDetails.tenantId,
-    payloadToken
-  });
+    postsResponse = await postsCreationPipeline({
+      posts: recentPosts,
+      clientBusinessBio: updatedBusinessDetails.businessBio,
+      clientLanguageStyle: updatedBusinessDetails.languageStyle,
+      clientServiceArea: updatedBusinessDetails.serviceArea,
+      clientKeywords: updatedBusinessKeywordsString,
+      instagramHandle: updatedBusinessDetails.instagramHandle,
+      userId: tenantDetails.userId,
+      tenantId: tenantDetails.tenantId,
+      payloadToken
+    });
+  }
 
   return postsResponse; 
 }
@@ -88,7 +92,7 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
 
   // setup vercel project using a branch of the main branch from lightson_template
   const projectDeploymentResponse = await setupProjectAndDeploy(branchName, projectName, envVariables)
-
+  console.log('===========>', projectDeploymentResponse)
   // Only set deployment data to business collection if running in production.
   if (process.env.APP_ENV === 'production') {
     const projectId = projectDeploymentResponse.project.id;

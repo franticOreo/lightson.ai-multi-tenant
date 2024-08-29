@@ -3,10 +3,11 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
-// import { Input, Button, Message } from '../components'; // Adjust import paths as needed
 import { Input } from '../app/_components/Input'; 
 import { Gutter } from '../app/_components/Gutter';
 import { Button } from '../app/_components/Button';
+
+import '../app/_css/signup.scss';
 
 
 type FormData = {
@@ -55,26 +56,20 @@ const WaitlistForm: React.FC = () =>  {
   }
 
   return (
-    <Gutter>
-    <div className="card ">
-      <div className="form-container">
-        <h1 className='unbounded'>lightson.ai</h1><br />
-        <h2 className='unbounded'>Turn Your Instagram Posts Into a Stunning Portfolio Website</h2>
-        <h3 className='unbounded'>Join Our Waitlist</h3>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Input name="email" label="Email" required register={register} error={errors.email} type="email" />
-          <Input name="instagramHandle" label="Instagram Handle" required register={register} error={errors.instagramHandle} type="text" />
-          <Button
-            type="submit"
-            label={loading ? 'Joining Waitlist...' : 'Join'}
-            disabled={loading}
-            appearance="primary"
-            className="button mt-40"
-          />
-        </form>
-      </div>
+    <div className="signup-container">
+      <h2 className='signup-title'>Join Our Waitlist</h2>
+      <h3>Turn Your Instagram Posts Into a Stunning Portfolio Website</h3>
+      <form onSubmit={handleSubmit(onSubmit)} className="signup-form">
+          {error && <b className="error-message">{error}</b>}
+          <div>
+              <Input name="email" label="Email" required register={register} error={errors.email} type="email" />
+              </div>
+          <div>
+              <Input name="instagramHandle" label="Instagram Handle" required register={register} error={errors.instagramHandle} type="text" />
+          </div>
+          <Button type="submit" label={'Join'} disabled={loading} appearance="primary" className="button mt-40" />
+      </form>
     </div>
-    </Gutter>
   );
 };
 
