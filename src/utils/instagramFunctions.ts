@@ -126,27 +126,3 @@ export async function loginUser(email: string, password: string, admin: boolean 
       throw error; // Rethrow or handle as needed
     }
   }
-
-  
-
-interface InstagramProfileData {
-  payloadUserId: string;
-  instagramUserId: string;
-  instagramHandle: string;
-  accessToken: string;
-}
-
-export async function createInstagramProfileEntry(profileData: InstagramProfileData) {
-  try {
-    const newProfile = await payload.create({
-      collection: 'instagramProfiles',
-      data: profileData,
-    });
-
-    return newProfile;
-  } catch (error) {
-    console.error('Error creating Instagram Profile:', error);
-    throw error;
-  }
-}
-

@@ -124,25 +124,6 @@ async function getUserByUserId(userId: string) {
   }
 }
 
-
-async function getInstagramProfileByUserId(payloadUserId: string) {
-  try {
-    const result = await payload.find({
-      collection: 'instagramProfiles',
-      where: {
-        'payloadUserId': { // Assuming the relationship field is named 'user'
-          equals: payloadUserId
-        }
-      },
-      depth: 1 // Adjust depth as needed to fetch related documents
-    });
-    return result;
-  } catch (error) {
-    console.error('Error fetching user details:', error);
-    throw error;
-  }
-}
-
 export async function getBusinessDetailsByUserId(payloadUserId: string) {
   try {
     const result = await payload.find({
@@ -165,7 +146,7 @@ export async function updateCollection(collectionName: string, documentId: strin
   
   try {
     const updatedDocument = await payload.update({
-      collection: collectionName as 'business' | 'users' | 'tenants' | 'posts' | 'media' | 'waitlists' | 'instagramProfiles' | 'payload-preferences' | 'payload-migrations',
+      collection: collectionName as 'business' | 'users' | 'tenants' | 'posts' | 'media' | 'waitlists' | 'payload-preferences' | 'payload-migrations',
       where: {
         id: {
           equals: documentId
