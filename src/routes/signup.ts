@@ -1,7 +1,7 @@
 import { createUser, getUserPostUnderstandings } from '../utils/payload';
 import { createBusinessEntry } from '../utils/createBusinessDetails';   
 import payload from 'payload';
-import { createInstagramProfileEntry, loginUser} from '../utils/instagramFunctions'; 
+import { loginUser } from '../utils/instagramFunctions'; 
 import { getInstagramPostsAndPostToPayload, startDeployment, setUpBusinessDetailsAndPosts } from '../utils/onboarding';
 import { updateBusinessDetails } from '../utils/payload';
 import { emitToSocket, getAllSocketIds } from '../socketio';
@@ -70,15 +70,6 @@ export async function signUpRoute(req, res) {
       await createBusinessEntry(businessDetails);
 
       Promise.resolve().then(() => {
-        createInstagramProfileEntry({
-          payloadUserId: userId.toString(),
-          instagramUserId: 'notNanny',
-          instagramHandle: sanitizedInstagramHandle,
-          accessToken: 'notNanny',
-        })
-        .catch(error => {
-          console.error('Background process error:', error);
-        })
         setUpBusinessDetailsAndPosts(userId.toString(), sanitizedInstagramHandle, 4, accessToken).catch(error => {
           console.error('Background process error:', error);
         });

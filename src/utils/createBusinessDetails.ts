@@ -9,7 +9,6 @@ export const runtime = "edge";
 require('dotenv').config();
 
 
-
 export async function createBusinessEntry(businessDetails: any) {
     // Set businessName to instagramHandle if not provided
     if (!businessDetails.businessName) {
@@ -20,6 +19,7 @@ export async function createBusinessEntry(businessDetails: any) {
       const response = await payload.create({
           collection: 'business', // Adjust 'business' to your actual collection name
           data: businessDetails,
+          context: { isSignupOrOnboarding: true }
       });
       return response;
   } catch (error) {
