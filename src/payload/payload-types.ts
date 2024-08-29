@@ -14,7 +14,6 @@ export interface Config {
     media: Media;
     business: Business;
     waitlists: Waitlist;
-    instagramProfiles: InstagramProfile;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
@@ -152,19 +151,6 @@ export interface Waitlist {
   id: string;
   email: string;
   instagramHandle: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "instagramProfiles".
- */
-export interface InstagramProfile {
-  id: string;
-  payloadUserId: string | User;
-  instagramUserId: string;
-  instagramHandle: string;
-  accessToken: string;
   updatedAt: string;
   createdAt: string;
 }
