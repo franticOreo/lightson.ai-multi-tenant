@@ -4,6 +4,7 @@ import { makePostPrompt, createPostFields, understandImage } from './gpt';
 
 async function sendPostEntryDataToCollection(postEntryData: any, accessToken: string, client_instagram_handle: string) {    // This will be worked on later
     const protocol = process.env.APP_ENV === 'production' ? 'https' : 'http';
+    // const protocol = 'http';
     try {
       const response = await axios({
         method: 'post',
@@ -109,7 +110,6 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
           try {
               const postCaption = post.caption;
               const imageUrl = post.media_url;
-              console.log(imageUrl);
               
               const postUnderstanding = await understandImage(imageUrl);
               postUnderstandings.push(postUnderstanding);

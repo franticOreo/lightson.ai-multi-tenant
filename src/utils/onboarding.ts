@@ -92,7 +92,7 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
 
   // setup vercel project using a branch of the main branch from lightson_template
   const projectDeploymentResponse = await setupProjectAndDeploy(branchName, projectName, envVariables)
-
+  console.log('===========>', projectDeploymentResponse)
   // Only set deployment data to business collection if running in production.
   if (process.env.APP_ENV === 'production') {
     const projectId = projectDeploymentResponse.project.id;

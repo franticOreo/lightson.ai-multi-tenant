@@ -25,5 +25,10 @@ export const Media: CollectionConfig = {
         },
       }),
     },
+    {
+      name: 'description',
+      type: 'text',
+      required: false,
+    },
   ],
 }
