@@ -25,8 +25,24 @@ export function prepareEnvVariables(businessDetails: any) {
   }
 
 export const createDeployment = async (vercelProjectName, gitBranchName) => {
-    const apiUrl = `https://api.vercel.com/v12/now/deployments`;
     const token = process.env.VERCEL_TOKEN
+    const teamId = process.env.VERCEL_TEAM_ID
+    const apiUrl = `https://api.vercel.com/v12/now/deployments?teamId=${teamId}`;
+
+    const data = JSON.stringify({
+      name: vercelProjectName,
+      projectSettings: {
+        framework: 'nextjs',
+        installCommand: 'npm install', // Default install command
+        buildCommand: 'npm run build', // Default build command for Next.js
+      },
+      target: 'production', // or 'preview'
+      gitSource: {
+        type: 'github',
+        ref: gitBranchName,
+        repoId: '775700951'
+      },
+    })
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -34,20 +50,7 @@ export const createDeployment = async (vercelProjectName, gitBranchName) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({
-        name: vercelProjectName,
-        projectSettings: {
-          framework: 'nextjs',
-          installCommand: 'npm install', // Default install command
-          buildCommand: 'npm run build', // Default build command for Next.js
-        },
-        target: 'production', // or 'preview'
-        gitSource: {
-          type: 'github',
-          ref: gitBranchName,
-          repoId: '775700951'
-        },
-      })
+      body: data
     });
   
     if (!response.ok) {
@@ -57,17 +60,18 @@ export const createDeployment = async (vercelProjectName, gitBranchName) => {
   
     const jsonResponse = await response.json();
 
-    console.log('Deployment created:', {
-        id: jsonResponse.id,
-        url: jsonResponse.url,
-        state: jsonResponse.state
-    });
+    // console.log('Deployment created:', {
+    //     id: jsonResponse.id,
+    //     url: jsonResponse.url,
+    //     state: jsonResponse.state
+    // });
 
     return jsonResponse;
   };
   
   export const setEnvironmentVariables = async (projectId, envVariables) => {
-    const apiUrl = `https://api.vercel.com/v10/projects/${projectId}/env`;
+    const teamId = process.env.VERCEL_TEAM_ID
+    const apiUrl = `https://api.vercel.com/v10/projects/${projectId}/env?teamId=${teamId}&upsert=true`;
     const token = process.env.VERCEL_TOKEN
   
     const response = await fetch(apiUrl, {
@@ -85,7 +89,7 @@ export const createDeployment = async (vercelProjectName, gitBranchName) => {
     }
   
     const jsonResponse = await response.json();
-    console.log('Environment variables set:', jsonResponse);
+    // console.log('Environment variables set:', jsonResponse);
     return jsonResponse;
   };
   
@@ -196,24 +200,22 @@ export const payloadFieldToEnvVarMap = {
     console.log('Environment variables updated successfully');
   }
 
-export async function getProjectProductionURL(projectId: string): Promise<string> {
+export async function getProjectProductionURL(deploymentId: string): Promise<string> {
     const headers = {
       'Authorization': `Bearer ${process.env.VERCEL_TOKEN}`,
       'Content-Type': 'application/json'
     };
   
-    const response = await fetch(`https://api.vercel.com/v9/projects/${projectId}/deployments`, { headers });
+    const response = await fetch(`https://api.vercel.com/v13/deployments/${deploymentId}`, { headers });
     const data = await response.json();
   
     if (!response.ok) {
       throw new Error(`Error fetching deployments: ${data.error.message}`);
     }
-  
-    const productionDeployment = data.latestDeployments.find((deployment: any) => deployment.target === 'production' && deployment.readyState === 'READY');
-  
-    if (!productionDeployment) {
+
+    if (!data) {
       throw new Error('No production deployment found');
     }
   
-    return productionDeployment.url;
+    return data.url;
   }

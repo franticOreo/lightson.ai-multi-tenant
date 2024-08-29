@@ -94,7 +94,7 @@ export async function loginUser(email: string, password: string, admin: boolean 
 }
 
 
-  export async function uploadImageToCollection(imageBuffer: Buffer, imageTitle: string, accessToken: string, makeUnique: boolean = true) {
+  export async function uploadImageToCollection(imageBuffer: Buffer, imageTitle: string, accessToken: string, makeUnique: boolean = true, description: string = '') {
     try {
       const uniqueId = makeUnique ? uuidv4() : "";
       const tempImagePath = `./${imageTitle}_${uniqueId}.jpg`; // Now includes a UUID
@@ -105,6 +105,7 @@ export async function loginUser(email: string, password: string, admin: boolean 
       const formData = new FormData();
       formData.append('file', fs.createReadStream(tempImagePath));
       formData.append('alt', imageTitle);
+      formData.append('description', description);
   
       // Perform the upload
       const response = await axios({

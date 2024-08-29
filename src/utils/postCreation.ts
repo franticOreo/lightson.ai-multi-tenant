@@ -4,7 +4,7 @@ import { makePostPrompt, createPostFields, understandImage } from './gpt';
 
 async function sendPostEntryDataToCollection(postEntryData: any, accessToken: string, client_instagram_handle: string) {    // This will be worked on later
     const protocol = process.env.APP_ENV === 'production' ? 'https' : 'http';
-    // const protocol = 'http';
+
     try {
       const response = await axios({
         method: 'post',
@@ -16,10 +16,8 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
         },
       });
   
-      console.log('Post created successfully:', response.data);
       return response.data;
     } catch (error) {
-      console.log('Access token:', accessToken);
       console.error('Failed to create post:', error.response ? error.response.data : error.message);
       // throw error;
       return []
@@ -27,11 +25,11 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
   }
   
   export async function createPostEntry(instagramHandle: string, userId: string, tenantId: string, payloadToken: string,
-    post: any, postFields: any,) {
+    post: any, postFields: any, postUnderstanding: string = '') {
     
     const postUrl = post.media_url
     const image = await downloadImageToMemory(postUrl);
-    const imageUploadResponse = await uploadImageToCollection(image, instagramHandle, payloadToken)
+    const imageUploadResponse = await uploadImageToCollection(image, instagramHandle, payloadToken, true, postUnderstanding);
     const mediaId = imageUploadResponse.doc.id;
 
     const postEntryData = {
@@ -62,7 +60,6 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
     await Promise.all(posts.map(async (post) => {
         try {
             const imageUrl = post.media_url;
-            console.log(imageUrl);
             
             const postUnderstanding = await understandImage(imageUrl);
             postUnderstandings.push(postUnderstanding);
@@ -106,18 +103,17 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
     const postUnderstandings = await getPostsUnderstandings(posts);
 
     const processPostsAndSend = async () => {
-      const postEntriesData = await Promise.all(posts.map(async (post) => {
+      const postEntriesData = await Promise.all(posts.map(async (post, index) => {
           try {
               const postCaption = post.caption;
               const imageUrl = post.media_url;
               
-              const postUnderstanding = await understandImage(imageUrl);
-              postUnderstandings.push(postUnderstanding);
+              const postUnderstanding = postUnderstandings[index]
   
               const blogPrompt = makePostPrompt(postCaption, postUnderstanding, bioLanguageKwObj, clientServiceArea);
               const postFields = await createPostFields(blogPrompt);
   
-              const postEntryData = await createPostEntry(instagramHandle, userId, tenantId, payloadToken, post, postFields);
+              const postEntryData = await createPostEntry(instagramHandle, userId, tenantId, payloadToken, post, postFields, postUnderstanding);
               return postEntryData;
           } catch (error) {
               console.error('Error processing post:', error);
