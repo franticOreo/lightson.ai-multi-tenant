@@ -11,7 +11,7 @@ export async function redeployProjectWithNewEnvVars({ doc, previousDoc, req }) {
     'serviceArea', 'phoneNumber', 'operatingHours', 'primaryColor', 'secondaryColor', 'serviceList'];
   const newEnvVars = [];
 
-  if (req?.isSignupOrOnboarding) {
+  if (req?.context.isSignupOrOnboarding) {
     console.log('Skipping redeployment (redeployProjectWithNewEnvVars) due to onboarding flow. ');
     return;
   }

@@ -13,6 +13,7 @@ dotenv.config({
 });
 
 export async function handleBusinessDetailsUpdate(businessId: string, businessDetailsData: any, instagramHandle: string, tenantId: string): Promise<any> {
+  const context = { isSignupOrOnboarding: true }
   const serviceArea = businessDetailsData.serviceArea || 'No location provided';
 
   const remainingDetails = await generateRemainingBusinessDetails(instagramHandle, serviceArea);
@@ -28,7 +29,7 @@ export async function handleBusinessDetailsUpdate(businessId: string, businessDe
     secondaryColor: remainingDetails.SECONDARY_COLOR
   };
 
-  const updatedBusinessObj = await updateBusinessDetails(businessId, newBusinessData);
+  const updatedBusinessObj = await updateBusinessDetails(businessId, newBusinessData, context);
 
   return updatedBusinessObj;
 }
@@ -80,6 +81,7 @@ export const getEnvVariables = (userId, instagramHandle, aboutPageServices, busi
 }
 
 export const startDeployment = async (userId: string, instagramHandle: string, aboutPageServices: any, businessDetails: any): Promise<any | void> => {
+  const context = { isSignupOrOnboarding: true }
   // We create .env file. This .env file is created for a next.js project. This project is a branch of a template website I have created (lightson_template)
   const envVariables = getEnvVariables(userId, instagramHandle, aboutPageServices, businessDetails)
 
@@ -99,7 +101,7 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
       vercelProductionURL: productionURL
     } 
     // update business details with projectDeploymentURL
-    const businessDetailsWithDeployment = await updateBusinessDetails(businessDetails.id, deploymentData)
+    const businessDetailsWithDeployment = await updateBusinessDetails(businessDetails.id, deploymentData, context)
 
     if (productionURL) {
       return businessDetailsWithDeployment;
