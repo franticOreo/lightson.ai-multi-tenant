@@ -108,7 +108,7 @@ export default async function setupProjectAndDeploy(projectName, branchName, env
   }
 
   if (process.env.APP_ENV === 'production') {
-    const vercelToken = process.env.VERCEL_TOKEN;
+
     // Create deployment and get project ID
     const deployment = await createDeployment(projectName, branchName);
     if (!deployment) return;

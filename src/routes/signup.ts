@@ -1,4 +1,4 @@
-import { createUser } from '../utils/payload';
+import { createUser, getUserPostUnderstandings } from '../utils/payload';
 import { createBusinessEntry } from '../utils/createBusinessDetails';   
 import payload from 'payload';
 import { createInstagramProfileEntry, loginUser} from '../utils/instagramFunctions'; 
@@ -128,16 +128,13 @@ export const regenerateAboutPage = async(req, res)=>{
           userId: userId
         }
 
-        const postCreationResponse = await getInstagramPostsAndPostToPayload(4, instagramHandle, updatedBusiness, tenantDetails, accessToken, renewPosts);
-
-        const postUnderstandings = postCreationResponse.postUnderstandings;
+        const userPosts: any = await getUserPostUnderstandings(userId);
+        const postUnderstandings: string[] = userPosts?.map((post: any) => post.description)
         
-        const aboutPageServices = await generateAboutPage(updatedBusiness, postUnderstandings);
+        const aboutPageServices = {aboutPage: updatedBusiness.aboutPage, serviceList: updatedBusiness.serviceList}
+        
         const { aboutPage } = aboutPageServices
-
-        const updatedBusinessDetailsAgain = await updateBusinessDetails(updatedBusiness.id, {aboutPage})
-
-        const businessDetailsWithDeployment = await startDeployment(userId, instagramHandle, aboutPageServices, updatedBusinessDetailsAgain);
+        const businessDetailsWithDeployment = await startDeployment(userId, instagramHandle, aboutPageServices, updatedBusiness);
         
         res.status(200).send({ message: 'Onboarding completed successfully', data: businessDetailsWithDeployment });
 

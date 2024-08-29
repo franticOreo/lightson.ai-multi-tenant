@@ -161,6 +161,25 @@ export async function getBusinessDetailsByUserId(payloadUserId: string) {
   }
 }
 
+export async function getUserPostUnderstandings(userId: string) {
+  try {
+    const result = await payload.find({
+      collection: 'posts', // Adjust to your actual posts collection name
+      where: {
+        author: {
+          equals: userId,
+        },
+      },
+    });
+
+    // Extract and return only the coverImage from each post
+    return result.docs.map(post => post?.coverImage);
+  } catch (error) {
+    console.error('Error fetching cover images by userId:', error);
+    throw error;
+  }
+}
+
 export async function updateCollection(collectionName: string, documentId: string, newData: any) {
   
   try {

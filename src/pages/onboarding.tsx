@@ -125,7 +125,7 @@ const Onboarding = () => {
 
     try {
         setLoading(true);
-        const response = await fetch('/api/pages', {
+        const response = await fetch('/api/deployments', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -437,7 +437,7 @@ const Onboarding = () => {
               {!loading ? (
                 <div>
                   <h2 className="onboarding-title">Your Site is Ready!</h2>
-                  <p>Visit your site at: <a href={productionURL} target="_blank" rel="noopener noreferrer">{productionURL}</a></p>
+                  <p>Visit your site at: <a href={`https://${productionURL}`} target="_blank" rel="noopener noreferrer">{productionURL}</a></p>
                 </div>
               ) : 
               <div>

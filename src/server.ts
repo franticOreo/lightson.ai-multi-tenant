@@ -39,7 +39,7 @@ app.get('/api/onboarding', (req, res) => {
   onBoardingRoute(req, res);
 });
 
-app.post('/api/pages', regenerateAboutPage)
+app.post('/api/deployments', regenerateAboutPage)
 
 
 const start = async (): Promise<void> => {
