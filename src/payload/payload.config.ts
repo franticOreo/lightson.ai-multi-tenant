@@ -11,7 +11,6 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Business } from './collections/Business';
 import { Waitlists } from './collections/Waitlists'
-import { InstagramProfiles } from './collections/InstagramProfiles'
 import { cloudStorage } from '@payloadcms/plugin-cloud-storage'
 import { s3Adapter } from '@payloadcms/plugin-cloud-storage/s3'
 
@@ -30,7 +29,7 @@ const digitalOceanAdapter = s3Adapter({
 })
 
 export default buildConfig({
-  collections: [Users, Tenants, Posts, Media, Business, Waitlists, InstagramProfiles],
+  collections: [Users, Tenants, Posts, Media, Business, Waitlists],
   cors: '*',
   admin: {
     bundler: webpackBundler(),

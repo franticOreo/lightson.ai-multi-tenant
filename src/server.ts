@@ -13,8 +13,6 @@ dotenv.config();
 import express from 'express'
 import payload from 'payload'
 
-import { seed } from './payload/seed'
-
 const app = express()
 const PORT = process.env.PORT || 3000
 
@@ -27,15 +25,12 @@ app.use(express.urlencoded({ extended: true }))
 //   res.redirect('/join-waitlist');
 // });
 
-
 // signup user to our CMS and input their form details into the business collection.
 app.post('/api/signup', (req, res) => {
-  req.isSignupOrOnboarding = true;
   signUpRoute(req, res);
 });
 
 app.get('/api/onboarding', (req, res) => {
-  req.isSignupOrOnboarding = true;
   onBoardingRoute(req, res);
 });
 

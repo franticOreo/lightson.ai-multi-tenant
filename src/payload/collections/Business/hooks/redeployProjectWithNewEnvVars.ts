@@ -11,7 +11,7 @@ export async function redeployProjectWithNewEnvVars({ doc, previousDoc, req }) {
     'serviceArea', 'phoneNumber', 'operatingHours', 'primaryColor', 'secondaryColor', 'serviceList'];
   const newEnvVars = [];
 
-  if (req?.isSignupOrOnboarding) {
+  if (req?.context.isSignupOrOnboarding) {
     console.log('Skipping redeployment (redeployProjectWithNewEnvVars) due to onboarding flow. ');
     return;
   }
@@ -34,6 +34,10 @@ export async function redeployProjectWithNewEnvVars({ doc, previousDoc, req }) {
 
   if (newEnvVars.length > 0) {
     const projectId = doc.vercelProjectId;
+    if (!projectId) {
+      console.log('Skipping redeployment: vercelProjectId is undefined');
+      return;
+    }
     console.log('updating vercel project Env Variables for project', projectId)
     await updateEnvVars(projectId, newEnvVars);
     await updateProjectFromMainAndDeploy(doc.instagramHandle, doc.instagramHandle)

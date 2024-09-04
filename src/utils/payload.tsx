@@ -124,25 +124,6 @@ async function getUserByUserId(userId: string) {
   }
 }
 
-
-async function getInstagramProfileByUserId(payloadUserId: string) {
-  try {
-    const result = await payload.find({
-      collection: 'instagramProfiles',
-      where: {
-        'payloadUserId': { // Assuming the relationship field is named 'user'
-          equals: payloadUserId
-        }
-      },
-      depth: 1 // Adjust depth as needed to fetch related documents
-    });
-    return result;
-  } catch (error) {
-    console.error('Error fetching user details:', error);
-    throw error;
-  }
-}
-
 export async function getBusinessDetailsByUserId(payloadUserId: string) {
   try {
     const result = await payload.find({
@@ -180,17 +161,18 @@ export async function getUserPostUnderstandings(userId: string) {
   }
 }
 
-export async function updateCollection(collectionName: string, documentId: string, newData: any) {
+export async function updateCollection(collectionName: string, documentId: string, newData: any, context: null | any = null) {
   
   try {
     const updatedDocument = await payload.update({
-      collection: collectionName as 'business' | 'users' | 'tenants' | 'posts' | 'media' | 'waitlists' | 'instagramProfiles' | 'payload-preferences' | 'payload-migrations',
+      collection: collectionName as 'business' | 'users' | 'tenants' | 'posts' | 'media' | 'waitlists' | 'payload-preferences' | 'payload-migrations',
       where: {
         id: {
           equals: documentId
         }
       },
-      data: newData
+      data: newData,
+      context: context
     });
 
     return updatedDocument.docs[0];
@@ -200,12 +182,9 @@ export async function updateCollection(collectionName: string, documentId: strin
   }
 }
 
-export async function updateBusinessDetails(businessId: string, newData: any) {
-  // if (Object.keys(newData).includes('keywords')){
-  //   newData.keywords = Array.isArray(newData.keywords) ? newData.keywords.map(keyword => ({ keyword })) : typeof newData.keywords === 'string' ? newData.keywords.split(', ').map(keyword => ({ keyword })) : []
-  // }
+export async function updateBusinessDetails(businessId: string, newData: any, context: null | any = null) {
   try {
-    return await updateCollection('business', businessId, newData);
+    return await updateCollection('business', businessId, newData, context);
 
   } catch (error) {
     console.error('Error updating business details:', error);

@@ -1,5 +1,8 @@
 import { updateBranchFromMain } from "./gitHub";
 
+const teamId = process.env.VERCEL_TEAM_ID
+const token = process.env.VERCEL_TOKEN
+
 export function prepareEnvVariables(businessDetails: any) {
     return [
       // Fixed .env vars.
@@ -25,8 +28,6 @@ export function prepareEnvVariables(businessDetails: any) {
   }
 
 export const createDeployment = async (vercelProjectName, gitBranchName) => {
-    const token = process.env.VERCEL_TOKEN
-    const teamId = process.env.VERCEL_TEAM_ID
     const apiUrl = `https://api.vercel.com/v12/now/deployments?teamId=${teamId}`;
 
     const data = JSON.stringify({
@@ -85,7 +86,6 @@ export const createDeployment = async (vercelProjectName, gitBranchName) => {
   };
   
   export const setEnvironmentVariables = async (projectId, envVariables) => {
-    const teamId = process.env.VERCEL_TEAM_ID
     const apiUrl = `https://api.vercel.com/v10/projects/${projectId}/env?teamId=${teamId}&upsert=true`;
     const token = process.env.VERCEL_TOKEN
   
@@ -102,14 +102,11 @@ export const createDeployment = async (vercelProjectName, gitBranchName) => {
       console.error('Failed to set environment variables:', response.status, await response.text());
       return null;
     }
-  
     const jsonResponse = await response.json();
-    // console.log('Environment variables set:', jsonResponse);
     return jsonResponse;
   };
   
   export async function updateProjectFromMainAndDeploy(projectName: string, branchName: string) {
-    const vercelToken = process.env.VERCEL_TOKEN;
     const updateResult = await updateBranchFromMain('main', branchName);
   
     if (!updateResult) {
@@ -117,7 +114,7 @@ export const createDeployment = async (vercelProjectName, gitBranchName) => {
       return;
     }
   
-    const finalDeployment = await createDeployment(projectName, branchName);
+    await createDeployment(projectName, branchName);
   }
 
 // Mapping of payload fields to environment variable names
@@ -142,8 +139,7 @@ export const payloadFieldToEnvVarMap = {
    */
   async function fetchEnvVars(projectId: string) {
     const accessToken = process.env.VERCEL_TOKEN;
- 
-    const response = await fetch(`https://api.vercel.com/v9/projects/${projectId}/env`, {
+    const response = await fetch(`https://api.vercel.com/v9/projects/${projectId}/env?teamId=${teamId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -152,6 +148,7 @@ export const payloadFieldToEnvVarMap = {
     });
   
     if (!response.ok) {
+      console.log(`Failed: https://api.vercel.com/v9/projects/${projectId}/env?teamId=${teamId}`)
       throw new Error(`Failed to retrieve environment variables: ${response.statusText}`);
     }
   
@@ -165,9 +162,9 @@ export const payloadFieldToEnvVarMap = {
    * @param {string} value - The new value for the environment variable.
    * @param {string[]} target - The target environments (e.g., ["production"]).
    */
-  async function updateEnvVar(projectId: string, envId: string, value: string, target: string[]) {
+  async function updateEnvVar(projectId: string, envVarId: string, value: string, target: string[]) {
     const accessToken = process.env.VERCEL_TOKEN;
-    const response = await fetch(`https://api.vercel.com/v9/projects/${projectId}/env/${envId}`, {
+    const response = await fetch(`https://api.vercel.com/v9/projects/${projectId}/env/${envVarId}?teamId=${teamId}`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -193,9 +190,9 @@ export const payloadFieldToEnvVarMap = {
     const existingEnvs = await fetchEnvVars(projectId);
   
     for (const newEnvVar of newEnvVars) {
-      const existingEnv = existingEnvs.envs.find(e => e.key === newEnvVar.key);
-      if (existingEnv) {
-        await updateEnvVar(projectId, existingEnv.id, newEnvVar.value, existingEnv.target);
+      const existingEnvVar = existingEnvs.envs.find(e => e.key === newEnvVar.key);
+      if (existingEnvVar) {
+        await updateEnvVar(projectId, existingEnvVar.id, newEnvVar.value, existingEnvVar.target);
         console.log(`Environment variable ${newEnvVar.key} updated successfully`);
       } else {
         console.warn(`Environment variable ${newEnvVar.key} not found`);
