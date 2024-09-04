@@ -1,13 +1,18 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import { Gutter } from '../Gutter'
 
 import classes from './index.module.scss'
 
 export default function Header() {
+  const router = useRouter();
+  const pathname = router.pathname;
+  const unAuthenticatedPaths = ['/', '/join-waitlist', '/signup', '/login']
+
   return (
-    <footer className={classes.footer}>
+    <header className={classes.header}>
       <Gutter className={classes.wrap}>
         {/* <Link href="/"> */}
       <picture>
@@ -19,8 +24,11 @@ export default function Header() {
           </picture>
         {/* </Link> */}
         <nav className={classes.nav}>
+          {unAuthenticatedPaths.includes(pathname) ? (
+            <Link href={'/join-waitlist'} className={classes.button}>Sign Up</Link>
+          ) : null}
         </nav>
       </Gutter>
-    </footer>
+    </header>
   )
 }

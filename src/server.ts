@@ -23,9 +23,9 @@ const httpServer = createServer(app)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.get('/', (req, res) => {
-  res.redirect('/join-waitlist');
-});
+// app.get('/', (req, res) => {
+//   res.redirect('/join-waitlist');
+// });
 
 
 // signup user to our CMS and input their form details into the business collection.
