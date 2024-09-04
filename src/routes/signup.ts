@@ -66,9 +66,9 @@ export async function signUpRoute(req, res) {
           instagramHandle: sanitizedInstagramHandle,
           email
       };
-
+      console.log('-----BEFORE CREATE BUSINESS ENTRY-----');
       await createBusinessEntry(businessDetails);
-
+      console.log('-----REACHED HERE-----');
       Promise.resolve().then(() => {
         createInstagramProfileEntry({
           payloadUserId: userId.toString(),

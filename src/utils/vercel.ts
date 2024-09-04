@@ -60,6 +60,21 @@ export const createDeployment = async (vercelProjectName, gitBranchName) => {
   
     const jsonResponse = await response.json();
 
+    const domainRequest = await fetch(`https://api.vercel.com/v10/projects/${vercelProjectName}/domains?teamId=${teamId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        name: `${vercelProjectName}.vercel.app`
+      })
+    })
+
+    const domainResponse = await domainRequest.json();
+
+    console.log('Domain response:', domainResponse);
+
     // console.log('Deployment created:', {
     //     id: jsonResponse.id,
     //     url: jsonResponse.url,
@@ -127,8 +142,7 @@ export const payloadFieldToEnvVarMap = {
    */
   async function fetchEnvVars(projectId: string) {
     const accessToken = process.env.VERCEL_TOKEN;
-    console.log(accessToken)
-    console.log(`https://api.vercel.com/v9/projects/${projectId}/env`)
+ 
     const response = await fetch(`https://api.vercel.com/v9/projects/${projectId}/env`, {
       method: 'GET',
       headers: {

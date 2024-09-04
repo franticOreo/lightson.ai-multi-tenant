@@ -25,6 +25,7 @@
     "@payloadcms/db-mongodb": "^1.0.0",
     "@payloadcms/plugin-cloud-storage": "^1.1.2",
     "@payloadcms/richtext-slate": "^1.0.0",
+    "@react-google-maps/api": "^2.19.3",
     "axios": "^1.6.8",
     "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",

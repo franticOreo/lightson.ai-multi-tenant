@@ -61,10 +61,10 @@ body {
   color: var(--theme-text);
 }
 
-::selection {
-  background: var(--theme-success-500);
-  color: var(--color-base-800);
-}
+// ::selection {
+//   background: var(--theme-success-500);
+//   color: var(--color-base-800);
+// }
 
 ::-moz-selection {
   background: var(--theme-success-500);

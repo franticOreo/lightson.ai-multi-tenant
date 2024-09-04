@@ -6,24 +6,43 @@ import styles from './index.module.scss';
 type Props = {
   name: string
   label: string
-  register: UseFormRegister<FieldValues & any>
+  value?: string
+  register?: UseFormRegister<FieldValues & any>
   required?: boolean
-  error: any
+  error?: any
   type?: 'text' | 'number' | 'password' | 'email'
   validate?: (value: string) => boolean | string
-  disabled?: boolean
+  disabled?: boolean,
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export const Input: React.FC<Props> = ({
   name,
   label,
+  value = '',
   required,
   register,
   error,
   type = 'text',
   validate,
   disabled,
+  onChange,
 }) => {
+  const registerProps = register
+    ? register(name, {
+        required,
+        validate,
+        ...(type === 'email'
+          ? {
+              pattern: {
+                value: /\S+@\S+\.\S+/,
+                message: 'Please enter a valid email',
+              },
+            }
+          : {}),
+      })
+    : {};
+
   return (
     <div>
       <label htmlFor={name} className={styles.formLabel}>
@@ -33,19 +52,10 @@ export const Input: React.FC<Props> = ({
       <input
         className={`${styles.formInput} ${error ? styles.error : ''}`}
         {...{ type }}
-        {...register(name, {
-          required,
-          validate,
-          ...(type === 'email'
-            ? {
-                pattern: {
-                  value: /\S+@\S+\.\S+/,
-                  message: 'Please enter a valid email',
-                },
-              }
-            : {}),
-        })}
+        {...registerProps}
+        value={value}
         disabled={disabled}
+        onChange={onChange}
       />
       {error && (
         <div className={styles.errorMessage}>
