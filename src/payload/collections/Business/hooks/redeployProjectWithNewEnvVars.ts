@@ -18,7 +18,6 @@ export async function redeployProjectWithNewEnvVars({ doc, previousDoc, req }) {
 
   for (const field of fieldsToWatch) {
     if (!isEqual(doc[field], previousDoc[field])) {
-      console.log(doc[field], previousDoc[field])
       const envVarKey = payloadFieldToEnvVarMap[field];
       if (envVarKey) {
         let value = doc[field];
@@ -29,8 +28,6 @@ export async function redeployProjectWithNewEnvVars({ doc, previousDoc, req }) {
       }
     }
   }
-
-  console.log(newEnvVars)
 
   if (newEnvVars.length > 0) {
     const projectId = doc.vercelProjectId;

@@ -7,7 +7,8 @@ import { updateBusinessDetails } from '../utils/payload';
 import { emitToSocket, getAllSocketIds } from '../socketio';
 import { generateAboutPage } from '../utils/gpt';
 import { fetchInstagramData } from '../utils/instagramBio';
-
+import { sendDeploymentEmail } from '../utils/email';
+import { verifySignature } from '../utils/vercel';
 
 export async function signUpRoute(req, res) {
     try {
@@ -66,9 +67,9 @@ export async function signUpRoute(req, res) {
           instagramHandle: sanitizedInstagramHandle,
           email
       };
-      console.log('-----BEFORE CREATE BUSINESS ENTRY-----');
+
       await createBusinessEntry(businessDetails);
-      console.log('-----REACHED HERE-----');
+
       Promise.resolve().then(() => {
         setUpBusinessDetailsAndPosts(userId.toString(), sanitizedInstagramHandle, 4, accessToken).catch(error => {
           console.error('Background process error:', error);
@@ -126,12 +127,61 @@ export const regenerateAboutPage = async(req, res)=>{
         
         const { aboutPage } = aboutPageServices
         const businessDetailsWithDeployment = await startDeployment(userId, instagramHandle, aboutPageServices, updatedBusiness);
-        
+
         res.status(200).send({ message: 'Onboarding completed successfully', data: businessDetailsWithDeployment });
 
     } catch (error) {
         console.error('Onboarding error:', error);
-
         res.status(500).send({ error: 'Error updating page' });
     }
 }
+
+export const vercelDeploymentWebhook = async (req, res) => {
+  try {
+    const isValid = await verifySignature(req);
+    if (!isValid) {
+      return res.status(401).send({ error: 'Invalid signature' });
+    }
+
+    const { deployment } = req.body;
+
+    if (!deployment || !deployment.url) {
+      return res.status(400).send({ error: 'Invalid deployment data' });
+    }
+
+    const productionURL = deployment.url;
+    const projectId = deployment.projectId;
+
+    const business = await payload.find({
+      collection: 'business',
+      where: {
+        vercelProjectId: {
+          equals: projectId
+        }
+      }
+    });
+
+    if (business.docs.length === 0) {
+      return res.status(404).send({ error: 'Business not found for this project' });
+    }
+
+    const businessData = business.docs[0];
+
+    const userEmail = businessData.email;
+
+    await sendDeploymentEmail(userEmail.toString(), productionURL);
+
+    await payload.update({
+      collection: 'business',
+      id: businessData.id,
+      data: {
+        vercelProductionURL: productionURL
+      }
+    });
+
+    res.status(200).send({ message: 'Deployment webhook processed successfully' });
+  } catch (error) {
+    console.error('Deployment webhook error:', error);
+    res.status(500).send({ error: 'Deployment webhook processing failed' });
+  }
+};

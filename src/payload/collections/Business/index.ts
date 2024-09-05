@@ -172,6 +172,6 @@ export const Business: CollectionConfig = {
     tenant,
   ],
   hooks: {
-    afterChange: [redeployProjectWithNewEnvVars]
+    // afterChange: [redeployProjectWithNewEnvVars]
   }
 };

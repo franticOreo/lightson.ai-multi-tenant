@@ -53,7 +53,7 @@ export const Input: React.FC<Props> = ({
         className={`${styles.formInput} ${error ? styles.error : ''}`}
         {...{ type }}
         {...registerProps}
-        value={value}
+        defaultValue={value}
         disabled={disabled}
         onChange={onChange}
       />
