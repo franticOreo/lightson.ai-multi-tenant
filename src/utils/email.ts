@@ -3,9 +3,10 @@ import sgMail from '@sendgrid/mail';
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export async function sendDeploymentEmail(email: string, productionURL: string) {
+  const senderEmail = process.env.SENDGRID_FROM_EMAIL;
   const msg = {
     to: email,
-    from: 'your-verified-sender@example.com', // Replace with your SendGrid verified sender
+    from: senderEmail,
     subject: 'Your Website is Live!',
     text: `Congratulations! Your website is now live at: ${productionURL}`,
     html: `
