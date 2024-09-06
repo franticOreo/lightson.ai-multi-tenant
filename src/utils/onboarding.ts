@@ -89,19 +89,21 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
   // We create .env file. This .env file is created for a next.js project. This project is a branch of a template website I have created (lightson_template)
   const envVariables = getEnvVariables(userId, instagramHandle, aboutPageServices, businessDetails)
   
-  const branchName = process.env.APP_ENV === 'development' ? `dev-${instagramHandle}` : `${instagramHandle}`;
+  const branchName = process.env.APP_ENV === 'development' ? `dev-${instagramHandle}` : instagramHandle;
   const projectName = branchName;
 
   // setup vercel project using a branch of the main branch from lightson_template
   const projectDeploymentResponse = await setupProjectAndDeploy(branchName, projectName, envVariables)
 
   // Only set deployment data to business collection if running in production.
-  // if (process.env.APP_ENV === 'production') {
-    const deploymentId = projectDeploymentResponse.id;
-    const productionURL = await getProjectProductionURL(deploymentId)
+  if (process.env.APP_ENV === 'production') {
+    // const deploymentId = projectDeploymentResponse.id;
+    // const productionURL = await getProjectProductionURL(deploymentId)
+    const productionURL = projectName.replace(/[^a-zA-Z0-9]/g, '') + '.vercel.app'
 
     const deploymentData = {
       vercelProjectId: projectDeploymentResponse.project.id,
+      vercelDeploymentId: projectDeploymentResponse.id,
       vercelProductionURL: productionURL
     } 
     // update business details with projectDeploymentURL
@@ -110,7 +112,7 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
     if (productionURL) {
       return businessDetailsWithDeployment;
     }
-  // }
+  }
 
   return 'Project Not Deployed: Currently in local development mode.'
 }
@@ -144,4 +146,27 @@ export async function setUpBusinessDetailsAndPosts(payloadUserId: string, instag
     console.error('Error in firstPassBusinessDetails:', error);
     throw error;
   }
+}
+
+export function subscribeToDeploymentStatus(deploymentId: string, onStatusUpdate: (status: string) => void) {
+  const eventSource = new EventSource(`/api/deployments/status?id=${deploymentId}`);
+
+  eventSource.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.status) {
+      onStatusUpdate(data.status);
+    }
+    if (data.status === 'READY') {
+      eventSource.close();
+    }
+  };
+
+  eventSource.onerror = (error) => {
+    console.error('SSE error:', error);
+    eventSource.close();
+  };
+
+  return () => {
+    eventSource.close();
+  };
 }

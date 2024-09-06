@@ -137,4 +137,3 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
         postUnderstandings
     };
 }
-

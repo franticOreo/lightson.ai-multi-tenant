@@ -2,11 +2,13 @@ import dotenv from 'dotenv'
 import next from 'next'
 import nextBuild from 'next/dist/build'
 import path from 'path'
-import { signUpRoute, onBoardingRoute, regenerateAboutPage, vercelDeploymentWebhook } from './routes/signup';
+import { signUpRoute, onBoardingRoute } from './routes/signup';
 import { createServer } from 'http'
 import { initIO } from './socketio'
 import express from 'express'
 import payload from 'payload'
+import { deployWebsiteRoute, getDeploymentStatusRoute, vercelDeploymentWebhookRoute } from './routes/deployments';
+import { getDeployment } from './utils/vercel';
 
 dotenv.config();
 
@@ -23,18 +25,14 @@ app.use(express.urlencoded({ extended: true }))
 // });
 
 // signup user to our CMS and input their form details into the business collection.
-app.post('/api/signup', (req, res) => {
-  signUpRoute(req, res);
-});
+app.post('/api/signup', signUpRoute);
 
-app.get('/api/onboarding', (req, res) => {
-  onBoardingRoute(req, res);
-});
+app.get('/api/onboarding', onBoardingRoute);
 
-app.post('/api/deployments', regenerateAboutPage)
-
-// Update the vercel deployment webhook route
-app.post('/api/vercel-deployment-webhook', vercelDeploymentWebhook)
+app.post('/api/deployments', deployWebsiteRoute)
+app.get('/api/deployments/status', getDeploymentStatusRoute)
+app.post('/api/deployments/webhook', vercelDeploymentWebhookRoute)
+app.get('/api/deployments', getDeployment)
 
 const start = async (): Promise<void> => {
   await payload.init({

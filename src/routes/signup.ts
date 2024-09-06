@@ -1,14 +1,10 @@
-import { createUser, getUserPostUnderstandings } from '../utils/payload';
+import { createUser } from '../utils/payload';
 import { createBusinessEntry } from '../utils/createBusinessDetails';   
 import payload from 'payload';
+import { setUpBusinessDetailsAndPosts } from '../utils/onboarding';
 import { loginUser } from '../utils/instagramFunctions'; 
-import { getInstagramPostsAndPostToPayload, startDeployment, setUpBusinessDetailsAndPosts } from '../utils/onboarding';
-import { updateBusinessDetails } from '../utils/payload';
 import { emitToSocket, getAllSocketIds } from '../socketio';
-import { generateAboutPage } from '../utils/gpt';
 import { fetchInstagramData } from '../utils/instagramBio';
-import { sendDeploymentEmail } from '../utils/email';
-import { verifySignature } from '../utils/vercel';
 
 export async function signUpRoute(req, res) {
     try {
@@ -110,81 +106,3 @@ export const onBoardingRoute = async(req, res)=>{
     }
 }
 
-export const regenerateAboutPage = async(req, res)=>{
-    try {
-        let { userId, businessId, accessToken, instagramHandle, renewPosts, ...data } = req.body;
-        const updatedBusiness: any = await updateBusinessDetails(businessId, data)
-        
-        const tenantDetails = {
-          tenantId: updatedBusiness.tenant.id,
-          userId: userId
-        }
-
-        const userPosts: any = await getUserPostUnderstandings(userId);
-        const postUnderstandings: string[] = userPosts?.map((post: any) => post.description)
-        
-        const aboutPageServices = {aboutPage: updatedBusiness.aboutPage, serviceList: updatedBusiness.serviceList}
-        
-        const { aboutPage } = aboutPageServices
-        const businessDetailsWithDeployment = await startDeployment(userId, instagramHandle, aboutPageServices, updatedBusiness);
-
-        res.status(200).send({ message: 'Onboarding completed successfully', data: businessDetailsWithDeployment });
-
-    } catch (error) {
-        console.error('Onboarding error:', error);
-        res.status(500).send({ error: 'Error updating page' });
-    }
-}
-
-export const vercelDeploymentWebhook = async (req, res) => {
-  try {
-    const isValid = await verifySignature(req);
-    if (!isValid) {
-      return res.status(401).send({ error: 'Invalid signature' });
-    }
-
-    const { payload } = req.body;
-    const { project, deployment } = payload;
-
-    console.log('===Deployment data:', deployment);
-    if (!deployment || !deployment.url) {
-      return res.status(400).send({ error: 'Invalid deployment data' });
-    }
-
-    const productionURL = deployment.url;
-    const projectId = project.id;
-
-    const business = await payload.find({
-      collection: 'business',
-      where: {
-        vercelProjectId: {
-          equals: projectId
-        }
-      }
-    });
-
-    if (business.docs.length === 0) {
-      return res.status(404).send({ error: 'Business not found for this project' });
-    }
-
-    const businessData = business.docs[0];
-
-    const userEmail = businessData.email;
-
-    console.log('===Production URL:', productionURL);
-    await sendDeploymentEmail(userEmail.toString(), productionURL);
-
-    await payload.update({
-      collection: 'business',
-      id: businessData.id,
-      data: {
-        vercelProductionURL: productionURL
-      }
-    });
-
-    res.status(200).send({ message: 'Deployment webhook processed successfully' });
-  } catch (error) {
-    console.error('Deployment webhook error:', error);
-    res.status(500).send({ error: 'Deployment webhook processing failed' });
-  }
-};

@@ -133,6 +133,7 @@ export interface Business {
   secondaryColor?: string | null;
   vercelProductionURL?: string | null;
   vercelProjectId?: string | null;
+  vercelDeploymentId?: string | null;
   aboutPage?: string | null;
   serviceList?:
     | {

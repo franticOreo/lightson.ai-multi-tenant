@@ -199,12 +199,13 @@ export const payloadFieldToEnvVarMap = {
   }
 
 export async function getProjectProductionURL(deploymentId: string): Promise<string> {
+    const teamId = process.env.VERCEL_TEAM_ID
     const headers = {
       'Authorization': `Bearer ${process.env.VERCEL_TOKEN}`,
       'Content-Type': 'application/json'
     };
   
-    const response = await fetch(`https://api.vercel.com/v13/deployments/${deploymentId}`, { headers });
+    const response = await fetch(`https://api.vercel.com/v13/deployments/${deploymentId}?teamId=${teamId}`, { headers });
     const data = await response.json();
   
     if (!response.ok) {
@@ -216,7 +217,28 @@ export async function getProjectProductionURL(deploymentId: string): Promise<str
     }
   
     return data.url;
-  }
+}
+
+export async function getDeployment(deploymentId: string): Promise<string> {
+    const teamId = process.env.VERCEL_TEAM_ID
+    const headers = {
+      'Authorization': `Bearer ${process.env.VERCEL_TOKEN}`,
+      'Content-Type': 'application/json'
+    };
+  
+    const response = await fetch(`https://api.vercel.com/v13/deployments/${deploymentId}?teamId=${teamId}`, { headers });
+    const data = await response.json();
+  
+    if (!response.ok) {
+      throw new Error(`Error fetching deployments: ${data.error.message}`);
+    }
+
+    if (!data) {
+      throw new Error('No production deployment found');
+    }
+  
+    return data;
+}
 
 export async function verifySignature(req) {
     const payload = JSON.stringify(req.body);

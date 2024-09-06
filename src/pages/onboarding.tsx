@@ -9,10 +9,11 @@ import { InputItem, MultiInput } from '../app/_components/MultiInput';
 import { Timeline } from '../app/_components/Timeline/Timeline';
 import { LoadScript, Autocomplete } from '@react-google-maps/api';
 
-import '../app/_css/onboarding.scss';
 import { ZoomingCircleLoaderWithStyles } from '../app/_components/LoadingShimmer/PageLoader';
 import TipsAndFactsComponent from '../app/_components/TipsAndFacts';
 import { Input } from '../app/_components/Input';
+import { subscribeToDeploymentStatus } from '../utils/onboarding';
+import '../app/_css/onboarding.scss';
 
 const Onboarding = () => {
   const router = useRouter();
@@ -22,6 +23,7 @@ const Onboarding = () => {
   const { userId, accessToken, instagramHandle } = router.query;
   const [businessId, setBusinessId] = useState(null)
   const [productionURL, setProductionURL] = useState(null);
+  const [deploymentId, setDeploymentId] = useState(null);
 
   const [businessName, setBusinessName] = useState('');
   const [businessNameCopy, setBusinessNameCopy] = useState('');
@@ -40,6 +42,7 @@ const Onboarding = () => {
   const [serviceAreaChoice, setServiceAreaChoice] = useState<'happy' | 'custom' | null>('happy');
   const [currentStep, setCurrentStep] = useState(1);
   const [currentFactIndex, setCurrentFactIndex] = useState(0);
+  const [status, setStatus] = useState('');
 
   let intervalId: any;
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
@@ -71,6 +74,17 @@ const Onboarding = () => {
       console.error('Onboarding failed:', error);
     }
   };
+
+  useEffect(() => {
+    if (deploymentId) {
+      const unsubscribe = subscribeToDeploymentStatus(deploymentId, (newStatus) => {
+        console.log(newStatus)
+        setStatus(newStatus);
+      });
+
+      return unsubscribe;
+    }
+  }, [deploymentId]);
 
   useEffect(() => {
     if (socket) {
@@ -124,7 +138,7 @@ const Onboarding = () => {
     setAboutPage(event.target.value);
   };
 
-  const generateAboutPage = async() => {
+  const deployWebsite = async() => {
     handleNextStep();
     
     const updateData = {
@@ -154,8 +168,9 @@ const Onboarding = () => {
         if (response.ok){
             const { message, data } = await response.json()
             console.log(data)
-            const { vercelProductionURL, ...update} = data
+            const { vercelProductionURL, vercelDeploymentId, ...update} = data
             setProductionURL(vercelProductionURL)
+            setDeploymentId(vercelDeploymentId)
             updateStates(update)
             handleNextStep()
         }
@@ -546,13 +561,13 @@ const Onboarding = () => {
                 </div>
                 <div className="button-group">
                     <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary"/>
-                    <Button type="button" label={"Regenerate Site"} disabled={loading} appearance="primary" onClick={generateAboutPage} />
+                    <Button type="button" label={"Regenerate Site"} disabled={loading} appearance="primary" onClick={deployWebsite} />
                 </div>
             </div>
           )}
           {currentStep === 8 && (
             <div>
-              {!loading ? (
+              {!loading && status === 'READY' ? (
                 <div>
                   <h2 className="onboarding-title">Your Site is Ready!</h2>
                   <p>Visit your site at: <a href={`https://${productionURL}`} target="_blank" rel="noopener noreferrer">{productionURL}</a></p>

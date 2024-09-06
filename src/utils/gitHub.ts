@@ -107,7 +107,7 @@ export default async function setupProjectAndDeploy(projectName, branchName, env
     return;
   }
 
-  // if (process.env.APP_ENV === 'production') {
+  if (process.env.APP_ENV === 'production') {
 
     // Create deployment and get project ID
     const deployment = await createDeployment(projectName, branchName);
@@ -121,9 +121,9 @@ export default async function setupProjectAndDeploy(projectName, branchName, env
     const finalDeployment = await createDeployment(projectName, branchName);
 
     return finalDeployment;
-  // } else {
-  //   console.log('Not in production, skipping Vercel deployment')
-  // }
+  } else {
+    console.log('Not in production, skipping Vercel deployment')
+  }
 }
 
 

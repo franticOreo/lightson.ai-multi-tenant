@@ -150,6 +150,15 @@ export const Business: CollectionConfig = {
       },
     },
     {
+      label: "Vercel Deployment ID",
+      name: "vercelDeploymentId",
+      type: "text",
+      required: false,
+      admin: {
+        hidden: false, // Hide this field
+      },
+    },
+    {
       label: "About Page",
       name: "aboutPage",
       type: "textarea",
