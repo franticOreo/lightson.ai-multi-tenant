@@ -3,7 +3,8 @@ import { downloadImageToMemory, uploadImageToCollection, loginUser } from './ins
 import { makePostPrompt, createPostFields, understandImage } from './gpt';
 
 async function sendPostEntryDataToCollection(postEntryData: any, accessToken: string, client_instagram_handle: string) {    // This will be worked on later
-    const protocol = process.env.APP_ENV === 'production' ? 'https' : 'http';
+    // const protocol = process.env.APP_ENV === 'production' ? 'https' : 'http';
+    const protocol = 'https'
 
     try {
       const response = await axios({
@@ -15,7 +16,7 @@ async function sendPostEntryDataToCollection(postEntryData: any, accessToken: st
           'Authorization': `Bearer ${accessToken}`, // Ensure accessToken is passed correctly
         },
       });
-  
+
       return response.data;
     } catch (error) {
       console.error('Failed to create post:', error.response ? error.response.data : error.message);

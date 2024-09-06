@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { updateBranchFromMain } from "./gitHub";
 
 const teamId = process.env.VERCEL_TEAM_ID
@@ -29,15 +30,16 @@ export function prepareEnvVariables(businessDetails: any) {
 
 export const createDeployment = async (vercelProjectName, gitBranchName) => {
     const apiUrl = `https://api.vercel.com/v12/now/deployments?teamId=${teamId}`;
+    const token = process.env.VERCEL_TOKEN
 
     const data = JSON.stringify({
       name: vercelProjectName,
       projectSettings: {
         framework: 'nextjs',
-        installCommand: 'npm install', // Default install command
-        buildCommand: 'npm run build', // Default build command for Next.js
+        installCommand: 'npm install',
+        buildCommand: 'npm run build',
       },
-      target: 'production', // or 'preview'
+      target: 'production',
       gitSource: {
         type: 'github',
         ref: gitBranchName,
@@ -60,6 +62,28 @@ export const createDeployment = async (vercelProjectName, gitBranchName) => {
     }
   
     const jsonResponse = await response.json();
+    const validDomainName = vercelProjectName.replace(/[^a-zA-Z0-9]/g, '-');
+    const domainRequest = await fetch(`https://api.vercel.com/v10/projects/${vercelProjectName}/domains?teamId=${teamId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        name: `${validDomainName}.vercel.app`
+      })
+    })
+
+    const domainResponse = await domainRequest.json();
+
+    console.log('Domain response:', domainResponse);
+
+    // console.log('Deployment created:', {
+    //     id: jsonResponse.id,
+    //     url: jsonResponse.url,
+    //     state: jsonResponse.state
+    // });
+
     return jsonResponse;
   };
   
@@ -207,4 +231,13 @@ export async function getProjectProductionURL(deploymentId: string): Promise<str
     }
   
     return data.url;
+  }
+
+export async function verifySignature(req) {
+    const payload = await req.text();
+    const signature = crypto
+      .createHmac('sha1', process.env.WEBHOOK_SECRET)
+      .update(payload)
+      .digest('hex');
+    return signature === req.headers['x-vercel-signature'];
   }

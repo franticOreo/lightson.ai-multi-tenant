@@ -2,16 +2,13 @@ import dotenv from 'dotenv'
 import next from 'next'
 import nextBuild from 'next/dist/build'
 import path from 'path'
-import { signUpRoute, onBoardingRoute, regenerateAboutPage } from './routes/signup';
-
+import { signUpRoute, onBoardingRoute, regenerateAboutPage, vercelDeploymentWebhook } from './routes/signup';
 import { createServer } from 'http'
 import { initIO } from './socketio'
-
-
-dotenv.config();
-
 import express from 'express'
 import payload from 'payload'
+
+dotenv.config();
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -21,9 +18,9 @@ const httpServer = createServer(app)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.get('/', (req, res) => {
-  res.redirect('/join-waitlist');
-});
+// app.get('/', (req, res) => {
+//   res.redirect('/join-waitlist');
+// });
 
 // signup user to our CMS and input their form details into the business collection.
 app.post('/api/signup', (req, res) => {
@@ -36,6 +33,8 @@ app.get('/api/onboarding', (req, res) => {
 
 app.post('/api/deployments', regenerateAboutPage)
 
+// Update the vercel deployment webhook route
+app.post('/api/vercel-deployment-webhook', vercelDeploymentWebhook)
 
 const start = async (): Promise<void> => {
   await payload.init({

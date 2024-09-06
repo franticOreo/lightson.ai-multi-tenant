@@ -1,5 +1,5 @@
 // onboarding.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useSocket } from '../hooks/useSocket';
 import { ChromePicker } from 'react-color';
@@ -7,19 +7,26 @@ import { Gutter } from '../app/_components/Gutter';
 import { Button } from '../app/_components/Button';
 import { InputItem, MultiInput } from '../app/_components/MultiInput';
 import { Timeline } from '../app/_components/Timeline/Timeline';
+import { LoadScript, Autocomplete } from '@react-google-maps/api';
 
 import '../app/_css/onboarding.scss';
 import { ZoomingCircleLoaderWithStyles } from '../app/_components/LoadingShimmer/PageLoader';
 import TipsAndFactsComponent from '../app/_components/TipsAndFacts';
+import { Input } from '../app/_components/Input';
 
 const Onboarding = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const { socket, sendMessage } = useSocket();
   const { userId, accessToken, instagramHandle } = router.query;
   const [businessId, setBusinessId] = useState(null)
   const [productionURL, setProductionURL] = useState(null);
 
+  const [businessName, setBusinessName] = useState('');
+  const [businessNameCopy, setBusinessNameCopy] = useState('');
+  const [serviceArea,setServiceArea] = useState('');
+  const [serviceAreaCopy, setServiceAreaCopy] = useState('');
   const [primaryColor, setPrimaryColor] = useState('#fff');
   const [secondaryColor, setSecondaryColor] = useState('#fff');
   const [keywords, setKeywords] = useState([]);
@@ -29,10 +36,13 @@ const Onboarding = () => {
   const [keywordsChoice, setKeywordsChoice] = useState<'happy' | 'custom' | null>('happy');
   const [aboutPageChoice, setAboutPageChoice] = useState<'happy' | 'custom' | null>('happy');
   const [servicesChoice, setServicesChoice] = useState<'happy' | 'custom' | null>('happy');
+  const [businessNameChoice, setBusinessNameChoice] = useState<'happy' | 'custom' | null>('happy');
+  const [serviceAreaChoice, setServiceAreaChoice] = useState<'happy' | 'custom' | null>('happy');
   const [currentStep, setCurrentStep] = useState(1);
   const [currentFactIndex, setCurrentFactIndex] = useState(0);
 
   let intervalId: any;
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   
   const handleOnboarding = async (userId, accessToken) => {
     try {
@@ -53,6 +63,7 @@ const Onboarding = () => {
         updateStates(data)
 
         if (data.primaryColor && data.secondaryColor && data.keywords.length && data.serviceList.length) {
+          setPageLoading(false)
           clearInterval(intervalId);
         }
       }
@@ -70,8 +81,6 @@ const Onboarding = () => {
       handleOnboarding(userId, accessToken);
       let count = 1
       intervalId = setInterval(() => {
-        count += 2;
-        console.log(count)
         handleOnboarding(userId, accessToken);
       }, 2000);
     }
@@ -85,16 +94,23 @@ const Onboarding = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (currentStep === 5 && (businessName !== businessNameCopy)) {
+      setAboutPage(aboutPage.replaceAll(businessNameCopy, businessName))
+    }
+  }, [currentStep])
 
   const updateStates = (data: any)=>{
     setBusinessId(data.id)
+    setBusinessName(data.businessName || '')
+    setBusinessNameCopy(data.businessName || '')
+    setServiceArea(data.serviceArea || '')
     setPrimaryColor(data.primaryColor || '#fff'); // Prepopulate primary color
     setSecondaryColor(data.secondaryColor || '#fff'); // Prepopulate secondary color
     setKeywords(data.keywords?.map(keyword => keyword.keyword) || []);
     setServiceList(data.serviceList?.map(service => service.service) || []);
     setAboutPage(data.aboutPage || '')
   }
-
 
   const handleNextStep = () => {
     setCurrentStep(currentStep + 1);
@@ -110,6 +126,7 @@ const Onboarding = () => {
 
   const generateAboutPage = async() => {
     handleNextStep();
+    
     const updateData = {
         userId,
         accessToken,
@@ -120,6 +137,8 @@ const Onboarding = () => {
         aboutPage,
         keywords: keywords.map(keyword => ({ keyword })),
         serviceList: serviceList.map(service => ({ service })),
+        businessName,
+        serviceArea,
         renewPosts: false
     }
 
@@ -143,9 +162,22 @@ const Onboarding = () => {
     } catch (error) {
         console.log('Error updating about page:', error);
     } finally {
-        setLoading(false);}
+        setLoading(false);
+    }
   }
+
+  const handlePlaceChanged = () => {
+    if (autocompleteRef.current) {
+      const place = autocompleteRef.current.getPlace();
+      if (place.formatted_address) {
+        setServiceArea(place.formatted_address);
+      }
+    }
+  };
+
   const steps = [
+    'Business Name',
+    'Service Area',
     'Theme Colors',
     'Keywords',
     'About Your Business',
@@ -165,6 +197,75 @@ const Onboarding = () => {
       <div className="onboarding-card">
         <div className="form-container">
           {currentStep === 1 && (
+            <>
+              {(businessName === '' && pageLoading) ?
+              <ZoomingCircleLoaderWithStyles />
+              : 
+              <>
+              <h2 className="onboarding-title">Business Name</h2>
+              {businessNameChoice === 'happy' ? (
+                <div className="color-prompt">
+                  <p>What do you think of this name?</p>
+                  <h3 style={{textAlign: 'start'}}>{businessName}</h3>
+                  {(businessName !== '') ?
+                    <div className="button-group">
+                      <Button
+                        type="button"
+                        label="Happy with them"
+                        onClick={() => { handleNextStep(); }}
+                        appearance="positive"
+                      />
+                      <Button
+                        type="button"
+                        label="I'll pick my own"
+                        onClick={() => setBusinessNameChoice('custom')}
+                        appearance="secondary"
+                      />
+                    </div>
+                  : null
+                  }
+                </div>
+              )
+              : (
+                <div className="form">
+                  <Input
+                    name="businessName"
+                    label="Enter your business name"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                  />
+                  <Button type="button" label="Next" appearance="primary" className="next-button" onClick={handleNextStep}/>
+                </div>
+              )}
+              </>
+              }
+            </>
+          )}
+          {currentStep === 2 && (
+            <>
+              <h2 className="onboarding-title">Service Area</h2>
+              <div className="form">
+              <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''} libraries={['places']}>
+                  <Autocomplete
+                    onLoad={autocomplete => (autocompleteRef.current = autocomplete)}
+                    onPlaceChanged={handlePlaceChanged}
+                  >
+                    <Input
+                      name="serviceArea"
+                      label="Where do you provide your services?"
+                      value={serviceArea}
+                      onChange={(e) => setServiceArea(e.target.value)}
+                    />
+                  </Autocomplete>
+                </LoadScript>
+              </div>
+              <div className="button-group">
+                <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary" />
+                <Button type="button" label="Next" appearance="primary" onClick={handleNextStep}/>
+              </div>
+            </>
+          )}
+          {currentStep === 3 && (
             <>
               {(primaryColor === '#fff' && secondaryColor === '#fff') ?
               <ZoomingCircleLoaderWithStyles />
@@ -220,12 +321,15 @@ const Onboarding = () => {
                         <ChromePicker color={secondaryColor} onChange={updatedColor => setSecondaryColor(updatedColor.hex)} />
                         </div>
                     </div>
-                    <Button type="button" label="Next" appearance="primary" className="next-button" onClick={handleNextStep}/>
+                    <div className="button-group">
+                      <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary" />
+                      <Button type="button" label="Next" appearance="primary" onClick={handleNextStep}/>
+                    </div>
                 </div>
               )}
             </>
           )}
-          {currentStep === 2 && (
+          {currentStep === 4 && (
             <>
             {!keywords.length ?
               <ZoomingCircleLoaderWithStyles />
@@ -272,7 +376,7 @@ const Onboarding = () => {
             )}
             </>
           )}
-          {currentStep === 3 && ( 
+          {currentStep === 5 && ( 
             <>
             {!aboutPage?
               <ZoomingCircleLoaderWithStyles />
@@ -332,7 +436,7 @@ const Onboarding = () => {
             )}
             </>
           )}
-          {currentStep === 4 && (
+          {currentStep === 6 && (
             <>
             {!serviceList.length ?
               <ZoomingCircleLoaderWithStyles />
@@ -379,9 +483,23 @@ const Onboarding = () => {
             )}
             </>
           )}
-          {currentStep === 5 && (
+          {currentStep === 7 && (
             <div>
                 <h2 className="onboarding-title">Preview Your Changes</h2>
+                <Input
+                    name="businessName"
+                    label="Your Business Name"
+                    value={businessName}
+                    disabled={true}
+                />
+                <hr />
+                <Input
+                    name="serviceArea"
+                    label="Your Service Area"
+                    value={serviceArea}
+                    disabled={true}
+                />
+                <hr />
                 <div>
                     <strong>Your Color Pallete</strong>
                     <div className="total-preview-colors">
@@ -432,7 +550,7 @@ const Onboarding = () => {
                 </div>
             </div>
           )}
-          {currentStep === 6 && (
+          {currentStep === 8 && (
             <div>
               {!loading ? (
                 <div>

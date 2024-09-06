@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Unbounded:wght@300;700&display=swap');
+
+header {
+    display: flex;
+    flex-direction: column;
+    margin-block-end: 50px;
+    gap: 50px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+
+    button {
+        padding: 15px 30px;
+        background: #D9D9D9;
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 15px;
+        text-align: left;
+        color: #000000;
+        border-radius: 13px;
+        border: none;
+        text-align: center;
+    }
+}
+
+h2 {
+    font-family: 'Unbounded';
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 59.52px;
+    text-align: left;
+    color: #000000;
+
+    span {
+        font-size: 40px;
+        line-height: 50px;
+    }
+}
+
+hr {
+    border: 3px solid #000000;
+}
+
+section {
+    margin-block-start: 100px;
+}
+
+section.instagram-posts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    overflow: hidden;
+}
+
+.pointing_website {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    max-inline-size: 100vmin;
+}
+
+.pointing_website img {
+    z-index: 10;
+    max-width: 100%;
+    height: auto;
+}
+
+img.website-preview {
+    margin-left: -50px;
+    z-index: 0;
+    max-width: 100%;
+    height: auto;
+}
+
+section.services {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    justify-content: center;
+    text-align: center;
+    align-items: flex-end;
+    gap: 70px;
+    justify-items: center;
+}
+
+.service .title {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 19px;
+    text-align: center;
+    color: #000000;
+    margin-block: 30px 10px;
+}
+
+.service .description {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 19px;
+    text-align: center;
+    color: #000000;
+}
+
+@media (max-width: 768px) {
+    h2 {
+        font-size: 36px;
+        line-height: 45px;
+
+        span {
+            font-size: 30px;
+            line-height: 40px;
+        }
+    }
+
+    .header-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .header-content button {
+        width: 100%;
+        text-align: center;
+    }
+
+    section.services {
+        gap: 40px;
+    }
+
+    .service .title {
+        font-size: 14px;
+        line-height: 17px;
+    }
+
+    .service .description {
+        font-size: 12px;
+        line-height: 16px;
+    }
+}
+
