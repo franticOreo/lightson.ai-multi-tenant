@@ -12,8 +12,8 @@ import { LoadScript, Autocomplete } from '@react-google-maps/api';
 import { ZoomingCircleLoaderWithStyles } from '../app/_components/LoadingShimmer/PageLoader';
 import TipsAndFactsComponent from '../app/_components/TipsAndFacts';
 import { Input } from '../app/_components/Input';
-import { subscribeToDeploymentStatus } from '../utils/onboarding';
 import '../app/_css/onboarding.scss';
+import { subscribeToDeploymentStatus } from '../utils/common';
 
 const Onboarding = () => {
   const router = useRouter();

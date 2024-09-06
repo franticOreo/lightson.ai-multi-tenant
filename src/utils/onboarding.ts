@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 import path from 'path';
 import setupProjectAndDeploy from './gitHub';
 import { generateAboutPage } from './gpt';
-import { getProjectProductionURL } from './vercel';
 import { updateBusinessDetails, getBusinessDetailsByUserId, handleTenantCreation } from './payload';
 
 dotenv.config({
@@ -146,27 +145,4 @@ export async function setUpBusinessDetailsAndPosts(payloadUserId: string, instag
     console.error('Error in firstPassBusinessDetails:', error);
     throw error;
   }
-}
-
-export function subscribeToDeploymentStatus(deploymentId: string, onStatusUpdate: (status: string) => void) {
-  const eventSource = new EventSource(`/api/deployments/status?id=${deploymentId}`);
-
-  eventSource.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    if (data.status) {
-      onStatusUpdate(data.status);
-    }
-    if (data.status === 'READY') {
-      eventSource.close();
-    }
-  };
-
-  eventSource.onerror = (error) => {
-    console.error('SSE error:', error);
-    eventSource.close();
-  };
-
-  return () => {
-    eventSource.close();
-  };
 }
