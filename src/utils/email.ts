@@ -16,10 +16,12 @@ export async function sendDeploymentEmail(email: string, productionURL: string) 
     `,
   };
 
+  console.log('===Sending deployment email:', JSON.stringify(msg));
+
   try {
     await sgMail.send(msg);
     console.log('Deployment email sent successfully');
   } catch (error) {
-    console.error('Error sending deployment email:', error);
+    console.error('Error sending deployment email:', JSON.stringify(error));
   }
 }
