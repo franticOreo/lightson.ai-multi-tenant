@@ -42,7 +42,7 @@ export async function getDeploymentStatusRoute(req, res){
         return;
       }
 
-      setTimeout(sendStatus, 5000);
+      setTimeout(sendStatus, 3000);
     } catch (error) {
       console.error('Error fetching deployment status:', error);
       res.write(`data: ${JSON.stringify({ error: 'Failed to fetch deployment status' })}\n\n`);
