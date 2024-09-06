@@ -99,7 +99,7 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
     // const deploymentId = projectDeploymentResponse.id;
     // const productionURL = await getProjectProductionURL(deploymentId)
     const productionURL = projectName.replace(/[^a-zA-Z0-9]/g, '') + '.vercel.app'
-
+    console.log('===Production URL:', productionURL)
     const deploymentData = {
       vercelProjectId: projectDeploymentResponse.project.id,
       vercelDeploymentId: projectDeploymentResponse.id,
