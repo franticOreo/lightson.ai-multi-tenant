@@ -556,7 +556,7 @@ const Onboarding = () => {
                 </div>
                 <div className="button-group">
                     <Button type="button" label="Previous" onClick={handlePreviousStep} appearance="secondary"/>
-                    <Button type="button" label={"Regenerate Site"} disabled={loading} appearance="primary" onClick={deployWebsite} />
+                    <Button type="button" label={"Deploy website"} disabled={loading} appearance="primary" onClick={deployWebsite} />
                 </div>
             </div>
           )}
@@ -564,7 +564,7 @@ const Onboarding = () => {
             <div>
               {!loading && status === 'READY' ? (
                 <div>
-                  <h2 className="onboarding-title">Your Site is Ready!</h2>
+                  <h2 className="onboarding-title">Your Website is Ready!</h2>
                   <p>Visit your site at: <a href={`https://${productionURL}`} target="_blank" rel="noopener noreferrer">{productionURL}</a></p>
                 </div>
               ) : 

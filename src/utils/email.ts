@@ -1,5 +1,6 @@
 import sgMail from '@sendgrid/mail';
 
+console.log('===SENDGRID_API_KEY:', process.env.SENDGRID_API_KEY);
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export async function sendDeploymentEmail(email: string, productionURL: string) {
@@ -22,6 +23,6 @@ export async function sendDeploymentEmail(email: string, productionURL: string) 
     await sgMail.send(msg);
     console.log('Deployment email sent successfully');
   } catch (error) {
-    console.error('Error sending deployment email:', JSON.stringify(error));
+    console.error('Error sending deployment email:', JSON.stringify(error?.response?.body));
   }
 }
