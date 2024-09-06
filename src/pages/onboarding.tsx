@@ -1,7 +1,7 @@
 // onboarding.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { useSocket } from '../hooks/useSocket';
+// import { useSocket } from '../hooks/useSocket';
 import { ChromePicker } from 'react-color';
 import { Gutter } from '../app/_components/Gutter';
 import { Button } from '../app/_components/Button';
@@ -19,7 +19,7 @@ const Onboarding = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
-  const { socket, sendMessage } = useSocket();
+  // const { socket, sendMessage } = useSocket();
   const { userId, accessToken, instagramHandle } = router.query;
   const [businessId, setBusinessId] = useState(null)
   const [productionURL, setProductionURL] = useState(null);
@@ -87,10 +87,6 @@ const Onboarding = () => {
   }, [deploymentId]);
 
   useEffect(() => {
-    if (socket) {
-      sendMessage('text', 'Message from the client');
-    }
-
     if (userId && accessToken) {
       handleOnboarding(userId, accessToken);
       let count = 1
@@ -98,7 +94,7 @@ const Onboarding = () => {
         handleOnboarding(userId, accessToken);
       }, 2000);
     }
-  }, [socket, userId, accessToken]);
+  }, [userId, accessToken]);
   
   useEffect(() => {
     const interval = setInterval(() => {
@@ -124,6 +120,8 @@ const Onboarding = () => {
     setKeywords(data.keywords?.map(keyword => keyword.keyword) || []);
     setServiceList(data.serviceList?.map(service => service.service) || []);
     setAboutPage(data.aboutPage || '')
+    setProductionURL(data.vercelProductionURL || null)
+    setDeploymentId(data.vercelDeploymentId || null)
   }
 
   const handleNextStep = () => {
@@ -168,10 +166,7 @@ const Onboarding = () => {
         if (response.ok){
             const { message, data } = await response.json()
             console.log(data)
-            const { vercelProductionURL, vercelDeploymentId, ...update} = data
-            setProductionURL(vercelProductionURL)
-            setDeploymentId(vercelDeploymentId)
-            updateStates(update)
+            updateStates(data)
             handleNextStep()
         }
     } catch (error) {

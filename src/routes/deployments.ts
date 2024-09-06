@@ -4,6 +4,7 @@ import { updateBusinessDetails } from '../utils/payload';
 import { getDeployment } from '../utils/vercel';
 import { sendDeploymentEmail } from '../utils/email';
 import { verifySignature } from '../utils/vercel';
+import payload from 'payload';
 
 export async function getDeploymentRoute(req, res){
   const { id } = req.query;
@@ -41,7 +42,7 @@ export async function getDeploymentStatusRoute(req, res){
         return;
       }
 
-      setTimeout(sendStatus, 3000);
+      setTimeout(sendStatus, 5000);
     } catch (error) {
       console.error('Error fetching deployment status:', error);
       res.write(`data: ${JSON.stringify({ error: 'Failed to fetch deployment status' })}\n\n`);
@@ -85,16 +86,13 @@ try {
     return res.status(401).send({ error: 'Invalid signature' });
   }
 
-  const { payload } = req.body;
-  const { project, deployment } = payload;
+  const { deployment } = req?.body?.payload;
 
   console.log('===Deployment data:', deployment);
   if (!deployment || !deployment.url) {
     return res.status(400).send({ error: 'Invalid deployment data' });
   }
-
-  // const productionURL = deployment.url;
-
+  
   const business = await payload.find({
     collection: 'business',
     where: {
@@ -114,7 +112,7 @@ try {
   const productionURL = businessData.vercelProductionURL;
 
   console.log('===Production URL:', productionURL);
-  await sendDeploymentEmail(userEmail.toString(), productionURL);
+  await sendDeploymentEmail(userEmail.toString(), productionURL.toString());
 
   res.status(200).send({ message: 'Deployment webhook processed successfully' });
 } catch (error) {
