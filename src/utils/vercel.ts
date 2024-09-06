@@ -221,8 +221,6 @@ export async function getProjectProductionURL(deploymentId: string): Promise<str
 export async function verifySignature(req) {
     const payload = JSON.stringify(req.body);
     const webhookSecret = process.env.WEBHOOK_SECRET;
-    console.log('===Webhook payload:', payload);
-    console.log('===Webhook Secret:', webhookSecret);
     const signature = crypto
       .createHmac('sha1', webhookSecret)
       .update(payload)

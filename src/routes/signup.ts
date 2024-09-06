@@ -138,21 +138,21 @@ export const regenerateAboutPage = async(req, res)=>{
 
 export const vercelDeploymentWebhook = async (req, res) => {
   try {
-    console.log('===Vercel deployment webhook called');
     const isValid = await verifySignature(req);
     if (!isValid) {
-      console.log('===Invalid signature');
       return res.status(401).send({ error: 'Invalid signature' });
     }
 
-    const { deployment } = req.body;
+    const { payload } = req.body;
+    const { project, deployment } = payload;
+
     console.log('===Deployment data:', deployment);
     if (!deployment || !deployment.url) {
       return res.status(400).send({ error: 'Invalid deployment data' });
     }
 
     const productionURL = deployment.url;
-    const projectId = deployment.projectId;
+    const projectId = project.id;
 
     const business = await payload.find({
       collection: 'business',
@@ -170,7 +170,7 @@ export const vercelDeploymentWebhook = async (req, res) => {
     const businessData = business.docs[0];
 
     const userEmail = businessData.email;
-    console.log('===User email:', userEmail);
+
     console.log('===Production URL:', productionURL);
     await sendDeploymentEmail(userEmail.toString(), productionURL);
 
