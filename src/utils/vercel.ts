@@ -62,27 +62,27 @@ export const createDeployment = async (vercelProjectName, gitBranchName) => {
     }
   
     const jsonResponse = await response.json();
-    const validDomainName = vercelProjectName.replace(/[^a-zA-Z0-9]/g, '-');
-    const domainRequest = await fetch(`https://api.vercel.com/v10/projects/${vercelProjectName}/domains?teamId=${teamId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        name: `${validDomainName}.vercel.app`
-      })
-    })
+    // const validDomainName = vercelProjectName.replace(/[^a-zA-Z0-9]/g, '-');
+    // const domainRequest = await fetch(`https://api.vercel.com/v10/projects/${vercelProjectName}/domains?teamId=${teamId}`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': `Bearer ${token}`
+    //   },
+    //   body: JSON.stringify({
+    //     name: `${validDomainName}.vercel.app`
+    //   })
+    // })
 
-    const domainResponse = await domainRequest.json();
+    // const domainResponse = await domainRequest.json();
 
-    console.log('Domain response:', domainResponse);
+    // console.log('Domain response:', domainResponse);
 
-    // console.log('Deployment created:', {
-    //     id: jsonResponse.id,
-    //     url: jsonResponse.url,
-    //     state: jsonResponse.state
-    // });
+    console.log('Deployment created:', {
+        id: jsonResponse.id,
+        url: jsonResponse.url,
+        state: jsonResponse.state
+    });
 
     return jsonResponse;
   };
@@ -234,10 +234,10 @@ export async function getProjectProductionURL(deploymentId: string): Promise<str
   }
 
 export async function verifySignature(req) {
-    const payload = await req.text();
+    const payload = JSON.stringify(req.body);
     const signature = crypto
       .createHmac('sha1', process.env.WEBHOOK_SECRET)
       .update(payload)
       .digest('hex');
     return signature === req.headers['x-vercel-signature'];
-  }
+}
