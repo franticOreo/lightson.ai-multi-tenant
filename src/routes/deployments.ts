@@ -111,7 +111,6 @@ try {
   const userEmail = businessData.email;
   const productionURL = businessData.vercelProductionURL;
 
-  console.log('===Production URL:', productionURL);
   await sendDeploymentEmail(userEmail.toString(), productionURL.toString());
 
   res.status(200).send({ message: 'Deployment webhook processed successfully' });
