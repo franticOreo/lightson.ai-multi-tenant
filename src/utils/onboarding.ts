@@ -20,7 +20,6 @@ export async function handleBusinessDetailsUpdate(businessId: string, businessDe
   const keywords = remainingDetails.SEO_keywords;
   const newBusinessData = {
     tenant: tenantId,
-    instagramHandle,
     businessBio: remainingDetails.business_bio,
     languageStyle: remainingDetails.language_style,
     keywords: Array.isArray(keywords) ? keywords.map(keyword => ({ keyword })) : typeof keywords === 'string' ? keywords.split(', ').map(keyword => ({ keyword })) : [],
@@ -118,15 +117,15 @@ export const startDeployment = async (userId: string, instagramHandle: string, a
 
 
 export async function setUpBusinessDetailsAndPosts(payloadUserId: string, instagramHandle: string, nPosts: number, accessToken: string): Promise<string | void> {
-  // Perform the first generations of the users business details.
-  // These are placeholders that could be altered in the onboarding process.
+  const sanitizedInstagramHandle = instagramHandle.replace('.', '_').replace('@', '').toLowerCase().trim();
+  
   try {
     
     const result: any = await getBusinessDetailsByUserId(payloadUserId);
     
     const businessDetailsData = result.docs[0];
 
-    const tenantDetails = await handleTenantCreation(payloadUserId, instagramHandle);
+    const tenantDetails = await handleTenantCreation(payloadUserId, sanitizedInstagramHandle);
     const tenantId = tenantDetails.tenantId;
 
     const updatedBusinessDetails = await handleBusinessDetailsUpdate(businessDetailsData.id, businessDetailsData, instagramHandle, tenantId);
