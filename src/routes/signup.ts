@@ -67,7 +67,7 @@ export async function signUpRoute(req, res) {
       await createBusinessEntry(businessDetails);
 
       Promise.resolve().then(() => {
-        setUpBusinessDetailsAndPosts(userId.toString(), sanitizedInstagramHandle, 4, accessToken).catch(error => {
+        setUpBusinessDetailsAndPosts(userId.toString(), instagramHandle, 4, accessToken).catch(error => {
           console.error('Background process error:', error);
         });
       });
