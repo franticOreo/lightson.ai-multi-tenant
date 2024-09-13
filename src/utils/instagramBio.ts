@@ -5,7 +5,7 @@ dotenv.config({ path: '.env' });
 
 // Common function to fetch data from the API
 export async function fetchInstagramData(username: string) {
-  const apiKey = "38njcl7axC7jZyTc22qmGb34Nucxk6w2";
+  const apiKey = process.env.HIKER_API_KEY;
   const url = `https://api.hikerapi.com/a2/user?username=${username}`;
 
   try {
