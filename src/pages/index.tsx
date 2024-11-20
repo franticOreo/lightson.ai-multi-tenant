@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 'use client'
 
 import React, { useState } from 'react';
@@ -88,4 +89,12 @@ const HomePage: React.FC = () =>  {
 };
 
 export default HomePage;
+=======
+<<<<<<< Updated upstream
+export default function Home() {
+  return <h1>Home</h1>;
+}
+>>>>>>> Stashed changes
 
+=======
+>>>>>>> Stashed changes
